@@ -188,7 +188,7 @@ export default async function NoticeDetailPage({ params }: PageProps) {
 
             {/* Document Body text paragraphs */}
             <section className="mt-8 text-sm md:text-base text-slate-600 font-medium leading-relaxed space-y-5 px-1 text-justify">
-              {paragraphs.map((p, idx) => (
+              {paragraphs.map((p: string, idx: number) => (
                 <p key={idx} className="indent-0 md:indent-8">
                   {p}
                 </p>
