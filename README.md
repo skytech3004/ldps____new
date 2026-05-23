@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LPS Vidyawadi Website
 
-## Getting Started
+A premium, high-fidelity website for **Leeladevi Parasmal Sancheti English Medium Sr. Sec. School**, a premier girls' residential institution in Vidyawadi, Khimel (Rani), Rajasthan.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### **Frontend**
+- **Modern UI:** Built with Next.js 16 and Tailwind CSS for a professional, responsive experience.
+- **Dynamic Navbar:** Fully integrated navigation for all school wings (About, Academics, Schooling, Gallery).
+- **Custom Pages:** High-fidelity designs for key pages like Scholastic, About LPS, and Leadership desks.
+- **Notice Board:** Interactive, looping marquee for news, announcements, and circulars.
+- **Advanced Facilities Showcase:** Interactive 3x5 grid showcasing 21st-century infrastructure (Robotics, AI, Aeronautics Labs, etc.).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### **Admin Dashboard (`/admin`)**
+- **Notice Management:** Full CRUD for school notices with custom subjects and labeling.
+- **Page Content Manager:** Edit text and sections of static informative pages dynamically.
+- **Events Management:** Create and manage school events with date and image support.
+- **Gallery Manager:** Organize campus photos into categories and albums.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tech Stack
+- **Framework:** Next.js 16 (App Router)
+- **Styling:** Tailwind CSS
+- **Database:** MongoDB (via Mongoose)
+- **Animations:** Framer Motion
+- **Icons:** Lucide React
+- **Deployment:** Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ⚙️ Installation & Setup
 
-## Learn More
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Akashchavda074/ldps.git
+   cd ldps
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Configure Environment Variables:**
+   Create a `.env.local` file in the root directory and add your MongoDB credentials (see `.env.example` for reference).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Run development server:**
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+## 🌍 Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project is optimized for deployment on the **Vercel Platform**.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### **Deployment Steps:**
+1. Connect this repository to your Vercel account.
+2. Add the following Environment Variables in the Vercel dashboard:
+   - `MONGODB_URI`
+   - `MONGODB_DB`
+3. Vercel will automatically handle the build and deployment.
+4. **Analytics & Performance:** Vercel Analytics and Speed Insights are built-in and will be active after deployment.
+
+## 👥 Collaboration
+Managed by **Akashchavda074** and **skytech3004**.
+
+---
+© 2026 LPS Vidyawadi Development Team.
