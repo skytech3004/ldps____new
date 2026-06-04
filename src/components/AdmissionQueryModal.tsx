@@ -40,8 +40,15 @@ export default function AdmissionQueryModal() {
     };
 
     window.addEventListener("open-admission-modal", handleOpen);
+
+    // Auto-open modal on homepage load after a 2-second delay
+    const autoOpenTimer = setTimeout(() => {
+      setIsOpen(true);
+    }, 2000);
+
     return () => {
       window.removeEventListener("open-admission-modal", handleOpen);
+      clearTimeout(autoOpenTimer);
     };
   }, []);
 
