@@ -31,7 +31,7 @@ export default function AdmissionQueryModal() {
   ];
 
   const streamsList = ["Science", "Commerce", "Humanities"];
-  const categoriesList = ["Day Scholar", "Boarder / Hostel"];
+  const categoriesList = ["Day Schoolar", "Boarding", "Hostel Facility"];
 
   useEffect(() => {
     const handleOpen = () => {
