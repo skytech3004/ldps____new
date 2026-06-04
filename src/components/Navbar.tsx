@@ -197,13 +197,13 @@ export default function Navbar() {
               >
                 Fee Payment
               </Link>
-              <Link 
-                href="/apply-for-admission"
+              <button 
+                onClick={() => window.dispatchEvent(new Event("open-admission-modal"))}
                 className="bg-accent text-primary font-extrabold text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wider px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-accent-hover hover:scale-[1.03] transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.25)] hover:shadow-[0_6px_16px_rgba(247,184,1,0.35)] whitespace-nowrap"
               >
                 <span className="xs:hidden">Admission</span>
                 <span className="hidden xs:inline">Admission Query</span>
-              </Link>
+              </button>
             </div>
 
             {/* Mobile Hamburger Toggle - Visible on mobile/tablet (< xl) */}
@@ -292,13 +292,15 @@ export default function Navbar() {
                   >
                     Fee Payment
                   </Link>
-                  <Link 
-                    href="/apply-for-admission"
+                  <button 
+                    onClick={() => {
+                      setIsOpen(false);
+                      window.dispatchEvent(new Event("open-admission-modal"));
+                    }}
                     className="bg-accent text-primary w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider hover:scale-[1.02] transition-all shadow-md shadow-accent/10 text-center block"
-                    onClick={() => setIsOpen(false)}
                   >
                     Admission Query
-                  </Link>
+                  </button>
                 </div>
               </div>
             </motion.div>

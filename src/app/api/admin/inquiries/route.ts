@@ -27,6 +27,9 @@ export async function POST(request: Request) {
       streamSelected: body.streamSelected ?? "",
       address: body.address ?? "",
       reason: body.reason ?? "",
+      admissionCategory: body.admissionCategory ?? "",
+      whatsAppNo: body.whatsAppNo ?? "",
+      city: body.city ?? "",
       status: "New Inquiry",
       notes: ""
     });

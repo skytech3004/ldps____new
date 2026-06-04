@@ -42,6 +42,21 @@ const InquirySchema = new Schema(
       default: "",
       trim: true,
     },
+    admissionCategory: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    whatsAppNo: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    city: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     status: {
       type: String,
       default: "New Inquiry",

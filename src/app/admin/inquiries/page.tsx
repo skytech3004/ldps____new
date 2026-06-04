@@ -29,10 +29,13 @@ interface Inquiry {
   parentName: string;
   studentName: string;
   contactNo: string;
+  whatsAppNo?: string;
   emailId: string;
   classApplied: string;
   streamSelected?: string;
   address?: string;
+  city?: string;
+  admissionCategory?: string;
   reason?: string;
   status: string;
   notes: string;
@@ -258,9 +261,15 @@ export default function AdminInquiriesPage() {
                     <td className="py-4.5 px-6">
                       <p className="font-black text-white">{inquiry.studentName}</p>
                       <p className="text-xs text-white/60 mt-0.5">Parent: {inquiry.parentName}</p>
+                      {inquiry.admissionCategory && (
+                        <p className="text-[10px] text-accent/80 font-bold mt-0.5">Category: {inquiry.admissionCategory}</p>
+                      )}
                     </td>
-                    <td className="py-4.5 px-6">
-                      <p className="font-semibold text-white/90">{inquiry.contactNo}</p>
+                    <td className="py-4.5 px-6 font-medium">
+                      <p className="text-white/90">Mob: {inquiry.contactNo}</p>
+                      {inquiry.whatsAppNo && inquiry.whatsAppNo !== inquiry.contactNo && (
+                        <p className="text-xs text-green-400 mt-0.5">WA: {inquiry.whatsAppNo}</p>
+                      )}
                       <p className="text-xs text-white/50 mt-0.5">{inquiry.emailId}</p>
                     </td>
                     <td className="py-4.5 px-6">
@@ -268,6 +277,9 @@ export default function AdminInquiriesPage() {
                         {inquiry.classApplied}
                         {inquiry.streamSelected ? ` (${inquiry.streamSelected})` : ""}
                       </span>
+                      {(inquiry.city || inquiry.address) && (
+                        <p className="text-xs text-white/60 mt-0.5">City: {inquiry.city || inquiry.address}</p>
+                      )}
                     </td>
                     <td className="py-4.5 px-6 text-white/60 font-medium">
                       {new Date(inquiry.createdAt).toLocaleDateString("en-US", {
@@ -357,6 +369,12 @@ export default function AdminInquiriesPage() {
                           {selectedInquiry.streamSelected ? ` (${selectedInquiry.streamSelected} Stream)` : ""}
                         </span>
                       </div>
+                      {selectedInquiry.admissionCategory && (
+                        <div>
+                          <span className="text-[10px] text-white/50 block uppercase">Admission Category</span>
+                          <span className="font-bold text-white">{selectedInquiry.admissionCategory}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -372,6 +390,15 @@ export default function AdminInquiriesPage() {
                           <a href={`tel:${selectedInquiry.contactNo}`} className="text-white hover:underline">{selectedInquiry.contactNo}</a>
                         </div>
                       </div>
+                      {selectedInquiry.whatsAppNo && (
+                        <div className="flex gap-2.5 items-center">
+                          <Phone size={14} className="text-green-400 shrink-0" />
+                          <div>
+                            <span className="text-[9px] text-white/40 block uppercase">WhatsApp Phone</span>
+                            <a href={`https://wa.me/${selectedInquiry.whatsAppNo}`} target="_blank" rel="noopener noreferrer" className="text-white hover:underline">{selectedInquiry.whatsAppNo}</a>
+                          </div>
+                        </div>
+                      )}
                       <div className="flex gap-2.5 items-center">
                         <Mail size={14} className="text-accent shrink-0" />
                         <div className="min-w-0">
@@ -382,8 +409,8 @@ export default function AdminInquiriesPage() {
                       <div className="flex gap-2.5 items-start">
                         <MessageSquare size={14} className="text-accent shrink-0 mt-0.5" />
                         <div>
-                          <span className="text-[9px] text-white/40 block uppercase">Postal Residence Address</span>
-                          <span className="text-white/80">{selectedInquiry.address || "Not Provided"}</span>
+                          <span className="text-[9px] text-white/40 block uppercase">City & Address</span>
+                          <span className="text-white/80">{selectedInquiry.city || selectedInquiry.address || "Not Provided"}</span>
                         </div>
                       </div>
                     </div>

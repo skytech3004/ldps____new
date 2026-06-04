@@ -7,6 +7,8 @@ import CategoryGrid from "@/components/CategoryGrid";
 import StaggeredStats from "@/components/StaggeredStats";
 import LifeAtGis from "@/components/LifeAtGis";
 import Footer from "@/components/Footer";
+import AdmissionQueryModal from "@/components/AdmissionQueryModal";
+import FloatingAdmissionButton from "@/components/FloatingAdmissionButton";
 
 export default function Home() {
   return (
@@ -30,6 +32,10 @@ export default function Home() {
       <LifeAtGis />
 
       <Footer />
+
+      {/* Modern Admissions Overlays */}
+      <AdmissionQueryModal />
+      <FloatingAdmissionButton />
     </main>
   );
 }
