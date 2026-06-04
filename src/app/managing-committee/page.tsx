@@ -64,7 +64,7 @@ export default function ManagingCommittee() {
             <span>/</span>
             <span className="text-white/80">Managing Committee</span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-black font-montserrat uppercase tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-black font-montserrat uppercase tracking-tight text-accent">
             Managing Committee & Staff
           </h1>
           <p className="text-white/60 font-medium text-xs md:text-sm max-w-xl">

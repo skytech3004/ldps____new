@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle } from "lucide-react";
+import { Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle, ClipboardList } from "lucide-react";
 
 const modules = [
   {
@@ -13,6 +13,12 @@ const modules = [
     description: "Edit text, sections, and descriptions of static informative pages across the site.",
     href: "/admin/pages",
     icon: FileText,
+  },
+  {
+    title: "Admission Inquiries",
+    description: "Review, filter, and track parent's admission inquiries and schedule campus follow-ups.",
+    href: "/admin/inquiries",
+    icon: ClipboardList,
   },
   {
     title: "Events Management",

@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Bell, Database, FileText, FolderKanban, Images, LayoutDashboard, LogOut } from "lucide-react";
+import { Bell, Database, FileText, FolderKanban, Images, LayoutDashboard, LogOut, ClipboardList } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/notices", label: "Notice Board", icon: Bell },
   { href: "/admin/pages", label: "Page Content", icon: FileText },
+  { href: "/admin/inquiries", label: "Inquiries", icon: ClipboardList },
   { href: "/admin/events", label: "Events", icon: Database },
   { href: "/admin/galleries", label: "Galleries", icon: Images },
 ];

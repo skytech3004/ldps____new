@@ -23,7 +23,7 @@ export default function DirectorsDesk() {
             <span>/</span>
             <span className="text-white/80">Director&apos;s Desk</span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-black font-montserrat uppercase tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-black font-montserrat uppercase tracking-tight text-accent">
             Director&apos;s Desk
           </h1>
           <p className="text-white/60 font-medium text-xs md:text-sm max-w-xl">

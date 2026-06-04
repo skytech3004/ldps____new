@@ -1,5 +1,5 @@
-import GisStaticPage from "@/components/GisStaticPage";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <GisStaticPage slug="a-day-at-gis" />;
+  redirect("/a-day-at-school");
 }

@@ -44,6 +44,7 @@ function getMappedContent(slug: string) {
     "hostel-care": ["Vidyawadi Support System"],
     meals: ["Vidyawadi Support System"],
     "a-day-at-gis": ["Home", "Vidyawadi Support System"],
+    "a-day-at-school": ["Home", "Vidyawadi Support System"],
     "items-required-by-boarders": ["Vidyawadi Support System"],
     "photo-gallery": ["Gallery"],
     "video-gallery": ["Gallery"],

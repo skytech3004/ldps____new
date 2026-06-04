@@ -31,7 +31,7 @@ export const gisMenuItems: GisMenuItem[] = [
   { title: "Hostel", slug: "hostel", group: "Schooling", sourceUrl: "https://www.gangainternationalschool.com/hostel/" },
   { title: "Hostel Care", slug: "hostel-care", group: "Schooling", sourceUrl: "https://www.gangainternationalschool.com/pastoral-care/" },
   { title: "Meals", slug: "meals", group: "Schooling", sourceUrl: "https://www.gangainternationalschool.com/meals/" },
-  { title: "A Day at GIS", slug: "a-day-at-gis", group: "Schooling", sourceUrl: "https://www.gangainternationalschool.com/a-day-at-gis/" },
+  { title: "A Day at School", slug: "a-day-at-school", group: "Schooling", sourceUrl: "https://www.gangainternationalschool.com/a-day-at-gis/" },
   { title: "Items Required By Boarders", slug: "items-required-by-boarders", group: "Schooling", sourceUrl: "https://www.gangainternationalschool.com/wp-content/uploads/2025/12/Items-required-by-boarders-1.pdf" },
   { title: "Photo Gallery", slug: "photo-gallery", group: "Gallery", sourceUrl: "https://www.gangainternationalschool.com/photo-gallery/" },
   { title: "Video Gallery", slug: "video-gallery", group: "Gallery", sourceUrl: "https://www.gangainternationalschool.com/video-gallery/" },

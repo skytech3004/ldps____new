@@ -47,7 +47,7 @@ const navLinks = [
       { label: "Hostel", href: "/hostel" },
       { label: "Hostel Care", href: "/hostel-care" },
       { label: "Meals", href: "/meals" },
-      { label: "A Day at School", href: "/a-day-at-gis" },
+      { label: "A Day at School", href: "/a-day-at-school" },
       { label: "Items Required By Boarders", href: "/items-required-by-boarders" },
     ],
   },
