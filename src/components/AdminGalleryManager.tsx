@@ -1,22 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { Bell, Download, FolderPlus, Settings, SquarePen, Trash2 } from "lucide-react";
+import { 
+  Bell, 
+  Download, 
+  FolderPlus, 
+  Settings, 
+  SquarePen, 
+  Trash2, 
+  Upload, 
+  Loader2, 
+  ImageIcon
+} from "lucide-react";
 import { schoolImages } from "@/data/lpsVidhyawadiDatabase";
 
-type UploadItem = {
-  id: string;
-  page: string;
-  section: string;
-  title: string;
-  description: string;
-  fileName: string;
-  src: string;
-  uploadedAt: string;
-};
-
 type Album = {
+  _id?: string;
   id: string;
   title: string;
   page: string;
@@ -26,7 +26,6 @@ type Album = {
   photos: string[];
   cover: string;
   featured: boolean;
-  source: "database" | "upload";
 };
 
 const PAGE_OPTIONS = ["All Pages", "home", "about", "contact", "admin"];
@@ -41,10 +40,8 @@ function toDate(dateIso: string) {
 }
 
 function buildBaseAlbums(): Album[] {
-  const logo = schoolImages.find((item) => item.category === "brand");
   const banner = schoolImages.find((item) => item.category === "banner");
   const gallery = schoolImages.filter((item) => item.category === "gallery");
-  const contacts = schoolImages.filter((item) => item.category === "contact");
 
   return [
     {
@@ -57,7 +54,6 @@ function buildBaseAlbums(): Album[] {
       photos: [banner?.src, gallery[0]?.src, gallery[1]?.src].filter(Boolean) as string[],
       cover: banner?.src ?? gallery[0]?.src ?? "/lps-vidhyawadi/about-banner.jpg",
       featured: true,
-      source: "database",
     },
     {
       id: "db-home-gallery",
@@ -69,31 +65,6 @@ function buildBaseAlbums(): Album[] {
       photos: gallery.slice(0, 6).map((item) => item.src),
       cover: gallery[2]?.src ?? "/lps-vidhyawadi/about-banner.jpg",
       featured: false,
-      source: "database",
-    },
-    {
-      id: "db-about-media",
-      title: "About Page Media",
-      page: "about",
-      category: "Cultural",
-      date: "28/11/2025",
-      description: "About page visual media block.",
-      photos: [banner?.src, gallery[3]?.src, gallery[4]?.src].filter(Boolean) as string[],
-      cover: gallery[3]?.src ?? banner?.src ?? "/lps-vidhyawadi/about-banner.jpg",
-      featured: false,
-      source: "database",
-    },
-    {
-      id: "db-contact-assets",
-      title: "Contact Assets",
-      page: "contact",
-      category: "Infrastructure",
-      date: "27/11/2025",
-      description: "Contact and institutional identity assets.",
-      photos: [logo?.src, ...contacts.map((item) => item.src)].filter(Boolean) as string[],
-      cover: logo?.src ?? "/lps-vidhyawadi/logo.jpg",
-      featured: false,
-      source: "database",
     },
   ];
 }
@@ -102,6 +73,8 @@ export default function AdminGalleryManager() {
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [activeCategory, setActiveCategory] = useState("All Categories");
   const [activePage, setActivePage] = useState("All Pages");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [showCategoryEditor, setShowCategoryEditor] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [showNewAlbum, setShowNewAlbum] = useState(false);
@@ -115,58 +88,147 @@ export default function AdminGalleryManager() {
   const [editDate, setEditDate] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [newImageUrl, setNewImageUrl] = useState("");
-  const [uploads, setUploads] = useState<UploadItem[]>([]);
+  
+  // Upload state
+  const [uploading, setUploading] = useState(false);
 
-  const [albums, setAlbums] = useState<Album[]>(buildBaseAlbums());
+  const [albums, setAlbums] = useState<Album[]>([]);
 
-  useEffect(() => {
-    async function loadUploads() {
-      try {
-        const response = await fetch("/data/admin-uploads.json", { cache: "no-store" });
-        if (!response.ok) return;
-        const data = (await response.json()) as { uploads?: UploadItem[] };
-        setUploads(data.uploads ?? []);
-      } catch {
-        setUploads([]);
+  const fetchGalleries = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/galleries");
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      if (data.length > 0) {
+        setAlbums(data);
+      } else {
+        setAlbums(buildBaseAlbums());
       }
+    } catch (err) {
+      console.error(err);
+      setAlbums(buildBaseAlbums());
+    } finally {
+      setLoading(false);
     }
-
-    loadUploads();
   }, []);
 
   useEffect(() => {
-    const imageUploads = uploads.filter((item) => /\.(png|jpe?g|webp|gif|svg)$/i.test(item.src));
-    if (!imageUploads.length) return;
+    fetchGalleries();
+  }, [fetchGalleries]);
 
-    const grouped = new Map<string, UploadItem[]>();
-    for (const item of imageUploads) {
-      const key = `${item.page}-${item.section}`;
-      const previous = grouped.get(key) ?? [];
-      previous.push(item);
-      grouped.set(key, previous);
+  const saveAlbum = async (album: Album) => {
+    setSaving(true);
+    try {
+      const method = album._id ? "PUT" : "POST";
+      const res = await fetch("/api/admin/galleries", {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(album),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      const saved = await res.json();
+      
+      setAlbums(prev => prev.map(a => (a.id === album.id ? saved : a)));
+      if (editorAlbumId === album.id) {
+        setEditorAlbumId(saved.id);
+      }
+    } catch (err) {
+      console.error("Save failed:", err);
+    } finally {
+      setTimeout(() => setSaving(false), 500);
     }
+  };
 
-    const uploadAlbums: Album[] = Array.from(grouped.entries()).map(([key, items]) => {
-      const first = items[0];
-      return {
-        id: `upload-${key}`,
-        title: first.title || `${first.page} / ${first.section}`,
-        page: first.page,
-        category: "Events",
-        date: toDate(first.uploadedAt),
-        description: first.description || "Uploaded media album",
-        photos: items.map((item) => item.src),
-        cover: first.src,
-        featured: false,
-        source: "upload",
+  const deleteAlbum = async (id: string, _id?: string) => {
+    if (!_id) {
+      setAlbums(prev => prev.filter(a => a.id !== id));
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/galleries?id=${_id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete");
+      setAlbums(prev => prev.filter(a => a._id !== _id));
+    } catch (err) {
+      console.error("Delete failed:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const optimizeImage = (file: File): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new (window as any).Image() as HTMLImageElement;
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 1200;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) resolve(blob);
+              else reject(new Error("Canvas to Blob failed"));
+            },
+            "image/webp",
+            0.8
+          );
+        };
       };
+      reader.onerror = (error) => reject(error);
     });
+  };
 
-    setAlbums((previous) => {
-      const withoutUpload = previous.filter((item) => item.source !== "upload");
-      return [...withoutUpload, ...uploadAlbums];
-    });
-  }, [uploads]);
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, targetAlbumId: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const optimizedBlob = await optimizeImage(file);
+      const formData = new FormData();
+      formData.append("file", optimizedBlob, `gallery-${Date.now()}.webp`);
+      formData.append("page", "admin");
+      formData.append("section", "gallery");
+      formData.append("title", "Gallery Image");
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+      const imageUrl = data.upload.src;
+
+      const album = albums.find(a => a.id === targetAlbumId);
+      if (album) {
+        const nextPhotos = [...album.photos, imageUrl];
+        const updatedAlbum = { ...album, photos: nextPhotos, cover: album.cover || imageUrl };
+        setAlbums(prev => prev.map(a => (a.id === targetAlbumId ? updatedAlbum : a)));
+        saveAlbum(updatedAlbum);
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Failed to upload image.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const filteredAlbums = useMemo(() => {
     return albums.filter((album) => {
@@ -178,7 +240,7 @@ export default function AdminGalleryManager() {
 
   function downloadExcelLikeCsv() {
     const rows = [
-      ["Album Title", "Page", "Category", "Date", "Photos", "Cover", "Source", "Featured"],
+      ["Album Title", "Page", "Category", "Date", "Photos", "Cover", "Featured"],
       ...filteredAlbums.map((album) => [
         album.title,
         album.page,
@@ -186,7 +248,6 @@ export default function AdminGalleryManager() {
         album.date,
         String(album.photos.length),
         album.cover,
-        album.source,
         album.featured ? "Yes" : "No",
       ]),
     ];
@@ -213,7 +274,6 @@ export default function AdminGalleryManager() {
 
   function addAlbum() {
     if (!newAlbumTitle.trim()) return;
-    const sourceImage = schoolImages.find((item) => item.category === "gallery")?.src ?? "/lps-vidhyawadi/about-banner.jpg";
     const now = toDate(new Date().toISOString());
     const nextAlbum: Album = {
       id: `custom-${Date.now()}`,
@@ -222,12 +282,12 @@ export default function AdminGalleryManager() {
       category: newAlbumCategory,
       date: now,
       description: "",
-      photos: [sourceImage],
-      cover: sourceImage,
+      photos: [],
+      cover: "",
       featured: false,
-      source: "upload",
     };
     setAlbums((previous) => [nextAlbum, ...previous]);
+    saveAlbum(nextAlbum);
     setNewAlbumTitle("");
     setShowNewAlbum(false);
   }
@@ -248,64 +308,74 @@ export default function AdminGalleryManager() {
     const image = newImageUrl.trim();
     if (!image) return;
 
-    setAlbums((previous) =>
-      previous.map((item) => {
-        if (item.id !== id) return item;
-        const nextPhotos = item.photos.includes(image) ? item.photos : [...item.photos, image];
-        return {
-          ...item,
-          photos: nextPhotos,
-          cover: item.cover || image,
-        };
-      })
-    );
+    const album = albums.find(a => a.id === id);
+    if (album) {
+      const nextPhotos = album.photos.includes(image) ? album.photos : [...album.photos, image];
+      const updatedAlbum = { ...album, photos: nextPhotos, cover: album.cover || image };
+      setAlbums(prev => prev.map(a => (a.id === id ? updatedAlbum : a)));
+      saveAlbum(updatedAlbum);
+    }
     setNewImageUrl("");
   }
 
   function removeImageFromAlbum(id: string, image: string) {
-    setAlbums((previous) =>
-      previous.map((item) => {
-        if (item.id !== id) return item;
-        const nextPhotos = item.photos.filter((photo) => photo !== image);
-        return {
-          ...item,
-          photos: nextPhotos,
-          cover: item.cover === image ? nextPhotos[0] ?? "" : item.cover,
-        };
-      })
-    );
+    const album = albums.find(a => a.id === id);
+    if (album) {
+      const nextPhotos = album.photos.filter((photo) => photo !== image);
+      const updatedAlbum = { 
+        ...album, 
+        photos: nextPhotos, 
+        cover: album.cover === image ? nextPhotos[0] ?? "" : album.cover 
+      };
+      setAlbums(prev => prev.map(a => (a.id === id ? updatedAlbum : a)));
+      saveAlbum(updatedAlbum);
+    }
   }
 
   function setCoverImage(id: string, image: string) {
-    setAlbums((previous) => previous.map((item) => (item.id === id ? { ...item, cover: image } : item)));
+    const album = albums.find(a => a.id === id);
+    if (album) {
+      const updatedAlbum = { ...album, cover: image };
+      setAlbums(prev => prev.map(a => (a.id === id ? updatedAlbum : a)));
+      saveAlbum(updatedAlbum);
+    }
   }
 
   const editorAlbum = useMemo(() => albums.find((item) => item.id === editorAlbumId) ?? null, [albums, editorAlbumId]);
 
   function saveEditedAlbum() {
     if (!editorAlbumId) return;
-    setAlbums((previous) =>
-      previous.map((item) =>
-        item.id === editorAlbumId
-          ? {
-              ...item,
-              title: editTitle.trim() || item.title,
-              category: editCategory,
-              date: editDate.trim() || item.date,
-              description: editDescription.trim(),
-            }
-          : item
-      )
-    );
+    const album = albums.find(a => a.id === editorAlbumId);
+    if (album) {
+      const updatedAlbum = {
+        ...album,
+        title: editTitle.trim() || album.title,
+        category: editCategory,
+        date: editDate.trim() || album.date,
+        description: editDescription.trim(),
+      };
+      setAlbums(prev => prev.map(a => (a.id === editorAlbumId ? updatedAlbum : a)));
+      saveAlbum(updatedAlbum);
+    }
     setEditModalOpen(false);
   }
 
-  function removeAlbum(id: string) {
-    setAlbums((previous) => previous.filter((item) => item.id !== id));
+  function toggleFeatured(id: string) {
+    const album = albums.find(a => a.id === id);
+    if (album) {
+      const updatedAlbum = { ...album, featured: !album.featured };
+      setAlbums(prev => prev.map(a => (a.id === id ? updatedAlbum : a)));
+      saveAlbum(updatedAlbum);
+    }
   }
 
-  function toggleFeatured(id: string) {
-    setAlbums((previous) => previous.map((item) => (item.id === id ? { ...item, featured: !item.featured } : item)));
+  if (loading) {
+    return (
+      <div className="py-40 flex flex-col items-center justify-center gap-4 text-white/40">
+        <Loader2 className="animate-spin text-accent" size={40} />
+        <p className="text-xs font-black uppercase tracking-widest">Loading Photo Galleries...</p>
+      </div>
+    );
   }
 
   return (
@@ -314,16 +384,31 @@ export default function AdminGalleryManager() {
         <div>
           <p className="text-xs tracking-[0.4em] text-white/70 font-black uppercase">Media</p>
           <h1 className="text-4xl font-black mt-2">Photo Gallery</h1>
-          <p className="text-white/70 mt-2">Curate visual collections of campus life and events.</p>
+          <p className="text-white/70 mt-2">Curate collections. All changes are saved automatically.</p>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${
+            saving ? "bg-accent/10 border-accent/20 text-accent" : "bg-green-500/10 border-green-500/20 text-green-400"
+          }`}>
+            {saving ? (
+              <>
+                <Loader2 className="animate-spin" size={14} />
+                <span className="text-[10px] font-black uppercase tracking-wider">Saving...</span>
+              </>
+            ) : (
+              <>
+                <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-wider">All Saved</span>
+              </>
+            )}
+          </div>
           <button onClick={downloadExcelLikeCsv} className="h-11 px-5 rounded-2xl border border-white/20 bg-white/5 font-bold inline-flex items-center gap-2">
             <Download size={16} />
-            Download Excel
+            CSV
           </button>
           <button onClick={() => setShowCategoryEditor((value) => !value)} className="h-11 px-5 rounded-2xl border border-white/20 bg-white/5 font-bold inline-flex items-center gap-2">
             <Settings size={16} />
-            Manage Categories
+            Categories
           </button>
           <button onClick={() => setShowNewAlbum((value) => !value)} className="h-11 px-5 rounded-2xl border border-pink-400/40 bg-gradient-to-r from-pink-500/20 to-purple-500/20 font-bold inline-flex items-center gap-2">
             <FolderPlus size={16} />
@@ -369,7 +454,7 @@ export default function AdminGalleryManager() {
             ))}
           </select>
           <button onClick={addAlbum} className="h-10 px-4 rounded-lg bg-green-primary font-bold text-white">
-            Save Album
+            Create Album
           </button>
         </section>
       ) : null}
@@ -414,7 +499,6 @@ export default function AdminGalleryManager() {
                 <th className="px-6 py-4">Date</th>
                 <th className="px-6 py-4">Photos</th>
                 <th className="px-6 py-4">Cover</th>
-                <th className="px-6 py-4">Source</th>
                 <th className="px-6 py-4">Actions</th>
               </tr>
             </thead>
@@ -432,11 +516,10 @@ export default function AdminGalleryManager() {
                   <td className="px-6 py-4 text-white/75">{album.photos.length} images</td>
                   <td className="px-6 py-4">
                     <div className="relative w-14 h-10 rounded-md overflow-hidden border border-white/20">
-                      <Image src={album.cover} alt={album.title} fill sizes="56px" className="object-cover" />
+                      {album.cover && (
+                        <Image src={album.cover} alt={album.title} fill sizes="56px" className="object-cover" />
+                      )}
                     </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="px-2 py-1 rounded bg-white/10 text-xs font-bold uppercase">{album.source}</span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
@@ -450,7 +533,7 @@ export default function AdminGalleryManager() {
                       <button onClick={() => toggleFeatured(album.id)} className={`w-9 h-9 rounded-lg flex items-center justify-center ${album.featured ? "bg-cyan-500/70" : "bg-white/10 hover:bg-white/20"}`} title="Feature">
                         <Bell size={14} />
                       </button>
-                      <button onClick={() => removeAlbum(album.id)} className="w-9 h-9 rounded-lg bg-red-500/20 hover:bg-red-500/35 flex items-center justify-center" title="Delete">
+                      <button onClick={() => deleteAlbum(album.id, album._id)} className="w-9 h-9 rounded-lg bg-red-500/20 hover:bg-red-500/35 flex items-center justify-center" title="Delete">
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -481,7 +564,8 @@ export default function AdminGalleryManager() {
                 <input
                   value={editTitle}
                   onChange={(event) => setEditTitle(event.target.value)}
-                  className="w-full h-12 rounded-full bg-[#061434] border border-white/15 px-5 text-white"
+                  onBlur={saveEditedAlbum}
+                  className="w-full h-12 rounded-full bg-[#061434] border border-white/15 px-5 text-white focus:border-accent outline-none"
                 />
               </div>
 
@@ -490,8 +574,12 @@ export default function AdminGalleryManager() {
                   <label className="text-xs font-black uppercase tracking-widest text-white/60 block mb-2">Category</label>
                   <select
                     value={editCategory}
-                    onChange={(event) => setEditCategory(event.target.value)}
-                    className="w-full h-12 rounded-full bg-[#061434] border border-white/15 px-5 text-white"
+                    onChange={(event) => {
+                      setEditCategory(event.target.value);
+                      const album = albums.find(a => a.id === editorAlbumId);
+                      if (album) saveAlbum({ ...album, category: event.target.value });
+                    }}
+                    className="w-full h-12 rounded-full bg-[#061434] border border-white/15 px-5 text-white outline-none"
                   >
                     {categories.filter((item) => item !== "All Categories").map((item) => (
                       <option key={item} value={item} className="text-black">
@@ -505,8 +593,9 @@ export default function AdminGalleryManager() {
                   <input
                     value={editDate}
                     onChange={(event) => setEditDate(event.target.value)}
+                    onBlur={saveEditedAlbum}
                     placeholder="dd-mm-yyyy"
-                    className="w-full h-12 rounded-full bg-[#061434] border border-white/15 px-5 text-white"
+                    className="w-full h-12 rounded-full bg-[#061434] border border-white/15 px-5 text-white outline-none"
                   />
                 </div>
               </div>
@@ -516,32 +605,49 @@ export default function AdminGalleryManager() {
                 <textarea
                   value={editDescription}
                   onChange={(event) => setEditDescription(event.target.value)}
+                  onBlur={saveEditedAlbum}
                   placeholder="Brief description..."
-                  rows={4}
-                  className="w-full rounded-3xl bg-[#061434] border border-white/15 px-5 py-4 text-white resize-y"
+                  rows={3}
+                  className="w-full rounded-3xl bg-[#061434] border border-white/15 px-5 py-4 text-white resize-y outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-black uppercase tracking-widest text-white/60 block mb-3">Images</label>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-xs font-black uppercase tracking-widest text-white/60">Album Photos</label>
+                  <div className="relative group">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleFileUpload(e, editorAlbum.id)}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+                    <button className={`flex items-center gap-2 px-4 py-2 rounded-xl border border-accent/30 bg-accent/10 text-accent font-black text-[10px] uppercase tracking-wider hover:bg-accent hover:text-primary transition-all ${uploading ? "opacity-50 cursor-not-allowed" : ""}`}>
+                      {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                      {uploading ? "Optimizing..." : "Upload Photo"}
+                    </button>
+                  </div>
+                </div>
+
                 {editorAlbum.photos.length === 0 ? (
-                  <p className="text-white/60 text-sm">No images yet in this album.</p>
+                  <div className="py-12 border-2 border-dashed border-white/10 rounded-3xl flex flex-col items-center justify-center text-white/20 gap-2">
+                    <ImageIcon size={40} />
+                    <p className="text-sm font-bold uppercase tracking-widest">No photos yet</p>
+                  </div>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-                    {editorAlbum.photos.map((photo) => (
-                      <div key={photo} className="rounded-xl border border-white/15 bg-[#0a214f] p-2">
-                        <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden">
-                          <Image src={photo} alt={editorAlbum.title} fill sizes="(max-width: 768px) 45vw, (max-width: 1280px) 30vw, 220px" className="object-cover" />
-                        </div>
-                        <div className="mt-2 flex gap-2">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    {editorAlbum.photos.map((photo, idx) => (
+                      <div key={idx} className="group relative aspect-square rounded-2xl overflow-hidden border border-white/10 bg-[#0a214f]">
+                        <Image src={photo} alt="Gallery" fill sizes="150px" className="object-cover transition-transform group-hover:scale-110" />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
                           <button
                             onClick={() => setCoverImage(editorAlbum.id, photo)}
-                            className={`flex-1 h-8 rounded text-xs font-black ${editorAlbum.cover === photo ? "bg-cyan-500 text-white" : "bg-white/10 hover:bg-white/20"}`}
+                            className={`w-24 h-8 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all ${editorAlbum.cover === photo ? "bg-accent text-primary" : "bg-white/20 hover:bg-white/40 text-white"}`}
                           >
-                            {editorAlbum.cover === photo ? "Cover" : "Set Cover"}
+                            {editorAlbum.cover === photo ? "Cover Image" : "Set as Cover"}
                           </button>
-                          <button onClick={() => removeImageFromAlbum(editorAlbum.id, photo)} className="px-2 h-8 rounded text-xs font-black bg-red-500/20 hover:bg-red-500/35">
-                            Del
+                          <button onClick={() => removeImageFromAlbum(editorAlbum.id, photo)} className="w-24 h-8 rounded-lg bg-red-500/80 hover:bg-red-500 text-white text-[10px] font-black uppercase tracking-wider transition-all">
+                            Remove
                           </button>
                         </div>
                       </div>
@@ -549,26 +655,23 @@ export default function AdminGalleryManager() {
                   </div>
                 )}
 
-                <div className="flex flex-col md:flex-row gap-3">
+                <div className="mt-4 pt-4 border-t border-white/5 flex flex-col md:flex-row gap-3">
                   <input
                     value={newImageUrl}
                     onChange={(event) => setNewImageUrl(event.target.value)}
-                    placeholder="Paste image URL here"
-                    className="flex-1 h-11 rounded-full bg-[#061434] border border-white/15 px-5 text-white"
+                    placeholder="Or paste external image URL"
+                    className="flex-1 h-11 rounded-full bg-[#061434] border border-white/15 px-5 text-white outline-none text-xs"
                   />
-                  <button onClick={() => addImageToAlbum(editorAlbum.id)} className="h-11 px-5 rounded-full bg-green-primary font-black">
-                    Add Image
+                  <button onClick={() => addImageToAlbum(editorAlbum.id)} className="h-11 px-5 rounded-full bg-white/10 hover:bg-white/20 font-black text-xs uppercase tracking-widest transition-all">
+                    Add URL
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="px-8 py-5 border-t border-white/10 flex items-center justify-end gap-3 bg-white/5">
-              <button onClick={() => setEditModalOpen(false)} className="px-5 h-11 rounded-full bg-white/10 hover:bg-white/20 font-bold">
-                Cancel
-              </button>
-              <button onClick={saveEditedAlbum} className="px-6 h-11 rounded-full bg-blue-500 hover:bg-blue-400 font-black">
-                Save Gallery
+            <div className="px-8 py-5 border-t border-white/10 flex items-center justify-end bg-white/5">
+              <button onClick={() => setEditModalOpen(false)} className="px-8 h-11 rounded-full bg-accent text-primary font-black uppercase tracking-widest text-xs">
+                Close
               </button>
             </div>
           </div>

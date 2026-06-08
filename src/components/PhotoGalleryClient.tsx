@@ -4,71 +4,35 @@ import React, { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const galleryItems = [
-  {
-    title: "Shining Stars of Annual Prize Distribution 2026",
-    src: "/lps-vidhyawadi/gallery-01.jpg",
-    alt: "Annual Prize Distribution 2026",
-  },
-  {
-    title: "LPS Vidyawadi Hosts the Iconic CBSE Zonal Sports Championship",
-    src: "/lps-vidhyawadi/gallery-02.jpg",
-    alt: "CBSE Zonal Sports Championship",
-  },
-  {
-    title: "Republic Day Vibes and Patriotic Parade at LPS Vidyawadi",
-    src: "/lps-vidhyawadi/gallery-03.jpg",
-    alt: "Republic Day Parade",
-  },
-  {
-    title: "Glimpses of Experiential Learning & Science Exhibition 2026",
-    src: "/lps-vidhyawadi/gallery-04.jpg",
-    alt: "Science Exhibition",
-  },
-  {
-    title: "Investiture Ceremony: Felicitation of Newly Elected Student Cabinet",
-    src: "/lps-vidhyawadi/gallery-05.jpg",
-    alt: "Student Cabinet Investiture",
-  },
-  {
-    title: "Vibrant Cultural Celebrations during Annual Day 'Tarang'",
-    src: "/lps-vidhyawadi/gallery-06.jpg",
-    alt: "Annual Day Tarang",
-  },
-  {
-    title: "Happy Saturday Bagless Initiative - Creative Art and Pottery Workshop",
-    src: "/lps-vidhyawadi/gallery-07.jpg",
-    alt: "Bagless Day Art Workshop",
-  },
-  {
-    title: "Inter-House Debate Championship and Public Speaking Finals",
-    src: "/lps-vidhyawadi/gallery-08.jpg",
-    alt: "Inter-House Debate",
-  },
-  {
-    title: "Interactive Smart Classroom Sessions & Tech Labs Tour",
-    src: "/lps-vidhyawadi/gallery-09.jpg",
-    alt: "Smart Classroom Sessions",
-  },
-  {
-    title: "State Board Achievers Felicitated by District SDM",
-    src: "/lps-vidhyawadi/gallery-10.jpg",
-    alt: "Board Achievers Felicitation",
-  },
-  {
-    title: "Yoga and Aerobics Morning Drills for Hostel Boarders",
-    src: "/lps-vidhyawadi/gallery-11.jpg",
-    alt: "Hostel Morning Drills",
-  },
-  {
-    title: "A Day at Vidyawadi - Student Bonding and Sports Meet",
-    src: "/lps-vidhyawadi/gallery-12.jpg",
-    alt: "Vidyawadi Student Bonding",
-  },
-];
+interface MediaItem {
+  _id: string;
+  title: string;
+  src: string;
+  alt: string;
+  type: "photo" | "video";
+}
 
 export default function PhotoGalleryClient() {
+  const [galleryItems, setGalleryItems] = useState<MediaItem[]>([]);
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const res = await fetch("/api/admin/media-items?type=photo");
+        if (res.ok) {
+          const data = await res.json();
+          setGalleryItems(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch photos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPhotos();
+  }, []);
 
   // Navigate lightbox photos
   const handlePrev = (e?: React.MouseEvent) => {
@@ -110,6 +74,25 @@ export default function PhotoGalleryClient() {
 
   return (
     <div className="w-full">
+      {/* Loading State */}
+      {loading && (
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <div className="w-12 h-12 border-4 border-[#3D348B] border-t-transparent rounded-full animate-spin" />
+          <p className="text-[#3D348B] font-bold animate-pulse">Loading Gallery...</p>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && galleryItems.length === 0 && (
+        <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+          <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <ImageIcon size={32} className="text-slate-300" />
+          </div>
+          <h3 className="text-xl font-bold text-[#3D348B] mb-2">No Photos Available</h3>
+          <p className="text-slate-500">We are currently updating our gallery. Please check back soon!</p>
+        </div>
+      )}
+
       {/* 3-Column Polaroid-Inspired Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {galleryItems.map((item, idx) => (

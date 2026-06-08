@@ -1,7 +1,13 @@
 import Link from "next/link";
-import { Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle, ClipboardList } from "lucide-react";
+import { Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle, ClipboardList, LayoutGrid } from "lucide-react";
 
 const modules = [
+  {
+    title: "Brand Identity",
+    description: "Manage school logo, favicons, and other brand assets used in Navbar and Footer.",
+    href: "/admin/brand",
+    icon: Images,
+  },
   {
     title: "Notice Board",
     description: "Manage news, announcements, circulars, and admission alerts shown on the home page.",
@@ -9,10 +15,16 @@ const modules = [
     icon: Bell,
   },
   {
-    title: "Page Content",
-    description: "Edit text, sections, and descriptions of static informative pages across the site.",
-    href: "/admin/pages",
-    icon: FileText,
+    title: "Home Carousel",
+    description: "Manage sliding banners and gallery images used in the main page IntroSection carousel.",
+    href: "/admin/carousel",
+    icon: Images,
+  },
+  {
+    title: "Category Grid",
+    description: "Manage the boarding, smart classes, and facility blocks shown on the home page.",
+    href: "/admin/categories",
+    icon: LayoutGrid,
   },
   {
     title: "Admission Inquiries",

@@ -1,12 +1,34 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Play } from "lucide-react";
 import Image from "next/image";
-import { schoolImages } from "@/data/lpsVidhyawadiDatabase";
 
 export default function LifeAtGis() {
-  const gallery = schoolImages.filter((image) => image.category === "gallery");
+  const [videoItems, setVideoItems] = useState<any[]>([]);
+  const [activeVideo, setActiveVideo] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchVideos() {
+      try {
+        const res = await fetch("/api/admin/media-items?type=video");
+        if (res.ok) {
+          const data = await res.json();
+          setVideoItems(data.slice(0, 4)); // Get top 4 videos
+        }
+      } catch (err) {
+        console.error("Failed to fetch videos:", err);
+      }
+    }
+    fetchVideos();
+  }, []);
+
+  const getYouTubeThumbnail = (url: string) => {
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    const match = url.match(regExp);
+    const videoId = (match && match[7].length === 11) ? match[7] : null;
+    return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
+  };
 
   return (
     <section className="bg-white pb-32">
@@ -20,46 +42,69 @@ export default function LifeAtGis() {
           </svg>
         </div>
 
-        <h2 className="relative z-10 text-4xl lg:text-5xl font-black text-white text-center mb-16">
-          Life at LPS Vidyawadi
+        <h2 className="relative z-10 text-4xl lg:text-5xl font-black text-white text-center mb-16 uppercase tracking-tight">
+          Campus Video Highlights
         </h2>
 
         {/* Video Thumbnails */}
         <div className="max-w-6xl mx-auto px-6 relative z-10">
           <div className="flex gap-6 overflow-x-auto pb-8 snap-x no-scrollbar items-center justify-center">
-            {gallery.slice(3, 6).map((img, i) => (
-              <div key={i} className="min-w-[280px] w-[280px] md:w-[320px] aspect-video relative rounded-xl overflow-hidden shrink-0 snap-center shadow-2xl cursor-pointer group border-4 border-white">
-                <Image src={img.src} alt={img.alt} fill sizes="(max-width: 768px) 280px, 320px" className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/40 transition-colors">
-                  <div className="w-16 h-16 rounded-full border-4 border-white/80 flex items-center justify-center bg-white/20 backdrop-blur-sm group-hover:scale-110 transition-transform">
-                    <Play className="text-white fill-white ml-1" size={24} />
+            {videoItems.slice(1).map((video, i) => {
+              const thumb = getYouTubeThumbnail(video.src);
+              return (
+                <div 
+                  key={i} 
+                  onClick={() => setActiveVideo(video.src)}
+                  className="min-w-[280px] w-[280px] md:w-[320px] aspect-video relative rounded-xl overflow-hidden shrink-0 snap-center shadow-2xl cursor-pointer group border-4 border-white"
+                >
+                  {thumb && <Image src={thumb} alt={video.title} fill sizes="(max-width: 768px) 280px, 320px" className="object-cover group-hover:scale-105 transition-transform duration-500" />}
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/40 transition-colors">
+                    <div className="w-16 h-16 rounded-full border-4 border-white/80 flex items-center justify-center bg-white/20 backdrop-blur-sm group-hover:scale-110 transition-transform">
+                      <Play className="text-white fill-white ml-1" size={24} />
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                    <p className="text-white text-xs font-bold line-clamp-1">{video.title}</p>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
 
       {/* Main Video Player */}
       <div className="max-w-6xl mx-auto px-6 relative z-20 -mt-20">
-        <div className="w-full aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gray-900 border-8 border-white relative group">
-           <Image src="/lps-vidhyawadi/gallery-07.jpg" alt="Campus View" fill sizes="(max-width: 1280px) 100vw, 1100px" className="object-cover opacity-80" />
-           <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-24 h-24 rounded-full border-4 border-white/80 flex items-center justify-center bg-black/40 backdrop-blur-md cursor-pointer hover:scale-110 transition-transform hover:bg-black/60">
-                <Play className="text-white fill-white ml-2" size={40} />
-              </div>
-           </div>
-           {/* Fake Video Controls Overlay */}
-           <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-6 opacity-0 group-hover:opacity-100 transition-opacity">
-             <div className="flex items-center gap-4 text-white">
-               <Play size={20} className="cursor-pointer" />
-               <div className="flex-1 h-1 bg-white/30 rounded-full relative">
-                 <div className="absolute left-0 top-0 h-full w-1/3 bg-yellow-accent rounded-full"></div>
-               </div>
-               <span className="text-xs font-bold font-mono">02:14 / 05:30</span>
-             </div>
-           </div>
+        <div className="w-full aspect-video rounded-3xl overflow-hidden shadow-2xl bg-gray-900 border-8 border-white relative group">
+           {videoItems[0] ? (
+             <>
+               {activeVideo === videoItems[0].src || activeVideo ? (
+                 <iframe 
+                   src={`${activeVideo || videoItems[0].src}?autoplay=1`} 
+                   className="w-full h-full" 
+                   allow="autoplay; fullscreen"
+                   allowFullScreen
+                 />
+               ) : (
+                 <>
+                   <Image src={getYouTubeThumbnail(videoItems[0].src) || ""} alt="Campus View" fill sizes="(max-width: 1280px) 100vw, 1100px" className="object-cover opacity-80" />
+                   <div className="absolute inset-0 flex items-center justify-center">
+                      <div 
+                        onClick={() => setActiveVideo(videoItems[0].src)}
+                        className="w-24 h-24 rounded-full border-4 border-white/80 flex items-center justify-center bg-black/40 backdrop-blur-md cursor-pointer hover:scale-110 transition-transform hover:bg-black/60 shadow-2xl"
+                      >
+                        <Play className="text-white fill-white ml-2" size={40} />
+                      </div>
+                   </div>
+                   <div className="absolute top-8 left-8">
+                     <h3 className="text-white text-2xl font-black uppercase tracking-widest drop-shadow-lg">{videoItems[0].title}</h3>
+                   </div>
+                 </>
+               )}
+             </>
+           ) : (
+             <div className="w-full h-full flex items-center justify-center text-white font-bold">Loading Highlights...</div>
+           )}
         </div>
       </div>
     </section>

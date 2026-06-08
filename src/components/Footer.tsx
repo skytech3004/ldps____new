@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { schoolDatabase } from "@/data/lpsVidhyawadiDatabase";
@@ -11,27 +13,45 @@ const socialLinks = [
 ];
 
 export default function Footer() {
+  const [logo, setLogo] = useState("/uploads/logo/white-logo.png");
+
+  useEffect(() => {
+    async function fetchLogo() {
+      try {
+        const res = await fetch("/api/admin/brand?key=logo");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.value) setLogo(data.value);
+        }
+      } catch (err) {
+        console.error("Failed to fetch logo:", err);
+      }
+    }
+    fetchLogo();
+  }, []);
+
   return (
     <footer className="bg-navy text-white pt-20 pb-10 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
           {/* Brand Info */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-mint rounded-xl flex items-center justify-center text-navy font-bold text-2xl">
-                L
+          <div className="space-y-8 lg:col-span-1">
+            <div className="flex flex-col sm:flex-row lg:flex-col gap-6">
+              <div className="w-16 h-24 bg-white rounded-full flex items-center justify-center flex-shrink-0 shadow-xl border-4 border-mint/20 overflow-hidden">
+                <img src={logo} alt="LPS Logo" className="object-contain w-full h-full p-2" />
               </div>
-              <div>
-                <h3 className="font-black text-xl leading-none text-white">Leeladevi Parasmal Sancheti English Medium Sr. Sec. School</h3>
-                <p className="text-[10px] text-mint font-bold tracking-[0.2em] uppercase">LDPS Institution</p>
+              <div className="flex flex-col justify-center">
+                <h3 className="font-black text-xl xs:text-2xl leading-[1.1] text-white uppercase max-w-[280px]">
+                  LEELADEVI PARASMAL SANCHETI ENGLISH MEDIUM SR. SEC. SCHOOL
+                </h3>
+                <p className="text-[11px] text-mint font-bold tracking-widest uppercase mt-4 border-l-2 border-mint/50 pl-3">
+                  Managed by Marudhar Mahila Shikshan Sangh Vidyawadi
+                </p>
               </div>
             </div>
-            <p className="text-white/60 leading-relaxed font-medium">
-              {schoolDatabase.site.managed_by}
-            </p>
-            <div className="flex gap-4">
+            <div className="flex gap-4 pt-2">
               {socialLinks.map((social, i) => (
-                <Link key={i} href="#" aria-label={social.name} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-mint hover:text-navy transition-all">
+                <Link key={i} href="#" aria-label={social.name} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-mint hover:text-navy transition-all border border-white/10">
                   {social.icon}
                 </Link>
               ))}

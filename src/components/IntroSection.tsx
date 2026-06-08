@@ -13,16 +13,45 @@ const bannerImages = schoolImages
 
 export default function IntroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [carouselImages, setCarouselImages] = useState<string[]>(bannerImages);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % bannerImages.length);
-    }, 5000);
-    return () => clearInterval(timer);
+    async function loadCarousel() {
+      try {
+        const res = await fetch("/api/admin/carousel");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.slides && data.slides.length > 0) {
+            setCarouselImages(data.slides.map((s: { image: string }) => s.image));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load dynamic carousel images", err);
+      }
+    }
+    loadCarousel();
   }, []);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % bannerImages.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + bannerImages.length) % bannerImages.length);
+  useEffect(() => {
+    if (carouselImages.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % carouselImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [carouselImages]);
+
+  const nextSlide = () => {
+    if (carouselImages.length === 0) return;
+    setCurrentSlide((prev) => (prev + 1) % carouselImages.length);
+  };
+  const prevSlide = () => {
+    if (carouselImages.length === 0) return;
+    setCurrentSlide((prev) => (prev - 1 + carouselImages.length) % carouselImages.length);
+  };
+
+  if (carouselImages.length === 0) {
+    return null;
+  }
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-16 mt-8">
@@ -44,7 +73,7 @@ export default function IntroSection() {
             className="absolute inset-0"
           >
             <Image 
-              src={bannerImages[currentSlide]}
+              src={carouselImages[currentSlide]}
               alt={`School Banner ${currentSlide + 1}`}
               fill
               sizes="(max-width: 768px) 100vw, 1200px"
@@ -67,7 +96,7 @@ export default function IntroSection() {
 
         {/* Carousel Pager Dots */}
         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
-          {bannerImages.map((_, idx) => (
+          {carouselImages.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}

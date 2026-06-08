@@ -1,0 +1,75 @@
+{
+  "updatedAt": "2026-06-08T09:49:13.455Z",
+  "uploads": [
+    {
+      "id": "1780912153558",
+      "page": "admin",
+      "section": "logo",
+      "title": "School Logo",
+      "description": "",
+      "fileName": "2026-06-08T09-49-13-455Z-111rrrdd.avif",
+      "src": "/uploads/logo/2026-06-08T09-49-13-455Z-111rrrdd.avif",
+      "uploadedAt": "2026-06-08T09:49:13.455Z"
+    },
+    {
+      "id": "1780912103088",
+      "page": "admin",
+      "section": "logo",
+      "title": "School Logo",
+      "description": "",
+      "fileName": "2026-06-08T09-48-23-081Z-16caae74-3fc2-4bea-8a89-554bda84f4a7.png",
+      "src": "/uploads/logo/2026-06-08T09-48-23-081Z-16caae74-3fc2-4bea-8a89-554bda84f4a7.png",
+      "uploadedAt": "2026-06-08T09:48:23.081Z"
+    },
+    {
+      "id": "1780911837579",
+      "page": "admin",
+      "section": "logo",
+      "title": "School Logo",
+      "description": "",
+      "fileName": "2026-06-08T09-43-57-576Z-white-logo.png",
+      "src": "/uploads/logo/2026-06-08T09-43-57-576Z-white-logo.png",
+      "uploadedAt": "2026-06-08T09:43:57.576Z"
+    },
+    {
+      "id": "1780911293019",
+      "page": "admin",
+      "section": "logo",
+      "title": "School Logo",
+      "description": "",
+      "fileName": "2026-06-08T09-34-53-013Z-untitled-2vvv.jpg.jpeg",
+      "src": "/uploads/logo/2026-06-08T09-34-53-013Z-untitled-2vvv.jpg.jpeg",
+      "uploadedAt": "2026-06-08T09:34:53.013Z"
+    },
+    {
+      "id": "1780905502838",
+      "page": "home",
+      "section": "carousel",
+      "title": "Carousel Image",
+      "description": "",
+      "fileName": "2026-06-08T07-58-22-836Z-carousel-1780905502669.webp",
+      "src": "/uploads/carousel/2026-06-08T07-58-22-836Z-carousel-1780905502669.webp",
+      "uploadedAt": "2026-06-08T07:58:22.836Z"
+    },
+    {
+      "id": "1780905002209",
+      "page": "home",
+      "section": "carousel",
+      "title": "Carousel Image",
+      "description": "",
+      "fileName": "2026-06-08T07-50-02-208Z-carousel-1780905002202.webp",
+      "src": "/uploads/carousel/2026-06-08T07-50-02-208Z-carousel-1780905002202.webp",
+      "uploadedAt": "2026-06-08T07:50:02.208Z"
+    },
+    {
+      "id": "1780904979785",
+      "page": "home",
+      "section": "carousel",
+      "title": "Carousel Image",
+      "description": "",
+      "fileName": "2026-06-08T07-49-39-782Z-carousel-1780904979766.webp",
+      "src": "/uploads/carousel/2026-06-08T07-49-39-782Z-carousel-1780904979766.webp",
+      "uploadedAt": "2026-06-08T07:49:39.782Z"
+    }
+  ]
+}

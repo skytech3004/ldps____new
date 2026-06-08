@@ -79,8 +79,22 @@ const navLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logo, setLogo] = useState("/lps-vidhyawadi/logo.jpg");
 
   useEffect(() => {
+    async function fetchLogo() {
+      try {
+        const res = await fetch("/api/admin/brand?key=logo");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.value) setLogo(data.value);
+        }
+      } catch (err) {
+        console.error("Failed to fetch logo:", err);
+      }
+    }
+    fetchLogo();
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
@@ -131,93 +145,124 @@ export default function Navbar() {
         )}
       >
         <div className="w-full flex items-center justify-between px-4 sm:px-6 h-full gap-2 md:gap-4">
-          {/* Logo Section - Left Aligned */}
-          <div className="flex items-center min-w-0 gap-2 sm:gap-4">
-            <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary rounded-xl flex items-center justify-center text-white font-extrabold text-xl sm:text-2xl shadow-md group-hover:bg-accent group-hover:text-primary transition-all duration-300 shrink-0">
-                L
-              </div>
-              <div className="flex flex-col min-w-0">
-                <h1 className="font-extrabold text-primary leading-none uppercase tracking-wider text-[11px] xs:text-[13px] sm:text-sm md:text-base lg:text-lg xl:text-xl font-black">
-                  {/* Shown on small mobile */}
-                  <span className="block xs:hidden">LPS Vidyawadi</span>
-                  {/* Shown on medium mobile/tablet */}
-                  <span className="hidden xs:block md:hidden">L.P.S. Sancheti</span>
-                  {/* Shown on desktop */}
-                  <span className="hidden md:block">Leeladevi Parasmal Sancheti</span>
-                </h1>
-                <span className="hidden sm:block text-[8px] md:text-[9px] lg:text-[10px] text-primary/60 font-semibold tracking-[0.2em] uppercase truncate mt-0.5">
-                  <span className="block md:hidden">Sr. Sec. School</span>
-                  <span className="hidden md:block">English Medium Sr. Sec. School</span>
-                </span>
-              </div>
-            </Link>
-          </div>
 
-          {/* Desktop Links - Centered between Left and Right */}
-          <div className="hidden xl:flex items-center gap-6 px-4">
-            {navLinks.map((link) => (
-              <div key={link.name} className="relative group py-2">
+  {/* Logo Section */}
+<div className="flex items-center min-w-0 gap-2 sm:gap-3">
+  <Link
+    href="/"
+    className="flex items-center gap-2 sm:gap-3 group shrink-0"
+  >
+    {/* Vidyawadi Logo */}
+   {/* Vidyawadi Logo */}
+<div className="relative shrink-0 pt-6">
+  <img
+    src="/uploads/logo/2026-06-08T09-49-13-455Z-111rrrdd.avif"
+    alt="Vidyawadi Logo"
+    className="
+      object-contain
+      w-16 h-20 pt-6
+      sm:w-20 sm:h-24
+      md:w-24 md:h-32
+      lg:w-28 lg:h-36
+      xl:w-32 xl:h-40
+      drop-shadow-xl
+    "
+  />
+</div>
+
+    {/* School Name */}
+    <div className="flex flex-col min-w-0">
+     <h1 className="font-black text-[#3D348B] leading-[1.1] uppercase tracking-tight text-[10px] xs:text-[11px] sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[16px] max-w-[200px]
+          xs:max-w-[250px] sm:max-w-[300px] md:max-w-[400px]">   <span className="block">LEELADEVI PARASMAL SANCHETI ENGLISH MEDIUM SR. SEC. SCHOOL</span>
+      </h1>
+
+     <span className="text-[6px] xs:text-[7px] sm:text-[8px] md:text-[9px] text-primary/70 font-bold tracking-wider uppercase mt-0.5">Managed by Marudhar Mahila Shikshan Sangh Vidyawadi</span>
+    </div>
+  </Link>
+</div>
+
+  {/* Desktop Navigation */}
+  <div className="hidden xl:flex items-center gap-6 px-4">
+    {navLinks.map((link) => (
+      <div key={link.name} className="relative group py-2">
+        <Link
+          href={link.href}
+          className="font-bold text-primary/80 hover:text-primary transition-all flex items-center gap-1.5 uppercase text-[12px] tracking-wider relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-accent after:transition-all hover:after:w-full whitespace-nowrap"
+        >
+          {link.name}
+
+          {link.dropdown && (
+            <ChevronDown
+              size={14}
+              className="group-hover:rotate-180 transition-transform duration-300 opacity-60"
+            />
+          )}
+        </Link>
+
+        {link.dropdown && (
+          <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0 z-[60]">
+            <div className="bg-white shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-xl p-3 min-w-[220px] border border-gray-100/50">
+              {link.dropdown.map((item) => (
                 <Link
-                  href={link.href}
-                  className="font-bold text-primary/80 hover:text-primary transition-all flex items-center gap-1.5 uppercase text-[12px] tracking-wider relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-accent after:transition-all hover:after:w-full whitespace-nowrap"
+                  key={item.label}
+                  href={item.href}
+                  className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
                 >
-                  {link.name}
-                  {link.dropdown && (
-                    <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-300 opacity-60" />
-                  )}
+                  {item.label}
                 </Link>
-
-                {link.dropdown && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0 z-[60]">
-                    <div className="bg-white shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-xl p-3 min-w-[220px] border border-gray-100/50">
-                      {link.dropdown.map((item) => (
-                        <Link
-                          key={item.label}
-                          href={item.href}
-                          className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
-                        >
-                          {item.label}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Action Buttons and Mobile Toggle Group */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* CTA Buttons - Visible on all devices */}
-            <div className="flex items-center gap-1.5 sm:gap-3">
-              <Link 
-                href="/fee-structure"
-                className="bg-accent text-primary font-extrabold text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wider px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-accent-hover hover:scale-[1.03] transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.25)] hover:shadow-[0_6px_16px_rgba(247,184,1,0.35)] whitespace-nowrap"
-              >
-                Fee Payment
-              </Link>
-              <button 
-                onClick={() => window.dispatchEvent(new Event("open-admission-modal"))}
-                className="bg-accent text-primary font-extrabold text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wider px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-accent-hover hover:scale-[1.03] transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.25)] hover:shadow-[0_6px_16px_rgba(247,184,1,0.35)] whitespace-nowrap"
-              >
-                <span className="xs:hidden">Admission</span>
-                <span className="hidden xs:inline">Admission Query</span>
-              </button>
+              ))}
             </div>
-
-            {/* Mobile Hamburger Toggle - Visible on mobile/tablet (< xl) */}
-            <button
-              className="xl:hidden flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 border border-gray-200 rounded-lg text-primary hover:bg-primary/5 transition-all shrink-0 ml-0.5 xs:ml-1"
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label={isOpen ? "Close menu" : "Open menu"}
-              aria-expanded={isOpen}
-              aria-controls="mobile-menu"
-            >
-              {isOpen ? <X size={18} /> : <Menu size={18} />}
-            </button>
           </div>
-        </div>
+        )}
+      </div>
+    ))}
+  </div>
+
+  {/* Right Side Buttons */}
+  <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+
+    <div className="flex items-center gap-1.5 sm:gap-3">
+      <Link
+        href="/fee-structure"
+        className="bg-accent text-primary font-extrabold text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wider px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-accent-hover hover:scale-[1.03] transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.25)] hover:shadow-[0_6px_16px_rgba(247,184,1,0.35)] whitespace-nowrap"
+      >
+        Fee Payment
+      </Link>
+
+      <button
+        onClick={() =>
+          window.dispatchEvent(
+            new Event("open-admission-modal")
+          )
+        }
+        className="bg-accent text-primary font-extrabold text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wider px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-accent-hover hover:scale-[1.03] transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.25)] hover:shadow-[0_6px_16px_rgba(247,184,1,0.35)] whitespace-nowrap"
+      >
+        <span className="xs:hidden">
+          Admission
+        </span>
+        <span className="hidden xs:inline">
+          Admission Query
+        </span>
+      </button>
+    </div>
+
+    {/* Mobile Menu */}
+    <button
+      className="xl:hidden flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 border border-gray-200 rounded-lg text-primary hover:bg-primary/5 transition-all shrink-0 ml-0.5 xs:ml-1"
+      onClick={() => setIsOpen(!isOpen)}
+      aria-label={isOpen ? "Close menu" : "Open menu"}
+      aria-expanded={isOpen}
+      aria-controls="mobile-menu"
+    >
+      {isOpen ? (
+        <X size={18} />
+      ) : (
+        <Menu size={18} />
+      )}
+    </button>
+  </div>
+
+</div>
       </nav>
 
       {/* Mobile Menu */}

@@ -11,6 +11,9 @@ const SECTION_FOLDERS: Record<string, string> = {
   categories: "categories",
   life: "life",
   documents: "documents",
+  carousel: "carousel",
+  logo: "logo",
+  "media-items": "media-items",
 };
 
 type UploadRecord = {
