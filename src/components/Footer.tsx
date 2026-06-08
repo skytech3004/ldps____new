@@ -13,7 +13,8 @@ const socialLinks = [
 ];
 
 export default function Footer() {
-  const [logo, setLogo] = useState("/uploads/logo/white-logo.png");
+  const [logo, setLogo] = useState("/uploads/logo/2026-06-08T09-49-13-455Z-111rrrdd.avif");
+    
 
   useEffect(() => {
     async function fetchLogo() {
