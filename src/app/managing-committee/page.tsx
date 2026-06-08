@@ -9,7 +9,7 @@ import { Shield, Users, Award, BookOpen, Heart, Activity, Check, MapPin, Buildin
 export default function ManagingCommittee() {
   const leadership = [
     {
-      name: "Mrs. Jyoti Nath",
+      name: "Ms. Jyoti Nath",
       role: "Principal",
       icon: Award,
       desc: "Directs academic strategies, policy framing, and external CBSE administration."

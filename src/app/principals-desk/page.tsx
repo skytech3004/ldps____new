@@ -53,7 +53,7 @@ export default function PrincipalsDesk() {
               <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden shadow-md border-4 border-white bg-gray-100 mb-6">
                 <Image 
                   src="/lps-vidhyawadi/principal_portrait.png" 
-                  alt="Mrs. Jyoti Nath - Principal" 
+                  alt="Ms. Jyoti Nath - Principal" 
                   fill 
                   sizes="(max-width: 1024px) 100vw, 420px" 
                   className="object-cover group-hover:scale-[1.02] transition-transform duration-700"
@@ -70,10 +70,10 @@ export default function PrincipalsDesk() {
                 </div>
                 
                 <h3 className="text-2xl md:text-3xl font-black text-primary uppercase font-montserrat tracking-tight mt-2">
-                  Mrs. Jyoti Nath
+                  Ms. Jyoti Nath
                 </h3>
                 <p className="text-gray-400 font-bold uppercase tracking-widest text-[11px] md:text-xs">
-                  Principal, LPS English Medium School
+                  Principal, Leeladevi Parasmal Sancheti English Medium Sr.Sec. School
                 </p>
               </div>
 
@@ -116,58 +116,51 @@ export default function PrincipalsDesk() {
 
             {/* Greeting */}
             <div>
-              <p className="text-gray-400 font-bold uppercase tracking-wider text-xs md:text-sm mb-1">Welcome to LPS Vidyawadi</p>
+              <p className="text-gray-400 font-bold uppercase tracking-wider text-xs md:text-sm mb-1">Principal&apos;s Message</p>
               <h2 className="text-3xl font-black text-primary uppercase font-montserrat tracking-tight">
-                Dear Parents, Students, and Friends,
+                Dear Students, Parents, and Community Members,
               </h2>
             </div>
 
             {/* Body Text */}
-            <div className="text-gray-600 font-medium text-sm md:text-base space-y-6">
-              <p>
-                At Leeladevi Parasmal Sancheti English Medium Sr. Sec. School, we believe that education is 
-                the most powerful tool we can use to change the world. It is our constant endeavour to empower each girl 
-                student to have a true sense of self-respect, which will enable her to build her unique identity, 
-                discover her purpose in life, and grow to be of value to global society.
-              </p>
-              
-              <p>
-                Our school embraces the challenge of nurturing individual talents and strengths into valued 
-                accomplishments. We provide a balanced, child-centered curriculum integrated with the latest 
-                CBSE guidelines and the <strong className="text-primary font-bold">National Education Policy (NEP)</strong>. 
-                We place equal emphasis on rigorous formal academics, physical health and wellness, and creative arts, 
-                cultivating well-rounded personalities.
-              </p>
-              
-              <p>
-                We understand that children thrive when they feel safe and cared for. Our management has left no stone 
-                unturned to provide the students a true <strong className="text-primary font-bold">&quot;home away from home.&quot;</strong> 
-                Our 65-acre campus contains comfortable hostels, part-time doctors and full-time nurses, and a modern, state-of-the-art 
-                kitchen and mess providing wholesome, healthy, and homely meals.
-              </p>
-              
-              <p>
-                We identify the unique potential of each girl child. Through specialized parallel remedial classes in 
-                Mathematics, English, and Hindi, we provide extra support to children overcoming academic difficulties, 
-                helping them move from dependency to independence through self-discipline and self-reliance.
-              </p>
-              
-              <p>
-                We are immensely grateful to the President, Secretary, and members of the School Managing Committee 
-                for their visionary leadership, constant guidance, and support. Together with our well-qualified, experienced, 
-                and vibrant teaching faculty, we look forward to welcoming you to the adventures of our academic journey.
-              </p>
-            </div>
+          <div className="text-gray-600 font-medium text-sm md:text-base space-y-6">
+  <p>
+    Welcome to LPS, Vidyawadi, where we take pride in fostering a nurturing
+    environment that empowers every learner to grow into a confident,
+    compassionate, and globally-minded citizen.
+  </p>
+
+  <p>
+    Founded in 2004, situated in the rural belt of Pali District in Rajasthan,
+    this Vidyalaya is a residential school providing quality education from
+    Nursery to XII primarily for girls, with a noble thought of promoting
+    girls&apos; education. Presently, the School accommodates more than 1000
+    girls.
+  </p>
+
+  <p>
+    At our core, we embrace a vision to nurture global citizens who are
+    equipped to thrive in an ever-changing world. Our mission is to provide a
+    healthy learning environment where every student feels safe, valued, and
+    inspired to pursue excellence.
+  </p>
+
+  <p>
+    Together, let us work to create a future where every child shines brightly,
+    empowered to shape their destiny and contribute meaningfully to the global
+    community.
+  </p>
+</div>
 
             {/* Closing and Signature */}
             <div className="pt-8 border-t border-gray-100 flex justify-between items-end">
               <div className="space-y-1">
-                <p className="text-gray-400 font-bold uppercase tracking-wider text-xs">Warm Regards,</p>
+                <p className="text-gray-400 font-bold uppercase tracking-wider text-xs">Principal</p>
                 <p className="text-xl font-black text-primary font-montserrat uppercase tracking-tight">
-                  Mrs. Jyoti Nath
+                  Ms. Jyoti Nath
                 </p>
                 <p className="text-xs font-semibold text-accent-hover uppercase tracking-wider">
-                  Principal, LPS English Medium School
+                  Principal, Leeladevi Parasmal Sancheti English Medium Sr.Sec. School
                 </p>
                 <p className="text-[11px] text-gray-400 font-medium">
                   Vidyawadi, Khimel, Dist. Pali (Rajasthan)
