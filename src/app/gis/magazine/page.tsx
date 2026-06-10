@@ -16,7 +16,7 @@ export default function GisMagazinePage() {
               School Publications
             </p>
             <h1 className="text-4xl font-black uppercase tracking-tight text-accent">
-              Akashganga Magazine
+              Magazine
             </h1>
             <p className="text-white/80 mt-2 max-w-2xl text-sm font-semibold leading-relaxed">
               Explore past and present issues of our official school magazine, celebrating the creativity, academic achievements, and scholastic talents of our students.
