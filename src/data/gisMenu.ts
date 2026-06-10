@@ -9,8 +9,7 @@ export type GisMenuItem = {
 export const gisMenuItems: GisMenuItem[] = [
   { title: "Home", slug: "home", group: "Top", sourceUrl: "https://www.gangainternationalschool.com/" },
   { title: "About LPS", slug: "about-lps", group: "About", sourceUrl: "https://www.gangainternationalschool.com/about-gis/" },
-  { title: "Chairman’s Desk", slug: "chairmans-desk", group: "About", sourceUrl: "https://www.gangainternationalschool.com/chairmans-desk/" },
-  { title: "Director’s Desk", slug: "directors-desk", group: "About", sourceUrl: "https://www.gangainternationalschool.com/directors-desk/" },
+  { title: "Leadership Team", slug: "leadership", group: "About", sourceUrl: "https://www.gangainternationalschool.com/" },
   { title: "Principal’s Desk", slug: "principals-desk", group: "About", sourceUrl: "https://www.gangainternationalschool.com/principals-desk/" },
   { title: "Managing Committee", slug: "managing-committee", group: "About", sourceUrl: "https://www.gangainternationalschool.com/managing-committee/" },
   { title: "Scholastic", slug: "scholastic", group: "Academics", sourceUrl: "https://www.gangainternationalschool.com/scholastic/" },
@@ -42,6 +41,7 @@ export const gisMenuItems: GisMenuItem[] = [
   { title: "G. R. Mechanism", slug: "g-r-mechanism", group: "More", sourceUrl: "https://www.gangainternationalschool.com/g-r-mechanism/" },
   { title: "Holiday List", slug: "holiday-list", group: "More", sourceUrl: "https://www.gangainternationalschool.com/holiday-list/" },
   { title: "Announcements", slug: "announcements", group: "More", sourceUrl: "https://www.gangainternationalschool.com/announcements/" },
+  { title: "More Home", slug: "more", group: "More", sourceUrl: "https://www.gangainternationalschool.com/" },
   { title: "Blog", slug: "blog", group: "Top", sourceUrl: "https://www.gangainternationalschool.com/blog/" },
   { title: "Contact", slug: "contact", group: "Top", sourceUrl: "https://www.gangainternationalschool.com/contact/" },
 ];

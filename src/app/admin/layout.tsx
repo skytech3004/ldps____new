@@ -1,14 +1,20 @@
 import Link from "next/link";
-import { Bell, Database, FileText, FolderKanban, Images, LayoutDashboard, LogOut, ClipboardList, LayoutGrid } from "lucide-react";
+import { Bell, Database, FileText, FolderKanban, Images, LayoutDashboard, LogOut, ClipboardList, LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/notices", label: "Notice Board", icon: Bell },
+  { href: "/admin/leadership", label: "Leadership Team", icon: ShieldCheck },
+  { href: "/admin/pages", label: "More Pages", icon: FileText },
   { href: "/admin/carousel", label: "Home Carousel", icon: Images },
   { href: "/admin/categories", label: "Category Grid", icon: LayoutGrid },
   { href: "/admin/inquiries", label: "Inquiries", icon: ClipboardList },
   { href: "/admin/events", label: "Events", icon: Database },
   { href: "/admin/galleries", label: "Galleries", icon: Images },
+  { href: "/admin/magazine", label: "Magazine", icon: BookOpen },
+  { href: "/admin/transport", label: "Bus Routes", icon: Bus },
+  { href: "/admin/disclosures", label: "CBSE Disclosures", icon: FileText },
+  { href: "/admin/holidays", label: "Holiday List", icon: Calendar },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

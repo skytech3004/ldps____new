@@ -1,6 +1,26 @@
 {
-  "updatedAt": "2026-06-08T09:49:13.455Z",
+  "updatedAt": "2026-06-10T10:28:11.461Z",
   "uploads": [
+    {
+      "id": "1781087291464",
+      "page": "magazine",
+      "section": "documents",
+      "title": "Akashganga - June 2026",
+      "description": "PDF for school magazine: Akashganga",
+      "fileName": "2026-06-10T10-28-11-461Z-h-43374518.pdf",
+      "src": "/uploads/documents/2026-06-10T10-28-11-461Z-h-43374518.pdf",
+      "uploadedAt": "2026-06-10T10:28:11.461Z"
+    },
+    {
+      "id": "1781087088046",
+      "page": "magazine",
+      "section": "documents",
+      "title": "akash - June 2026",
+      "description": "PDF for school magazine: akash",
+      "fileName": "2026-06-10T10-24-48-041Z-payslip-april-2026-rohit-kumar-gupta.pdf",
+      "src": "/uploads/documents/2026-06-10T10-24-48-041Z-payslip-april-2026-rohit-kumar-gupta.pdf",
+      "uploadedAt": "2026-06-10T10:24:48.041Z"
+    },
     {
       "id": "1780912153558",
       "page": "admin",

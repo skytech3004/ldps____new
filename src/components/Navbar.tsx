@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X, ChevronDown, Phone, Mail } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -14,9 +15,8 @@ const navLinks = [
     href: "/about-lps",
     dropdown: [
       { label: "About LPS", href: "/about-lps" },
-      { label: "Chairman’s Desk", href: "/chairmans-desk" },
-      { label: "Director’s Desk", href: "/directors-desk" },
-      { label: "Principal’s Desk", href: "/principals-desk" },
+      { label: "Leadership Team", href: "/leadership" },
+      { label: "Principal's Desk", href: "/principals-desk" },
       { label: "Managing Committee", href: "/managing-committee" },
     ],
   },
@@ -61,7 +61,7 @@ const navLinks = [
   },
   {
     name: "More",
-    href: "/news",
+    href: "/",
     dropdown: [
       { label: "Magazine", href: "/magazine" },
       { label: "News", href: "/news" },
@@ -116,7 +116,6 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-t-[3px] border-primary">
-      {/* Top Bar */}
       <div className="bg-primary text-white py-2 hidden md:block border-b border-white/10">
         <div className="w-full px-6 flex justify-between items-center text-sm">
           <div className="flex items-center gap-6">
@@ -135,137 +134,113 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Main Navbar */}
       <nav
         className={cn(
           "bg-white transition-all duration-300 flex items-center",
-          scrolled 
-            ? "shadow-lg h-16 md:h-20" 
+          scrolled
+            ? "shadow-lg h-16 md:h-20"
             : "shadow-sm h-20 md:h-24"
         )}
       >
         <div className="w-full flex items-center justify-between px-4 sm:px-6 h-full gap-2 md:gap-4">
+          <div className="flex items-center min-w-0 gap-2 sm:gap-3">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
+              <div className="relative shrink-0 pt-6">
+                <Image
+                  src={logo}
+                  alt="Vidyawadi Logo"
+                  width={128}
+                  height={160}
+                  className="
+                    object-contain
+                    w-16 h-20 pt-6
+                    sm:w-20 sm:h-24
+                    md:w-24 md:h-32
+                    lg:w-28 lg:h-36
+                    xl:w-32 xl:h-40
+                    drop-shadow-xl
+                  "
+                  priority
+                />
+              </div>
 
-  {/* Logo Section */}
-<div className="flex items-center min-w-0 gap-2 sm:gap-3">
-  <Link
-    href="/"
-    className="flex items-center gap-2 sm:gap-3 group shrink-0"
-  >
-    {/* Vidyawadi Logo */}
-   {/* Vidyawadi Logo */}
-<div className="relative shrink-0 pt-6">
-  <img
-    src="/uploads/logo/2026-06-08T09-49-13-455Z-111rrrdd.avif"
-    alt="Vidyawadi Logo"
-    className="
-      object-contain
-      w-16 h-20 pt-6
-      sm:w-20 sm:h-24
-      md:w-24 md:h-32
-      lg:w-28 lg:h-36
-      xl:w-32 xl:h-40
-      drop-shadow-xl
-    "
-  />
-</div>
+              <div className="flex flex-col min-w-0">
+                <h1 className="font-black text-[#3D348B] leading-[1.1] uppercase tracking-tight text-[10px] xs:text-[11px] sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[16px] max-w-[200px]
+                  xs:max-w-[250px] sm:max-w-[300px] md:max-w-[400px]">
+                  <span className="block">LEELADEVI PARASMAL SANCHETI ENGLISH MEDIUM SR. SEC. SCHOOL</span>
+                </h1>
 
-    {/* School Name */}
-    <div className="flex flex-col min-w-0">
-     <h1 className="font-black text-[#3D348B] leading-[1.1] uppercase tracking-tight text-[10px] xs:text-[11px] sm:text-[13px] md:text-[14px] lg:text-[15px] xl:text-[16px] max-w-[200px]
-          xs:max-w-[250px] sm:max-w-[300px] md:max-w-[400px]">   <span className="block">LEELADEVI PARASMAL SANCHETI ENGLISH MEDIUM SR. SEC. SCHOOL</span>
-      </h1>
-
-     <span className="text-[6px] xs:text-[7px] sm:text-[8px] md:text-[9px] text-primary/70 font-bold tracking-wider uppercase mt-0.5">Managed by Marudhar Mahila Shikshan Sangh Vidyawadi</span>
-    </div>
-  </Link>
-</div>
-
-  {/* Desktop Navigation */}
-  <div className="hidden xl:flex items-center gap-6 px-4">
-    {navLinks.map((link) => (
-      <div key={link.name} className="relative group py-2">
-        <Link
-          href={link.href}
-          className="font-bold text-primary/80 hover:text-primary transition-all flex items-center gap-1.5 uppercase text-[12px] tracking-wider relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-accent after:transition-all hover:after:w-full whitespace-nowrap"
-        >
-          {link.name}
-
-          {link.dropdown && (
-            <ChevronDown
-              size={14}
-              className="group-hover:rotate-180 transition-transform duration-300 opacity-60"
-            />
-          )}
-        </Link>
-
-        {link.dropdown && (
-          <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0 z-[60]">
-            <div className="bg-white shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-xl p-3 min-w-[220px] border border-gray-100/50">
-              {link.dropdown.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
+                <span className="text-[6px] xs:text-[7px] sm:text-[8px] md:text-[9px] text-primary/70 font-bold tracking-wider uppercase mt-0.5">Managed by Marudhar Mahila Shikshan Sangh Vidyawadi</span>
+              </div>
+            </Link>
           </div>
-        )}
-      </div>
-    ))}
-  </div>
 
-  {/* Right Side Buttons */}
-  <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="hidden xl:flex items-center gap-6 px-4">
+            {navLinks.map((link) => (
+              <div key={link.name} className="relative group py-2">
+                <Link
+                  href={link.href}
+                  className="font-bold text-primary/80 hover:text-primary transition-all flex items-center gap-1.5 uppercase text-[12px] tracking-wider relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-accent after:transition-all hover:after:w-full whitespace-nowrap"
+                >
+                  {link.name}
+                  {link.dropdown && (
+                    <ChevronDown
+                      size={14}
+                      className="group-hover:rotate-180 transition-transform duration-300 opacity-60"
+                    />
+                  )}
+                </Link>
 
-    <div className="flex items-center gap-1.5 sm:gap-3">
-      <Link
-        href="/fee-structure"
-        className="bg-accent text-primary font-extrabold text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wider px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-accent-hover hover:scale-[1.03] transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.25)] hover:shadow-[0_6px_16px_rgba(247,184,1,0.35)] whitespace-nowrap"
-      >
-        Fee Payment
-      </Link>
+                {link.dropdown && (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0 z-[60]">
+                    <div className="bg-white shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-xl p-3 min-w-[220px] border border-gray-100/50">
+                      {link.dropdown.map((item) => (
+                        <Link
+                          key={item.label}
+                          href={item.href}
+                          className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
 
-      <button
-        onClick={() =>
-          window.dispatchEvent(
-            new Event("open-admission-modal")
-          )
-        }
-        className="bg-accent text-primary font-extrabold text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wider px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-accent-hover hover:scale-[1.03] transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.25)] hover:shadow-[0_6px_16px_rgba(247,184,1,0.35)] whitespace-nowrap"
-      >
-        <span className="xs:hidden">
-          Admission
-        </span>
-        <span className="hidden xs:inline">
-          Admission Query
-        </span>
-      </button>
-    </div>
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-3">
+              <Link
+                href="/fee-structure"
+                className="bg-accent text-primary font-extrabold text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wider px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-accent-hover hover:scale-[1.03] transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.25)] hover:shadow-[0_6px_16px_rgba(247,184,1,0.35)] whitespace-nowrap"
+              >
+                Fee Payment
+              </Link>
 
-    {/* Mobile Menu */}
-    <button
-      className="xl:hidden flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 border border-gray-200 rounded-lg text-primary hover:bg-primary/5 transition-all shrink-0 ml-0.5 xs:ml-1"
-      onClick={() => setIsOpen(!isOpen)}
-      aria-label={isOpen ? "Close menu" : "Open menu"}
-      aria-expanded={isOpen}
-      aria-controls="mobile-menu"
-    >
-      {isOpen ? (
-        <X size={18} />
-      ) : (
-        <Menu size={18} />
-      )}
-    </button>
-  </div>
+              <button
+                onClick={() => window.dispatchEvent(new Event("open-admission-modal"))}
+                className="bg-accent text-primary font-extrabold text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wider px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-accent-hover hover:scale-[1.03] transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.25)] hover:shadow-[0_6px_16px_rgba(247,184,1,0.35)] whitespace-nowrap"
+              >
+                <span className="xs:hidden">Admission</span>
+                <span className="hidden xs:inline">Admission Query</span>
+              </button>
+            </div>
 
-</div>
+            <button
+              className="xl:hidden flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 border border-gray-200 rounded-lg text-primary hover:bg-primary/5 transition-all shrink-0 ml-0.5 xs:ml-1"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
+            >
+              {isOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
+        </div>
       </nav>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -309,9 +284,7 @@ export default function Navbar() {
                       >
                         {link.name}
                       </Link>
-                      {link.dropdown && (
-                        <ChevronDown size={18} className="text-primary/40" />
-                      )}
+                      {link.dropdown && <ChevronDown size={18} className="text-primary/40" />}
                     </div>
                     {link.dropdown && (
                       <div className="my-2 flex flex-col gap-1 pl-4 border-l-2 border-accent/30">
@@ -330,14 +303,14 @@ export default function Navbar() {
                   </div>
                 ))}
                 <div className="flex flex-col gap-3 mt-8">
-                  <Link 
+                  <Link
                     href="/fee-structure"
                     className="bg-primary text-white w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-primary/90 transition-all shadow-md shadow-primary/10 text-center block"
                     onClick={() => setIsOpen(false)}
                   >
                     Fee Payment
                   </Link>
-                  <button 
+                  <button
                     onClick={() => {
                       setIsOpen(false);
                       window.dispatchEvent(new Event("open-admission-modal"));

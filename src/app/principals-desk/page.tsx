@@ -35,27 +35,27 @@ export default function PrincipalsDesk() {
       {/* Main Content Details */}
       <section className="py-20 px-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          
+
           {/* Left Column: Portrait Card */}
           <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-32">
-            
+
             {/* The Professional Card */}
             <div className="relative bg-white border border-primary/10 rounded-[2.5rem] p-6 shadow-2xl hover:shadow-[0_20px_50px_rgba(61,52,139,0.15)] transition-all duration-500 overflow-hidden group">
               {/* Card Accent Gradients */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-bl-[8rem] -z-10 group-hover:scale-110 transition-transform duration-300" />
               <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-primary/5 rounded-full -z-10 blur-xl" />
-              
+
               {/* Border accents */}
               <div className="absolute top-4 left-4 right-4 h-[1px] bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4 h-[1px] bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
 
               {/* Portrait Wrapper */}
               <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden shadow-md border-4 border-white bg-gray-100 mb-6">
-                <Image 
-                  src="/lps-vidhyawadi/principal_portrait.png" 
-                  alt="Ms. Jyoti Nath - Principal" 
-                  fill 
-                  sizes="(max-width: 1024px) 100vw, 420px" 
+                <Image
+                  src="/principle.avif"
+                  alt="Ms. Jyoti Nath - Principal"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 420px"
                   className="object-cover group-hover:scale-[1.02] transition-transform duration-700"
                   priority
                 />
@@ -68,7 +68,7 @@ export default function PrincipalsDesk() {
                   <Sparkles size={12} />
                   <span>Academic Leadership</span>
                 </div>
-                
+
                 <h3 className="text-2xl md:text-3xl font-black text-primary uppercase font-montserrat tracking-tight mt-2">
                   Ms. Jyoti Nath
                 </h3>
@@ -94,8 +94,8 @@ export default function PrincipalsDesk() {
             </div>
 
             {/* Back Link */}
-            <Link 
-              href="/about-lps" 
+            <Link
+              href="/about-lps"
               className="inline-flex items-center gap-2 text-primary hover:text-accent-hover font-extrabold uppercase text-xs tracking-wider transition-colors ml-4 group"
             >
               <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
@@ -105,7 +105,7 @@ export default function PrincipalsDesk() {
 
           {/* Right Column: Message Letter */}
           <div className="lg:col-span-7 bg-white border border-primary/10 rounded-[2.5rem] p-8 md:p-12 shadow-xl space-y-8 leading-relaxed">
-            
+
             {/* Stylized Quote Block */}
             <div className="relative bg-[#F8F9FC] border-l-4 border-secondary rounded-r-2xl p-6 md:p-8 space-y-4">
               <Quote className="text-secondary/20 absolute -top-3 right-6" size={54} />
@@ -123,34 +123,34 @@ export default function PrincipalsDesk() {
             </div>
 
             {/* Body Text */}
-          <div className="text-gray-600 font-medium text-sm md:text-base space-y-6">
-  <p>
-    Welcome to LPS, Vidyawadi, where we take pride in fostering a nurturing
-    environment that empowers every learner to grow into a confident,
-    compassionate, and globally-minded citizen.
-  </p>
+            <div className="text-gray-600 font-medium text-sm md:text-base space-y-6">
+              <p>
+                Welcome to LPS, Vidyawadi, where we take pride in fostering a nurturing
+                environment that empowers every learner to grow into a confident,
+                compassionate, and globally-minded citizen.
+              </p>
 
-  <p>
-    Founded in 2004, situated in the rural belt of Pali District in Rajasthan,
-    this Vidyalaya is a residential school providing quality education from
-    Nursery to XII primarily for girls, with a noble thought of promoting
-    girls&apos; education. Presently, the School accommodates more than 1000
-    girls.
-  </p>
+              <p>
+                Founded in 2004, situated in the rural belt of Pali District in Rajasthan,
+                this Vidyalaya is a residential school providing quality education from
+                Nursery to XII primarily for girls, with a noble thought of promoting
+                girls&apos; education. Presently, the School accommodates more than 1000
+                girls.
+              </p>
 
-  <p>
-    At our core, we embrace a vision to nurture global citizens who are
-    equipped to thrive in an ever-changing world. Our mission is to provide a
-    healthy learning environment where every student feels safe, valued, and
-    inspired to pursue excellence.
-  </p>
+              <p>
+                At our core, we embrace a vision to nurture global citizens who are
+                equipped to thrive in an ever-changing world. Our mission is to provide a
+                healthy learning environment where every student feels safe, valued, and
+                inspired to pursue excellence.
+              </p>
 
-  <p>
-    Together, let us work to create a future where every child shines brightly,
-    empowered to shape their destiny and contribute meaningfully to the global
-    community.
-  </p>
-</div>
+              <p>
+                Together, let us work to create a future where every child shines brightly,
+                empowered to shape their destiny and contribute meaningfully to the global
+                community.
+              </p>
+            </div>
 
             {/* Closing and Signature */}
             <div className="pt-8 border-t border-gray-100 flex justify-between items-end">
@@ -166,7 +166,7 @@ export default function PrincipalsDesk() {
                   Vidyawadi, Khimel, Dist. Pali (Rajasthan)
                 </p>
               </div>
-              
+
               <div className="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center text-primary/30 rotate-12 hidden xs:flex">
                 <Award size={36} />
               </div>

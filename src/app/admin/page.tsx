@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle, ClipboardList, LayoutGrid } from "lucide-react";
+import { Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle, ClipboardList, LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar } from "lucide-react";
 
 const modules = [
   {
@@ -7,6 +7,18 @@ const modules = [
     description: "Manage school logo, favicons, and other brand assets used in Navbar and Footer.",
     href: "/admin/brand",
     icon: Images,
+  },
+  {
+    title: "Leadership Team",
+    description: "Manage the public leadership page with names, designations, and portrait images.",
+    href: "/admin/leadership",
+    icon: ShieldCheck,
+  },
+  {
+    title: "More Pages",
+    description: "Edit the content pages behind the More menu items and publish new page sections.",
+    href: "/admin/pages",
+    icon: FileText,
   },
   {
     title: "Notice Board",
@@ -43,6 +55,30 @@ const modules = [
     description: "Manage page-wise albums, categories, and uploaded photos used across the website.",
     href: "/admin/galleries",
     icon: Images,
+  },
+  {
+    title: "Magazine Management",
+    description: "Manage school magazines, bulletins, and journals with month, year, and PDF uploads.",
+    href: "/admin/magazine",
+    icon: BookOpen,
+  },
+  {
+    title: "Transport Management",
+    description: "Manage school bus routes, safety norms, operating timings, and driver details.",
+    href: "/admin/transport",
+    icon: Bus,
+  },
+  {
+    title: "CBSE Disclosures",
+    description: "Manage mandatory public disclosures, school certificates, safety documents, and compliance PDFs.",
+    href: "/admin/disclosures",
+    icon: FileText,
+  },
+  {
+    title: "Holiday List",
+    description: "Manage academic year school holidays, seasonal breaks, and national festivals.",
+    href: "/admin/holidays",
+    icon: Calendar,
   },
 ];
 

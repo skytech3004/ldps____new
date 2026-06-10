@@ -63,7 +63,7 @@ function getMappedContent(slug: string) {
   const selectedPages = selectedTitles
     .map((title) => mapByTitle.get(title))
     .filter((page): page is SchoolPage => Boolean(page));
-  
+
   // Transform SchoolPage format to DBPageContent format for uniform rendering
   return selectedPages.map(p => ({
     title: p.title,
@@ -112,7 +112,7 @@ export default function GisStaticPage({ slug }: { slug: string }) {
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-8 text-white shadow-xl">
             <p className="text-accent uppercase text-xs font-black tracking-[0.35em] mb-2">{menu.group}</p>
-            <h1 className="text-4xl font-black uppercase tracking-tight">{menu.title}</h1>
+            <h1 className="text-4xl font-black uppercase tracking-tight text-accent">{menu.title}</h1>
             {menu.sourceUrl ? (
               <p className="mt-3 text-white/60 text-[10px] uppercase font-bold tracking-widest">
                 Source Reference:{" "}
@@ -170,12 +170,12 @@ export default function GisStaticPage({ slug }: { slug: string }) {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {gallery.map((image) => (
                 <div key={image.file} className="relative aspect-square rounded-2xl overflow-hidden group shadow-md">
-                  <Image 
-                    src={image.src} 
-                    alt={image.alt} 
-                    fill 
-                    sizes="(max-width: 768px) 50vw, 16vw" 
-                    className="object-cover group-hover:scale-110 transition-transform duration-500" 
+                  <Image
+                    src={image.src}
+                    alt={image.alt}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 16vw"
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
@@ -183,8 +183,8 @@ export default function GisStaticPage({ slug }: { slug: string }) {
             </div>
           </section>
 
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-white font-black uppercase text-xs tracking-widest hover:bg-secondary transition-all shadow-lg shadow-primary/10"
           >
             Back to Home

@@ -1,5 +1,5 @@
-import GisStaticPage from "@/components/GisStaticPage";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <GisStaticPage slug="directors-desk" />;
+  redirect("/leadership");
 }

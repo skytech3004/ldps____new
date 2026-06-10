@@ -13,6 +13,7 @@ const SECTION_FOLDERS: Record<string, string> = {
   documents: "documents",
   carousel: "carousel",
   logo: "logo",
+  leadership: "leadership",
   "media-items": "media-items",
 };
 
