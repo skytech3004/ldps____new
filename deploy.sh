@@ -27,7 +27,7 @@ echo "==> Restarting PM2 app"
 if pm2 describe "${APP_NAME}" >/dev/null 2>&1; then
   pm2 restart "${APP_NAME}"
 else
-  pm2 start npm --name "${APP_NAME}" -- start -- -H "${HOST}" -p "${PORT}"
+  pm2 start node_modules/next/dist/bin/next --name "${APP_NAME}" -- start -- -H "${HOST}" -p "${PORT}"
 fi
 
 echo "==> Reset PM2 counters and save"
