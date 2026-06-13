@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle, ClipboardList, LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar } from "lucide-react";
+import { Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle, ClipboardList, LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar, Download } from "lucide-react";
 
 const modules = [
   {
@@ -79,6 +79,12 @@ const modules = [
     description: "Manage academic year school holidays, seasonal breaks, and national festivals.",
     href: "/admin/holidays",
     icon: Calendar,
+  },
+  {
+    title: "Downloads Manager",
+    description: "Manage official school PDF forms, applications, brochures, and dynamic planners.",
+    href: "/admin/downloads",
+    icon: Download,
   },
 ];
 

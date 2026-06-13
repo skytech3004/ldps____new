@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, Database, FileText, FolderKanban, Images, LayoutDashboard, LogOut, ClipboardList, LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar } from "lucide-react";
+import { Bell, Database, FileText, FolderKanban, Images, LayoutDashboard, LogOut, ClipboardList, LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar, Download } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -15,6 +15,7 @@ const navItems = [
   { href: "/admin/transport", label: "Bus Routes", icon: Bus },
   { href: "/admin/disclosures", label: "CBSE Disclosures", icon: FileText },
   { href: "/admin/holidays", label: "Holiday List", icon: Calendar },
+  { href: "/admin/downloads", label: "Downloads", icon: Download },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

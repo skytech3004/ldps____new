@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, ChevronDown, Phone, Mail } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, Mail, CreditCard, UserPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { schoolDatabase } from "@/data/lpsVidhyawadiDatabase";
@@ -80,6 +80,14 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [logo, setLogo] = useState("/lps-vidhyawadi/logo.jpg");
+  const [openMobileDropdowns, setOpenMobileDropdowns] = useState<Record<string, boolean>>({});
+
+  const toggleMobileDropdown = (name: string) => {
+    setOpenMobileDropdowns((prev) => ({
+      ...prev,
+      [name]: !prev[name],
+    }));
+  };
 
   useEffect(() => {
     async function fetchLogo() {
@@ -211,7 +219,7 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <div className="flex items-center gap-1.5 sm:gap-3">
+            <div className="hidden xl:flex items-center gap-1.5 sm:gap-3">
               <Link
                 href="/fee-structure"
                 className="bg-accent text-primary font-extrabold text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wider px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-accent-hover hover:scale-[1.03] transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.25)] hover:shadow-[0_6px_16px_rgba(247,184,1,0.35)] whitespace-nowrap"
@@ -259,7 +267,7 @@ export default function Navbar() {
               className="ml-auto h-full w-[88%] max-w-sm bg-white pt-6 px-6 pb-8 overflow-y-auto shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center justify-between mb-6">
                 <div className="flex flex-col">
                   <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">Menu</p>
                   <p className="text-xs font-bold text-primary mt-1">Navigation</p>
@@ -273,53 +281,80 @@ export default function Navbar() {
                 </button>
               </div>
 
+              {/* Action Buttons at the top of Drawer on Mobile */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <Link
+                  href="/fee-structure"
+                  className="bg-gradient-to-r from-primary to-[#2c246b] text-white py-3 px-2 rounded-xl font-extrabold text-[10px] uppercase tracking-wider hover:scale-[1.02] transition-all shadow-md shadow-primary/20 text-center flex items-center justify-center gap-1.5 min-h-[46px] border border-white/10"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <CreditCard size={12} className="text-accent" />
+                  Fee Payment
+                </Link>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    window.dispatchEvent(new Event("open-admission-modal"));
+                  }}
+                  className="bg-gradient-to-r from-accent to-[#e5ab00] text-primary py-3 px-2 rounded-xl font-extrabold text-[10px] uppercase tracking-wider hover:scale-[1.02] transition-all shadow-md shadow-accent/20 text-center flex items-center justify-center gap-1.5 min-h-[46px] border border-accent/20"
+                >
+                  <UserPlus size={12} />
+                  Admission Query
+                </button>
+              </div>
+
               <div className="flex flex-col gap-1">
                 {navLinks.map((link) => (
                   <div key={link.name} className="group">
                     <div className="flex items-center justify-between py-3 border-b border-gray-50">
-                      <Link
-                        href={link.href}
-                        className="text-lg font-bold text-primary flex-1"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {link.name}
-                      </Link>
-                      {link.dropdown && <ChevronDown size={18} className="text-primary/40" />}
+                      {link.dropdown ? (
+                        <button
+                          onClick={() => toggleMobileDropdown(link.name)}
+                          className="text-lg font-bold text-primary flex-1 text-left flex items-center justify-between w-full focus:outline-none"
+                        >
+                          <span>{link.name}</span>
+                          <ChevronDown
+                            size={18}
+                            className={cn(
+                              "text-primary/40 transition-transform duration-300",
+                              openMobileDropdowns[link.name] ? "rotate-180" : ""
+                            )}
+                          />
+                        </button>
+                      ) : (
+                        <Link
+                          href={link.href}
+                          className="text-lg font-bold text-primary flex-1"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {link.name}
+                        </Link>
+                      )}
                     </div>
-                    {link.dropdown && (
-                      <div className="my-2 flex flex-col gap-1 pl-4 border-l-2 border-accent/30">
-                        {link.dropdown.map((item) => (
-                          <Link
-                            key={item.label}
-                            href={item.href}
-                            className="py-2 text-[14px] font-medium text-gray-500 hover:text-primary transition-colors"
-                            onClick={() => setIsOpen(false)}
-                          >
-                            {item.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
+                    <AnimatePresence initial={false}>
+                      {link.dropdown && openMobileDropdowns[link.name] && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="my-2 flex flex-col gap-1 pl-4 border-l-2 border-accent/30 overflow-hidden"
+                        >
+                          {link.dropdown.map((item) => (
+                            <Link
+                              key={item.label}
+                              href={item.href}
+                              className="py-2 text-[14px] font-medium text-gray-500 hover:text-primary transition-colors"
+                              onClick={() => setIsOpen(false)}
+                            >
+                              {item.label}
+                            </Link>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 ))}
-                <div className="flex flex-col gap-3 mt-8">
-                  <Link
-                    href="/fee-structure"
-                    className="bg-primary text-white w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-primary/90 transition-all shadow-md shadow-primary/10 text-center block"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Fee Payment
-                  </Link>
-                  <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      window.dispatchEvent(new Event("open-admission-modal"));
-                    }}
-                    className="bg-accent text-primary w-full py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider hover:scale-[1.02] transition-all shadow-md shadow-accent/10 text-center block"
-                  >
-                    Admission Query
-                  </button>
-                </div>
               </div>
             </motion.div>
           </motion.div>

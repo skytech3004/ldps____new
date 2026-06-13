@@ -1,39 +1,70 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Download, FileText, CalendarDays, ArrowRight, ShieldCheck, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
+const fallbackForms = [
+  {
+    title: "Student Leave Application Form",
+    description: "Prescribed form for submitting student leave requests to the Principal, detailing the duration and reasons.",
+    filename: "LPS_Student_Leave_Form.pdf",
+    fileSize: "184 KB",
+    pdfUrl: "#"
+  },
+  {
+    title: "School E-Prospectus & Brochure",
+    description: "Official school prospectus detailing standard guidelines, infrastructure details, streams offered, and values.",
+    filename: "LPS_Vidyawadi_Prospectus.pdf",
+    fileSize: "2.4 MB",
+    pdfUrl: "#"
+  },
+  {
+    title: "T.C. Application Request Form",
+    description: "Standard written application form required to initiate student withdrawals and Transfer Certificate clearances.",
+    filename: "LPS_TC_Request_Form.pdf",
+    fileSize: "142 KB",
+    pdfUrl: "#"
+  },
+  {
+    title: "Annual Activity Planner & Calendar",
+    description: "Year planner detailing summer and winter breaks, holidays, PTM dates, and exam schedules.",
+    filename: "LPS_Academic_Planner_2024.pdf",
+    fileSize: "512 KB",
+    pdfUrl: "#"
+  }
+];
+
 export default function DownloadsPage() {
-  const forms = [
-    {
-      title: "Student Leave Application Form",
-      desc: "Prescribed form for submitting student leave requests to the Principal, detailing the duration and reasons.",
-      filename: "LPS_Student_Leave_Form.pdf",
-      size: "184 KB"
-    },
-    {
-      title: "School E-Prospectus & Brochure",
-      desc: "Official school prospectus detailing standard guidelines, infrastructure details, streams offered, and values.",
-      filename: "LPS_Vidyawadi_Prospectus.pdf",
-      size: "2.4 MB"
-    },
-    {
-      title: "T.C. Application Request Form",
-      desc: "Standard written application form required to initiate student withdrawals and Transfer Certificate clearances.",
-      filename: "LPS_TC_Request_Form.pdf",
-      size: "142 KB"
-    },
-    {
-      title: "Annual Activity Planner & Calendar",
-      desc: "Year planner detailing summer and winter breaks, holidays, PTM dates, and exam schedules.",
-      filename: "LPS_Academic_Planner_2024.pdf",
-      size: "512 KB"
+  const [downloads, setDownloads] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchDownloads() {
+      try {
+        const response = await fetch("/api/admin/downloads");
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.length > 0) {
+            setDownloads(data);
+          } else {
+            setDownloads(fallbackForms);
+          }
+        } else {
+          setDownloads(fallbackForms);
+        }
+      } catch (err) {
+        console.error("Failed to fetch downloads:", err);
+        setDownloads(fallbackForms);
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    fetchDownloads();
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#F8F9FC] text-gray-800">
@@ -69,42 +100,57 @@ export default function DownloadsPage() {
           <div className="h-1.5 w-24 bg-accent mx-auto rounded-full" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto pt-4">
-          {forms.map((form, idx) => (
-            <div 
-              key={idx} 
-              className="bg-white border border-primary/10 rounded-[2rem] p-8 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between group overflow-hidden relative h-64"
-            >
-              <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-bl-[4rem] group-hover:scale-105 transition-transform" />
-              
-              <div className="space-y-4">
-                <div className="flex gap-4 items-center">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                    <FileText size={20} />
-                  </div>
-                  <h4 className="text-base md:text-lg font-black uppercase font-montserrat tracking-tight text-primary">{form.title}</h4>
-                </div>
-                <p className="text-gray-500 font-medium text-xs md:text-sm leading-relaxed">{form.desc}</p>
-              </div>
-
-              <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-4">
-                <div className="space-y-0.5">
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{form.filename}</p>
-                  <p className="text-[10px] text-accent-hover font-black uppercase tracking-wider">{form.size}</p>
-                </div>
-
-                <a 
-                  href="#"
-                  onClick={(e) => { e.preventDefault(); alert(`Form download initiated for ${form.filename}`); }}
-                  className="bg-primary hover:bg-secondary text-white font-extrabold uppercase text-[10px] md:text-xs tracking-wider px-5 py-3 rounded-xl shadow-md flex items-center gap-1.5 group"
-                >
-                  <Download size={14} className="group-hover:translate-y-0.5 transition-transform" />
-                  <span>Download PDF</span>
-                </a>
-              </div>
+        {loading ? (
+          <div className="h-64 flex items-center justify-center bg-white border border-primary/5 rounded-[2rem] max-w-5xl mx-auto shadow-md">
+            <div className="animate-pulse text-primary font-black uppercase tracking-widest text-sm">
+              Loading Download Resources...
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto pt-4">
+            {downloads.map((form, idx) => (
+              <div 
+                key={idx} 
+                className="bg-white border border-primary/10 rounded-[2rem] p-8 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between group overflow-hidden relative h-64"
+              >
+                <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-bl-[4rem] group-hover:scale-105 transition-transform" />
+                
+                <div className="space-y-4">
+                  <div className="flex gap-4 items-center">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                      <FileText size={20} />
+                    </div>
+                    <h4 className="text-base md:text-lg font-black uppercase font-montserrat tracking-tight text-primary">{form.title}</h4>
+                  </div>
+                  <p className="text-gray-500 font-medium text-xs md:text-sm leading-relaxed line-clamp-3">{form.description || form.desc}</p>
+                </div>
+
+                <div className="flex items-center justify-between border-t border-gray-100 pt-4 mt-4">
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider truncate max-w-[150px]" title={form.filename}>{form.filename}</p>
+                    <p className="text-[10px] text-accent-hover font-black uppercase tracking-wider">{form.fileSize || form.size}</p>
+                  </div>
+
+                  <a 
+                    href={form.pdfUrl || "#"}
+                    target={form.pdfUrl && form.pdfUrl !== "#" ? "_blank" : undefined}
+                    rel={form.pdfUrl && form.pdfUrl !== "#" ? "noopener noreferrer" : undefined}
+                    onClick={(e) => {
+                      if (!form.pdfUrl || form.pdfUrl === "#") {
+                        e.preventDefault();
+                        alert(`Form download initiated for ${form.filename}`);
+                      }
+                    }}
+                    className="bg-primary hover:bg-secondary text-white font-extrabold uppercase text-[10px] md:text-xs tracking-wider px-5 py-3 rounded-xl shadow-md flex items-center gap-1.5 group"
+                  >
+                    <Download size={14} className="group-hover:translate-y-0.5 transition-transform" />
+                    <span>Download PDF</span>
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Call to Action */}

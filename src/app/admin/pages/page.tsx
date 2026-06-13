@@ -18,15 +18,31 @@ type PageContentRecord = {
   sections: { title: string; content: string[] }[];
 };
 
-const moreMenuItems = gisMenuItems.filter((item) => item.group === "More");
+const EXCLUDED_SLUGS = [
+  "leadership",
+  "transport",
+  "public-disclosures-cbse",
+  "holiday-list",
+  "downloads",
+  "download-tc",
+  "e-brochure",
+  "magazine"
+];
+
+const moreMenuItems = gisMenuItems.filter(
+  (item) =>
+    (item.group === "About" || item.group === "Academics" || item.group === "Schooling" || item.group === "More") &&
+    !EXCLUDED_SLUGS.includes(item.slug)
+);
 
 const initialSection: SectionForm = { title: "", contentText: "" };
 
 function emptyRecord(slug: string, title: string) {
+  const matchedMenuItem = moreMenuItems.find(m => m.slug === slug);
   return {
     slug,
     title,
-    group: "More",
+    group: matchedMenuItem?.group ?? "More",
     sections: [initialSection],
   };
 }
@@ -38,9 +54,9 @@ export default function AdminPagesPage() {
   const [error, setError] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [selectedSlug, setSelectedSlug] = useState(moreMenuItems[0]?.slug ?? "news");
-  const [formTitle, setFormTitle] = useState(moreMenuItems[0]?.title ?? "News");
-  const [formGroup, setFormGroup] = useState("More");
+  const [selectedSlug, setSelectedSlug] = useState(moreMenuItems[0]?.slug ?? "about-lps");
+  const [formTitle, setFormTitle] = useState(moreMenuItems[0]?.title ?? "About LPS");
+  const [formGroup, setFormGroup] = useState<string>(moreMenuItems[0]?.group ?? "About");
   const [formSections, setFormSections] = useState<SectionForm[]>([initialSection]);
 
   async function fetchItems() {
@@ -221,40 +237,51 @@ export default function AdminPagesPage() {
         </div>
 
         <div className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-4 space-y-3">
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-teal">More Menu</p>
-            {moreMenuItems.map((item) => {
-              const record = items.find((entry) => entry.slug === item.slug);
+            <div className="lg:col-span-4 space-y-6 max-h-[70vh] overflow-y-auto pr-2">
+              {Object.entries(
+                moreMenuItems.reduce<Record<string, typeof moreMenuItems>>((groups, item) => {
+                  const g = item.group + " Wing";
+                  if (!groups[g]) groups[g] = [];
+                  groups[g].push(item);
+                  return groups;
+                }, {})
+              ).map(([groupName, groupItems]) => (
+                <div key={groupName} className="space-y-2">
+                  <p className="text-xs font-black uppercase tracking-[0.25em] text-accent mt-4 first:mt-0">{groupName}</p>
+                  {groupItems.map((item) => {
+                    const record = items.find((entry) => entry.slug === item.slug);
 
-              return (
-                <button
-                  key={item.slug}
-                  onClick={() => {
-                    setSelectedSlug(item.slug);
-                    setFormTitle(item.title);
-                    setFormGroup("More");
-                  }}
-                  className={`w-full text-left rounded-2xl border p-4 transition-all ${
-                    selectedSlug === item.slug
-                      ? "border-navy bg-navy text-white shadow-lg"
-                      : "border-teal/10 bg-[#f7fbf8] hover:bg-white"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="font-black uppercase tracking-tight">{item.title}</p>
-                      <p className={`text-xs font-bold mt-1 ${selectedSlug === item.slug ? "text-white/70" : "text-teal"}`}>
-                        /{item.slug}
-                      </p>
-                    </div>
-                    <div className={`text-xs font-black uppercase tracking-wider ${selectedSlug === item.slug ? "text-accent" : "text-green-primary"}`}>
-                      {record ? "Saved" : "New"}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+                    return (
+                      <button
+                        key={item.slug}
+                        onClick={() => {
+                          setSelectedSlug(item.slug);
+                          setFormTitle(item.title);
+                          setFormGroup(item.group);
+                        }}
+                        className={`w-full text-left rounded-2xl border p-4 transition-all ${
+                          selectedSlug === item.slug
+                            ? "border-navy bg-navy text-white shadow-lg"
+                            : "border-teal/10 bg-[#f7fbf8] hover:bg-white"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-4">
+                          <div>
+                            <p className="font-black uppercase tracking-tight text-xs md:text-sm">{item.title}</p>
+                            <p className={`text-[10px] font-bold mt-1 ${selectedSlug === item.slug ? "text-white/70" : "text-teal"}`}>
+                              /{item.slug}
+                            </p>
+                          </div>
+                          <div className={`text-[10px] font-black uppercase tracking-wider ${selectedSlug === item.slug ? "text-accent" : "text-green-primary"}`}>
+                            {record ? "Saved" : "New"}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
 
           <div className="lg:col-span-8">
             {error ? <p className="mb-4 text-sm font-semibold text-error">{error}</p> : null}
@@ -341,7 +368,15 @@ export default function AdminPagesPage() {
                   <label className="text-xs font-black uppercase tracking-wider text-teal block mb-2">Slug *</label>
                   <select
                     value={selectedSlug}
-                    onChange={(event) => setSelectedSlug(event.target.value)}
+                    onChange={(event) => {
+                      const val = event.target.value;
+                      setSelectedSlug(val);
+                      const matched = moreMenuItems.find(m => m.slug === val);
+                      if (matched) {
+                        setFormTitle(matched.title);
+                        setFormGroup(matched.group);
+                      }
+                    }}
                     className="w-full border border-teal/20 rounded-lg px-3 py-2 text-navy font-semibold"
                   >
                     {moreMenuItems.map((item) => (
