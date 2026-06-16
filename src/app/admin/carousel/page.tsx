@@ -261,12 +261,20 @@ export default function AdminCarouselPage() {
                   <label className="text-xs font-bold text-white/70 uppercase">Image Banner *</label>
                   
                   {imagePreview ? (
-                    <div className="relative w-full aspect-[21/9] bg-[#081736] rounded-xl overflow-hidden border-2 border-accent/50 group">
+                    <div className="relative w-full aspect-[21/9] bg-[#081736] rounded-xl overflow-hidden border-2 border-accent/50 group flex items-center justify-center">
                       <Image
                         src={imagePreview}
                         alt="Upload Preview"
                         fill
-                        className="object-cover"
+                        className="object-cover blur-xl opacity-35 scale-110 pointer-events-none select-none"
+                        unoptimized
+                      />
+                      <Image
+                        src={imagePreview}
+                        alt="Upload Preview"
+                        fill
+                        className="object-contain relative z-10"
+                        unoptimized
                       />
                       <button
                         type="button"
@@ -446,13 +454,20 @@ export default function AdminCarouselPage() {
               {slides.length > 0 && slides[currentSlide] ? (
                 <div className="space-y-4">
                   {/* Aspect Ratio Box mimicking homepage */}
-                  <div className="relative w-full aspect-[21/9] sm:aspect-[16/9] bg-[#081736] rounded-xl overflow-hidden border border-white/10 group">
+                  <div className="relative w-full aspect-[21/9] sm:aspect-[16/9] bg-[#081736] rounded-xl overflow-hidden border border-white/10 group flex items-center justify-center">
+                    <Image
+                      src={slides[currentSlide].image}
+                      alt=""
+                      fill
+                      className="object-cover blur-xl opacity-35 scale-110 pointer-events-none select-none"
+                      unoptimized
+                    />
                     <Image
                       src={slides[currentSlide].image}
                       alt="Carousel Preview"
                       fill
                       sizes="(max-width: 1024px) 100vw, 400px"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-contain relative z-10 transition-transform duration-500 group-hover:scale-[1.02]"
                     />
 
                     {/* Captions if existing */}
