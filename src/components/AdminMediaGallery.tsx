@@ -27,6 +27,24 @@ export default function AdminMediaGallery() {
     src: "",
   });
 
+  const getYouTubeThumbnail = (url: string) => {
+    try {
+      const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+      const match = url.match(regExp);
+      const videoId = (match && match[7].length === 11) ? match[7] : null;
+      if (videoId) {
+        return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      }
+    } catch (e) {
+      console.error("Failed to parse YT URL", e);
+    }
+    return null;
+  };
+
+  const isYouTubeUrl = (url: string) => {
+    return url.includes("youtube.com") || url.includes("youtu.be");
+  };
+
   // Load media items from database
   const fetchMediaItems = async () => {
     try {
@@ -105,6 +123,16 @@ export default function AdminMediaGallery() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (activeTab === "video" && file.size > 25 * 1024 * 1024) {
+      const proceed = window.confirm(
+        `This video file is quite large (${(file.size / (1024 * 1024)).toFixed(1)} MB). ` +
+        "Uploading large video files directly can cause slow loading times for your website visitors. " +
+        "We recommend uploading the video to YouTube and inserting the YouTube URL instead. " +
+        "\n\nDo you still want to upload this file directly?"
+      );
+      if (!proceed) return;
+    }
+
     setUploading(true);
     try {
       const dataToUpload = new FormData();
@@ -170,6 +198,8 @@ export default function AdminMediaGallery() {
 
   const handleDeleteItem = async (id: string) => {
     if (!id) return;
+    const confirmed = window.confirm(`Are you sure you want to delete this ${activeTab}?`);
+    if (!confirmed) return;
 
     setSaving(true);
     try {
@@ -198,26 +228,32 @@ export default function AdminMediaGallery() {
   const previewItem = currentItems.find((item) => item._id === activePreview);
 
   return (
-    <div className="w-full max-w-7xl mx-auto">
+    <div className="w-full max-w-7xl mx-auto font-montserrat text-white">
       {/* Tab Navigation */}
       <div className="flex gap-4 mb-8 border-b border-slate-200">
         <button
-          onClick={() => setActiveTab("photo")}
+          onClick={() => {
+            setActiveTab("photo");
+            setShowAddForm(false);
+          }}
           className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 ${
             activeTab === "photo"
-              ? "text-white-600 border-b-2 border-[#3D348B]"
-              : "text-white-400 hover:text-slate-900"
+              ? "text-white border-b-2 border-accent font-bold"
+              : "text-white/60 hover:text-white"
           }`}
         >
           <ImageIcon size={20} />
           Photos ({photoItems.length})
         </button>
         <button
-          onClick={() => setActiveTab("video")}
+          onClick={() => {
+            setActiveTab("video");
+            setShowAddForm(false);
+          }}
           className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 ${
             activeTab === "video"
-              ? "text-white-600 border-b-2 border-[#3D348B]"
-              : "text-white-400 hover:text-slate-900"
+              ? "text-white border-b-2 border-accent font-bold"
+              : "text-white/60 hover:text-white"
           }`}
         >
           <Film size={20} />
@@ -225,14 +261,21 @@ export default function AdminMediaGallery() {
         </button>
       </div>
 
-      {/* Add Item Button */}
-      <div className="mb-8 flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-white bg-yellow-500 px-4 py-2 rounded-lg">
-          {activeTab === "photo" ? "Manage Photos" : "Manage Videos"}
-        </h2>
+      {/* Header Area */}
+      <div className="mb-8 flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-white bg-[#3D348B] border border-white/10 px-4 py-2 rounded-lg inline-block">
+            {activeTab === "photo" ? "Manage General Photos" : "Manage General Videos"}
+          </h2>
+          <p className="text-white/60 text-xs mt-2">
+            {activeTab === "photo" 
+              ? "Upload and manage photos for the general school image gallery." 
+              : "Upload and manage videos for the general school video gallery."}
+          </p>
+        </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-2 px-4 py-2 text-white bg-yellow-500 hover:bg-white-500 transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 text-white bg-yellow-500 hover:bg-yellow-600 transition-colors rounded-lg disabled:opacity-50 font-bold text-sm uppercase shrink-0"
           disabled={loading}
         >
           <Plus size={20} />
@@ -243,243 +286,267 @@ export default function AdminMediaGallery() {
       {/* Loading State */}
       {loading && (
         <div className="text-center py-12">
-          <p className="text-slate-600">Loading media items...</p>
+          <p className="text-slate-400">Loading media items...</p>
         </div>
       )}
 
       {!loading && (
         <>
           {/* Add Form */}
-      {showAddForm && (
-        <div className="bg-slate-50 p-6 rounded-lg mb-8 border border-slate-200">
-          <div className="mb-4 flex gap-2">
-            <button
-              onClick={() => setInputMode("url")}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                inputMode === "url"
-                  ? "bg-[#3D348B] text-white"
-                  : "bg-slate-300 text-slate-700 hover:bg-slate-400"
-              }`}
-            >
-              URL
-            </button>
-            <button
-              onClick={() => setInputMode("upload")}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
-                inputMode === "upload"
-                  ? "bg-[#3D348B] text-white"
-                  : "bg-slate-300 text-slate-700 hover:bg-slate-400"
-              }`}
-            >
-              <Upload size={16} />
-              Upload
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <input
-              type="text"
-              placeholder="Title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="px-4 py-2 border text-black border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3D348B]"
-            />
-            
-            {inputMode === "url" ? (
-              <input
-                type="text"
-                placeholder={activeTab === "photo" ? "Image URL" : "YouTube Embed URL"}
-                value={formData.src}
-                onChange={(e) => setFormData({ ...formData, src: e.target.value })}
-                className="px-4 py-2 border text-black border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3D348B]"
-              />
-            ) : (
-              <label className="relative px-4 py-2 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-[#3D348B] transition-colors flex items-center justify-center">
-                <input
-                  type="file"
-                  accept={activeTab === "photo" ? "image/*" : "video/*"}
-                  onChange={handleFileUpload}
-                  disabled={uploading}
-                  className="hidden"
-                />
-                <span className="text-black font-semibold">
-                  {uploading ? "Uploading..." : formData.src ? "✓ File Selected" : "Click to Upload"}
-                </span>
-              </label>
-            )}
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={handleAddItem}
-              disabled={uploading || saving}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-400 disabled:cursor-not-allowed"
-            >
-              {saving ? "Saving..." : "Add"}
-            </button>
-            <button
-              onClick={() => {
-                setShowAddForm(false);
-                setFormData({ title: "", src: "" });
-                setInputMode("url");
-              }}
-              className="px-4 py-2 bg-slate-400 text-white rounded-lg hover:bg-slate-500 transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Gallery Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {currentItems.map((item, idx) => (
-          <motion.div
-            key={item._id || `${item.type}-${idx}-${item.title}`}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5, delay: (idx % 3) * 0.1 }}
-            className="bg-white rounded-lg border border-slate-200 shadow-md overflow-hidden group hover:shadow-lg transition-all"
-          >
-            {/* Media Preview */}
-            <div
-              onClick={() => {
-                if (item._id) setActivePreview(item._id);
-              }}
-              className="relative aspect-video bg-slate-100 cursor-pointer overflow-hidden"
-            >
-              {activeTab === "photo" ? (
-                <img
-                  src={item.src}
-                  alt={item.alt}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="w-full h-full bg-black/80 flex items-center justify-center">
-                  <Film size={48} className="text-[#F7B801]" />
-                </div>
-              )}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <span className="text-white font-bold text-sm">Preview</span>
+          {showAddForm && (
+            <div className="bg-[#0f234f]/80 p-6 rounded-2xl mb-8 border border-white/10">
+              <div className="mb-4 flex gap-2">
+                <button
+                  onClick={() => setInputMode("url")}
+                  className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                    inputMode === "url"
+                      ? "bg-[#3D348B] text-white"
+                      : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  URL
+                </button>
+                <button
+                  onClick={() => setInputMode("upload")}
+                  className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
+                    inputMode === "upload"
+                      ? "bg-[#3D348B] text-white"
+                      : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  <Upload size={16} />
+                  Upload
+                </button>
               </div>
-            </div>
 
-            {/* Title and Controls */}
-            <div className="p-4">
-              <h3 className="text-[#3D348B] font-bold line-clamp-2 mb-3 text-sm">
-                {item.title}
-              </h3>
-              <button
-                onClick={() => handleDeleteItem(item._id!)}
-                className="w-full px-3 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors flex items-center justify-center gap-2 font-semibold text-sm"
-              >
-                <Trash2 size={16} />
-                Delete
-              </button>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {currentItems.length === 0 && (
-        <div className="text-center py-12 text-slate-500">
-          <p className="text-lg">No {activeTab === "photo" ? "photos" : "videos"} yet. Add one to get started!</p>
-        </div>
-      )}
-
-      {/* Preview Modal */}
-      <AnimatePresence>
-        {activePreview !== null && previewItem && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setActivePreview(null)}
-            className="fixed inset-0 z-100 bg-black/95 backdrop-blur-md flex flex-col justify-between items-center py-6 px-4"
-          >
-            {/* Top Bar */}
-            <div className="w-full max-w-6xl flex justify-between items-center text-white px-2">
-              <span className="text-xs md:text-sm font-bold tracking-widest text-[#F7B801] uppercase">
-                LPS Vidyawadi Media Portal
-              </span>
-              <button
-                onClick={() => setActivePreview(null)}
-                className="p-2.5 bg-white/5 hover:bg-white/15 border border-white/10 rounded-full"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Media Area */}
-            <div className="flex-1 w-full flex items-center justify-center relative my-4 max-h-[75vh]">
-              <button
-                onClick={handlePrevPreview}
-                className="absolute left-2 md:left-4 z-10 p-3 bg-white/5 hover:bg-white/15 border border-white/10 text-white rounded-full hidden sm:block"
-              >
-                <ChevronLeft size={24} />
-              </button>
-
-              <motion.div
-                key={previewItem._id}
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                onClick={(e) => e.stopPropagation()}
-                className="relative max-h-full max-w-full md:max-w-4xl flex flex-col items-center justify-center"
-              >
-                {activeTab === "photo" ? (
-                  <img
-                    src={previewItem.src}
-                    alt={previewItem.alt}
-                    className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl border border-white/10"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <input
+                  type="text"
+                  placeholder="Title"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  className="px-4 py-2 border bg-[#081736] text-white border-white/10 rounded-lg focus:outline-none focus:border-accent"
+                />
+                
+                {inputMode === "url" ? (
+                  <input
+                    type="text"
+                    placeholder={activeTab === "photo" ? "Image URL" : "YouTube Embed URL"}
+                    value={formData.src}
+                    onChange={(e) => setFormData({ ...formData, src: e.target.value })}
+                    className="px-4 py-2 border bg-[#081736] text-white border-white/10 rounded-lg focus:outline-none focus:border-accent"
                   />
                 ) : (
-                  <iframe
-                    src={previewItem.src}
-                    title={previewItem.title}
-                    allowFullScreen
-                    className="w-full max-w-4xl aspect-video rounded-xl border border-white/10"
-                  />
+                  <label className="relative px-4 py-2 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-accent transition-colors flex items-center justify-center bg-[#081736]">
+                    <input
+                      type="file"
+                      accept={activeTab === "photo" ? "image/*" : "video/*"}
+                      onChange={handleFileUpload}
+                      disabled={uploading}
+                      className="hidden"
+                    />
+                    <span className="text-white/60 font-semibold">
+                      {uploading ? "Uploading..." : formData.src ? `✓ ${activeTab === "photo" ? "Image" : "Video"} Uploaded` : `Click to Upload ${activeTab === "photo" ? "Image" : "Video"}`}
+                    </span>
+                  </label>
                 )}
-              </motion.div>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleAddItem}
+                  disabled={uploading || saving}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                >
+                  {saving ? "Saving..." : "Add"}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowAddForm(false);
+                    setFormData({ title: "", src: "" });
+                    setInputMode("url");
+                  }}
+                  className="px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
 
-              <button
-                onClick={handleNextPreview}
-                className="absolute right-2 md:right-4 z-10 p-3 bg-white/5 hover:bg-white/15 border border-white/10 text-white rounded-full hidden sm:block"
+          {/* Gallery Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {currentItems.map((item, idx) => (
+              <motion.div
+                key={item._id || `${activeTab}-${idx}`}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: (idx % 3) * 0.1 }}
+                className="bg-[#0f234f]/60 rounded-xl border border-white/10 shadow-md overflow-hidden group hover:shadow-lg transition-all"
               >
-                <ChevronRight size={24} />
-              </button>
-            </div>
+                {/* Media Preview */}
+                <div
+                  onClick={() => {
+                    if (item._id) setActivePreview(item._id);
+                  }}
+                  className="relative aspect-video bg-slate-900 cursor-pointer overflow-hidden flex items-center justify-center"
+                >
+                  {activeTab === "photo" ? (
+                    <img
+                      src={item.src}
+                      alt={item.alt}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                  ) : isYouTubeUrl(item.src) ? (
+                    getYouTubeThumbnail(item.src) ? (
+                      <img
+                        src={getYouTubeThumbnail(item.src)!}
+                        alt={item.alt}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-[#081736] flex items-center justify-center">
+                        <Film size={48} className="text-[#F7B801]" />
+                      </div>
+                    )
+                  ) : (
+                    <video
+                      src={item.src}
+                      preload="metadata"
+                      muted
+                      playsInline
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">Preview</span>
+                  </div>
+                </div>
 
-            {/* Bottom Info Bar */}
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-3xl text-center flex flex-col items-center gap-4 text-white px-4"
-            >
-              <div className="space-y-1">
-                <p className="text-sm md:text-lg font-bold text-white max-w-2xl">
-                  {previewItem.title}
-                </p>
-                <p className="text-[11px] md:text-xs font-bold text-slate-400 uppercase">
-                  {activeTab === "photo" ? "Photo" : "Video"} {currentItems.findIndex((item) => item._id === activePreview) + 1} of{" "}
-                  {currentItems.length}
-                </p>
-              </div>
+                {/* Title and Controls */}
+                <div className="p-4">
+                  <h3 className="text-white font-bold line-clamp-2 mb-3 text-sm">
+                    {item.title}
+                  </h3>
+                  <button
+                    onClick={() => handleDeleteItem(item._id!)}
+                    className="w-full px-3 py-2 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white rounded transition-colors flex items-center justify-center gap-2 font-semibold text-sm"
+                  >
+                    <Trash2 size={16} />
+                    Delete {activeTab === "photo" ? "Photo" : "Video"}
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
 
-              {/* Mobile Arrows */}
-              <div className="flex sm:hidden items-center gap-6 mt-1">
-                <button onClick={handlePrevPreview} className="p-2.5 bg-white/5 rounded-full">
-                  <ChevronLeft size={20} />
-                </button>
-                <button onClick={handleNextPreview} className="p-2.5 bg-white/5 rounded-full">
-                  <ChevronRight size={20} />
-                </button>
-              </div>
+          {currentItems.length === 0 && (
+            <div className="text-center py-12 text-slate-500">
+              <p className="text-lg">No items yet. Add one to get started!</p>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+
+          {/* Preview Modal */}
+          <AnimatePresence>
+            {activePreview !== null && previewItem && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setActivePreview(null)}
+                className="fixed inset-0 z-100 bg-black/95 backdrop-blur-md flex flex-col justify-between items-center py-6 px-4"
+              >
+                {/* Top Bar */}
+                <div className="w-full max-w-6xl flex justify-between items-center text-white px-2">
+                  <span className="text-xs md:text-sm font-bold tracking-widest text-[#F7B801] uppercase">
+                    LPS Vidyawadi Media Portal
+                  </span>
+                  <button
+                    onClick={() => setActivePreview(null)}
+                    className="p-2.5 bg-white/5 hover:bg-white/15 border border-white/10 rounded-full"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {/* Media Area */}
+                <div className="flex-1 w-full flex items-center justify-center relative my-4 max-h-[75vh]">
+                  <button
+                    onClick={handlePrevPreview}
+                    className="absolute left-2 md:left-4 z-10 p-3 bg-white/5 hover:bg-white/15 border border-white/10 text-white rounded-full hidden sm:block"
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
+
+                  <motion.div
+                    key={previewItem._id}
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.95, opacity: 0 }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="relative w-full max-w-4xl aspect-video flex flex-col items-center justify-center"
+                  >
+                    {activeTab === "photo" ? (
+                      <img
+                        src={previewItem.src}
+                        alt={previewItem.alt}
+                        className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl border border-white/10"
+                      />
+                    ) : isYouTubeUrl(previewItem.src) ? (
+                      <iframe
+                        src={previewItem.src}
+                        title={previewItem.title}
+                        allowFullScreen
+                        className="w-full h-full rounded-xl border border-white/5 shadow-2xl"
+                      />
+                    ) : (
+                      <video
+                        src={previewItem.src}
+                        controls
+                        autoPlay
+                        preload="auto"
+                        className="w-full h-full rounded-xl border border-white/5 shadow-2xl object-contain bg-black"
+                      />
+                    )}
+                  </motion.div>
+
+                  <button
+                    onClick={handleNextPreview}
+                    className="absolute right-2 md:right-4 z-10 p-3 bg-white/5 hover:bg-white/15 border border-white/10 text-white rounded-full hidden sm:block"
+                  >
+                    <ChevronRight size={24} />
+                  </button>
+                </div>
+
+                {/* Bottom Info Bar */}
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-full max-w-3xl text-center flex flex-col items-center gap-4 text-white px-4"
+                >
+                  <div className="space-y-1">
+                    <p className="text-sm md:text-lg font-bold text-white max-w-2xl">
+                      {previewItem.title}
+                    </p>
+                    <p className="text-[11px] md:text-xs font-bold text-slate-400 uppercase">
+                      {activeTab === "photo" ? "Photo" : "Video"} {currentItems.findIndex((item) => item._id === activePreview) + 1} of {currentItems.length}
+                    </p>
+                  </div>
+
+                  {/* Mobile Arrows */}
+                  <div className="flex sm:hidden items-center gap-6 mt-1">
+                    <button onClick={handlePrevPreview} className="p-2.5 bg-white/5 rounded-full">
+                      <ChevronLeft size={20} />
+                    </button>
+                    <button onClick={handleNextPreview} className="p-2.5 bg-white/5 rounded-full">
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </>
       )}
     </div>

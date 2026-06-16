@@ -11,7 +11,7 @@ export default function LifeAtGis() {
   useEffect(() => {
     async function fetchVideos() {
       try {
-        const res = await fetch("/api/admin/media-items?type=video");
+        const res = await fetch("/api/admin/media-items?type=highlight");
         if (res.ok) {
           const data = await res.json();
           setVideoItems(data.slice(0, 4)); // Get top 4 videos
@@ -28,6 +28,10 @@ export default function LifeAtGis() {
     const match = url.match(regExp);
     const videoId = (match && match[7].length === 11) ? match[7] : null;
     return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
+  };
+
+  const isYouTubeUrl = (url: string) => {
+    return url.includes("youtube.com") || url.includes("youtu.be");
   };
 
   return (
@@ -50,20 +54,39 @@ export default function LifeAtGis() {
         <div className="max-w-6xl mx-auto px-6 relative z-10">
           <div className="flex gap-6 overflow-x-auto pb-8 snap-x no-scrollbar items-center justify-center">
             {videoItems.slice(1).map((video, i) => {
-              const thumb = getYouTubeThumbnail(video.src);
+              const isYT = isYouTubeUrl(video.src);
+              const thumb = isYT ? getYouTubeThumbnail(video.src) : null;
               return (
                 <div 
                   key={i} 
                   onClick={() => setActiveVideo(video.src)}
-                  className="min-w-[280px] w-[280px] md:w-[320px] aspect-video relative rounded-xl overflow-hidden shrink-0 snap-center shadow-2xl cursor-pointer group border-4 border-white"
+                  className="min-w-[280px] w-[280px] md:w-[320px] aspect-video relative rounded-xl overflow-hidden shrink-0 snap-center shadow-2xl cursor-pointer group border-4 border-white bg-black flex items-center justify-center"
                 >
-                  {thumb && <Image src={thumb} alt={video.title} fill sizes="(max-width: 768px) 280px, 320px" className="object-cover group-hover:scale-105 transition-transform duration-500" />}
+                  {isYT ? (
+                    thumb && (
+                      <Image 
+                        src={thumb} 
+                        alt={video.title} 
+                        fill 
+                        sizes="(max-width: 768px) 280px, 320px" 
+                        className="object-cover group-hover:scale-105 transition-transform duration-500" 
+                      />
+                    )
+                  ) : (
+                    <video 
+                      src={video.src} 
+                      preload="metadata" 
+                      muted 
+                      playsInline 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    />
+                  )}
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/40 transition-colors">
                     <div className="w-16 h-16 rounded-full border-4 border-white/80 flex items-center justify-center bg-white/20 backdrop-blur-sm group-hover:scale-110 transition-transform">
                       <Play className="text-white fill-white ml-1" size={24} />
                     </div>
                   </div>
-                  <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                  <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent font-sans">
                     <p className="text-white text-xs font-bold line-clamp-1">{video.title}</p>
                   </div>
                 </div>
@@ -79,15 +102,41 @@ export default function LifeAtGis() {
            {videoItems[0] ? (
              <>
                {activeVideo === videoItems[0].src || activeVideo ? (
-                 <iframe 
-                   src={`${activeVideo || videoItems[0].src}?autoplay=1`} 
-                   className="w-full h-full" 
-                   allow="autoplay; fullscreen"
-                   allowFullScreen
-                 />
+                 isYouTubeUrl(activeVideo || videoItems[0].src) ? (
+                   <iframe 
+                     src={`${activeVideo || videoItems[0].src}?autoplay=1`} 
+                     className="w-full h-full animate-fade-in" 
+                     allow="autoplay; fullscreen"
+                     allowFullScreen
+                   />
+                 ) : (
+                   <video 
+                     src={activeVideo || videoItems[0].src} 
+                     controls 
+                     autoPlay 
+                     preload="auto" 
+                     className="w-full h-full object-contain animate-fade-in" 
+                   />
+                 )
                ) : (
                  <>
-                   <Image src={getYouTubeThumbnail(videoItems[0].src) || ""} alt="Campus View" fill sizes="(max-width: 1280px) 100vw, 1100px" className="object-cover opacity-80" />
+                   {isYouTubeUrl(videoItems[0].src) ? (
+                     <Image 
+                       src={getYouTubeThumbnail(videoItems[0].src) || ""} 
+                       alt="Campus View" 
+                       fill 
+                       sizes="(max-width: 1280px) 100vw, 1100px" 
+                       className="object-cover opacity-80" 
+                     />
+                   ) : (
+                     <video 
+                       src={videoItems[0].src} 
+                       preload="metadata" 
+                       muted 
+                       playsInline 
+                       className="w-full h-full object-cover opacity-85" 
+                     />
+                   )}
                    <div className="absolute inset-0 flex items-center justify-center">
                       <div 
                         onClick={() => setActiveVideo(videoItems[0].src)}
@@ -97,7 +146,7 @@ export default function LifeAtGis() {
                       </div>
                    </div>
                    <div className="absolute top-8 left-8">
-                     <h3 className="text-white text-2xl font-black uppercase tracking-widest drop-shadow-lg">{videoItems[0].title}</h3>
+                     <h3 className="text-white text-2xl font-black uppercase tracking-widest drop-shadow-lg font-montserrat">{videoItems[0].title}</h3>
                    </div>
                  </>
                )}

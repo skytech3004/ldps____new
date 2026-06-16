@@ -4,6 +4,8 @@ const CarouselSlideSchema = new Schema({
   image: { type: String, required: true },
   title: { type: String, default: "" },
   description: { type: String, default: "" },
+  subtitle: { type: String, default: "" },
+  highlight: { type: String, default: "" },
 });
 
 const CarouselSchema = new Schema(

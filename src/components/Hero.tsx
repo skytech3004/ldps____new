@@ -31,16 +31,45 @@ const socialSidebar = [
 
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slides, setSlides] = useState<any[]>(heroSlides);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000); // Auto-advance every 5 seconds
-    return () => clearInterval(timer);
+    async function loadHeroSlides() {
+      try {
+        const res = await fetch("/api/admin/carousel?key=hero");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.slides && data.slides.length > 0) {
+            setSlides(data.slides);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load hero slides from DB", err);
+      }
+    }
+    loadHeroSlides();
   }, []);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  useEffect(() => {
+    if (slides.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000); // Auto-advance every 5 seconds
+    return () => clearInterval(timer);
+  }, [slides]);
+
+  const nextSlide = () => {
+    if (slides.length === 0) return;
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
+  const prevSlide = () => {
+    if (slides.length === 0) return;
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  if (slides.length === 0) {
+    return null;
+  }
 
   return (
     <section className="relative pt-32 lg:pt-0">
@@ -69,7 +98,7 @@ export default function Hero() {
           >
             <div className="absolute inset-0 bg-navy/40 z-10" />
             <Image 
-              src={heroSlides[currentSlide].image}
+              src={slides[currentSlide].image}
               alt={`LPS Vidyawadi campus ${currentSlide + 1}`}
               fill
               sizes="100vw"
@@ -85,16 +114,22 @@ export default function Hero() {
                 transition={{ duration: 0.8, delay: 0.3 }}
                 className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl bg-white/10 backdrop-blur-md p-6 sm:p-8 lg:p-12 rounded-[2.5rem] border border-white/20 shadow-2xl pointer-events-auto"
               >
-                <span className="text-mint font-black uppercase tracking-[0.4em] text-xs lg:text-sm mb-4 lg:mb-6 block">
-                  {heroSlides[currentSlide].subtitle}
-                </span>
+                {slides[currentSlide].subtitle && (
+                  <span className="text-mint font-black uppercase tracking-[0.4em] text-xs lg:text-sm mb-4 lg:mb-6 block">
+                    {slides[currentSlide].subtitle}
+                  </span>
+                )}
                 <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white leading-[1.1] md:leading-[0.9] mb-6 lg:mb-8 uppercase break-words">
-                  {heroSlides[currentSlide].title} <br />
-                  <span className="text-yellow-accent">{heroSlides[currentSlide].highlight}</span>
+                  {slides[currentSlide].title} <br />
+                  {slides[currentSlide].highlight && (
+                    <span className="text-yellow-accent">{slides[currentSlide].highlight}</span>
+                  )}
                 </h1>
-                <p className="text-white/80 text-sm md:text-lg lg:text-xl font-medium mb-8 lg:mb-10 max-w-xl leading-relaxed">
-                  {heroSlides[currentSlide].description}
-                </p>
+                {slides[currentSlide].description && (
+                  <p className="text-white/80 text-sm md:text-lg lg:text-xl font-medium mb-8 lg:mb-10 max-w-xl leading-relaxed">
+                    {slides[currentSlide].description}
+                  </p>
+                )}
                 <div className="flex flex-wrap gap-4">
                   <button className="bg-green-primary text-navy px-8 py-4 rounded-full font-black text-sm uppercase tracking-wider flex items-center gap-3 hover:bg-yellow-accent transition-all hover:scale-105 shadow-xl">
                     Explore School
@@ -123,7 +158,7 @@ export default function Hero() {
 
         {/* Carousel Pager Dots */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3">
-          {heroSlides.map((_, idx) => (
+          {slides.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}

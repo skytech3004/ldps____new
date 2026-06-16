@@ -1,6 +1,46 @@
 {
-  "updatedAt": "2026-06-13T11:17:30.232Z",
+  "updatedAt": "2026-06-16T09:48:16.669Z",
   "uploads": [
+    {
+      "id": "1781603296710",
+      "page": "gallery",
+      "section": "media-items",
+      "title": "Untitled video - Made with Clipchamp.mp4",
+      "description": "",
+      "fileName": "2026-06-16T09-48-16-669Z-untitled-video---made-with-clipchamp.mp4",
+      "src": "/uploads/media-items/2026-06-16T09-48-16-669Z-untitled-video---made-with-clipchamp.mp4",
+      "uploadedAt": "2026-06-16T09:48:16.669Z"
+    },
+    {
+      "id": "1781603275536",
+      "page": "gallery",
+      "section": "media-items",
+      "title": "Pfzz27QP53iZz39E22.webm",
+      "description": "",
+      "fileName": "2026-06-16T09-47-55-530Z-pfzz27qp53izz39e22.webm",
+      "src": "/uploads/media-items/2026-06-16T09-47-55-530Z-pfzz27qp53izz39e22.webm",
+      "uploadedAt": "2026-06-16T09:47:55.530Z"
+    },
+    {
+      "id": "1781603135295",
+      "page": "gallery",
+      "section": "media-items",
+      "title": "uvichar__1747840215_3637469320726766211_60511380458.mp4",
+      "description": "",
+      "fileName": "2026-06-16T09-45-35-280Z-uvichar-1747840215-3637469320726766211-60511380458.mp4",
+      "src": "/uploads/media-items/2026-06-16T09-45-35-280Z-uvichar-1747840215-3637469320726766211-60511380458.mp4",
+      "uploadedAt": "2026-06-16T09:45:35.280Z"
+    },
+    {
+      "id": "1781603045582",
+      "page": "gallery",
+      "section": "media-items",
+      "title": "Pfzz27QP53iZz39E22.webm",
+      "description": "",
+      "fileName": "2026-06-16T09-44-05-579Z-pfzz27qp53izz39e22.webm",
+      "src": "/uploads/media-items/2026-06-16T09-44-05-579Z-pfzz27qp53izz39e22.webm",
+      "uploadedAt": "2026-06-16T09:44:05.579Z"
+    },
     {
       "id": "1781349450239",
       "page": "downloads",

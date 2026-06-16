@@ -8,11 +8,40 @@ const defaultSlides = [
   { image: "/lps-vidhyawadi/gallery-02.jpg", title: "Gallery 2", description: "LPS Vidyawadi gallery image 2" },
 ];
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await connectToDatabase();
-    let carousel = await CarouselModel.findOne({ key: "homepage" }).lean();
+    const { searchParams } = new URL(request.url);
+    const key = searchParams.get("key") || "homepage";
+
+    let carousel = await CarouselModel.findOne({ key }).lean();
     if (!carousel) {
+      if (key === "hero") {
+        const defaultHeroSlides = [
+          {
+            image: "/lps-vidhyawadi/about-banner.jpg",
+            subtitle: "Premier Girls' Residential Institution",
+            title: "QUALITY",
+            highlight: "EDUCATION.",
+            description: "Providing healthy learning environment and quality education at Vidyawadi, Khimel.",
+          },
+          {
+            image: "/lps-vidhyawadi/gallery-01.jpg",
+            subtitle: "Academic Excellence",
+            title: "NURTURING",
+            highlight: "POTENTIAL.",
+            description: "CBSE education from L.K.G. to XII in a caring atmosphere built for confidence, leadership, and wellness.",
+          },
+          {
+            image: "/lps-vidhyawadi/gallery-02.jpg",
+            subtitle: "65 Acre Campus",
+            title: "HOME",
+            highlight: "AWAY FROM HOME.",
+            description: "Hostels, labs, library, sports grounds, dining, transport, and support systems for holistic student life.",
+          },
+        ];
+        return NextResponse.json({ key: "hero", slides: defaultHeroSlides });
+      }
       // Return default slides if not created in database yet
       return NextResponse.json({ key: "homepage", slides: defaultSlides });
     }
@@ -32,8 +61,10 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Slides array is required." }, { status: 400 });
     }
 
+    const key = body.key || "homepage";
+
     const updated = await CarouselModel.findOneAndUpdate(
-      { key: "homepage" },
+      { key },
       { slides: body.slides },
       { new: true, runValidators: true, upsert: true }
     );

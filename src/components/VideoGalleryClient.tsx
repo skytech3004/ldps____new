@@ -50,6 +50,10 @@ export default function VideoGalleryClient() {
     return null;
   };
 
+  const isYouTubeUrl = (url: string) => {
+    return url.includes("youtube.com") || url.includes("youtu.be");
+  };
+
   // Navigate lightbox videos
   const handlePrev = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -112,7 +116,8 @@ export default function VideoGalleryClient() {
       {/* 2-Column Grid Layout for Videos */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {galleryItems.map((item, idx) => {
-          const thumb = getYouTubeThumbnail(item.src);
+          const isYT = isYouTubeUrl(item.src);
+          const thumb = isYT ? getYouTubeThumbnail(item.src) : null;
           return (
             <motion.div
               key={item._id}
@@ -132,10 +137,20 @@ export default function VideoGalleryClient() {
 
               {/* Video Thumbnail Frame */}
               <div className="relative aspect-video rounded-xl overflow-hidden mt-auto bg-black flex items-center justify-center shadow-inner border border-slate-100">
-                {thumb ? (
-                  <img src={thumb} alt={item.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
+                {isYT ? (
+                  thumb ? (
+                    <img src={thumb} alt={item.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
+                  ) : (
+                    <div className="w-full h-full bg-slate-900" />
+                  )
                 ) : (
-                  <div className="w-full h-full bg-slate-900" />
+                  <video 
+                    src={item.src} 
+                    preload="metadata" 
+                    muted 
+                    playsInline 
+                    className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" 
+                  />
                 )}
                 
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -198,12 +213,22 @@ export default function VideoGalleryClient() {
                 onClick={(e) => e.stopPropagation()}
                 className="relative w-full max-w-4xl aspect-video flex flex-col items-center justify-center"
               >
-                <iframe
-                  src={galleryItems[activeVideo].src}
-                  title={galleryItems[activeVideo].title}
-                  allowFullScreen
-                  className="w-full h-full rounded-xl border border-white/5 shadow-2xl"
-                />
+                {isYouTubeUrl(galleryItems[activeVideo].src) ? (
+                  <iframe
+                    src={galleryItems[activeVideo].src}
+                    title={galleryItems[activeVideo].title}
+                    allowFullScreen
+                    className="w-full h-full rounded-xl border border-white/5 shadow-2xl"
+                  />
+                ) : (
+                  <video 
+                    src={galleryItems[activeVideo].src} 
+                    controls 
+                    autoPlay 
+                    preload="auto"
+                    className="w-full h-full rounded-xl border border-white/5 shadow-2xl object-contain bg-black"
+                  />
+                )}
               </motion.div>
 
               <button
