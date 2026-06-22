@@ -23,16 +23,15 @@ rm -rf .next
 echo "==> npm run build"
 npm run build
 
-echo "==> Restarting PM2 app"
-if pm2 describe "${APP_NAME}" >/dev/null 2>&1; then
-  pm2 restart "${APP_NAME}"
-else
-  pm2 start node_modules/next/dist/bin/next --name "${APP_NAME}" --cwd "$(pwd)" --args "start -p ${PORT} -H ${HOST}"
-fi
+echo "==> Deleting PM2 app (if running)"
+pm2 delete "${APP_NAME}" || true
 
-echo "==> Reset PM2 counters and save"
-pm2 reset "${APP_NAME}" || true
+echo "==> Starting PM2 app"
+PORT="${PORT}" pm2 start npm --name "${APP_NAME}" -- start
+
+echo "==> Save PM2 state and set startup"
 pm2 save
+pm2 startup
 
 echo "==> PM2 status"
 pm2 status
