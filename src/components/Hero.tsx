@@ -28,23 +28,26 @@ const socialSidebar = [
     icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> 
   }
 ];
-
+ 
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [slides, setSlides] = useState<any[]>(heroSlides);
-
+  const [slides, setSlides] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+ 
   useEffect(() => {
     async function loadHeroSlides() {
       try {
         const res = await fetch("/api/admin/carousel?key=hero");
         if (res.ok) {
           const data = await res.json();
-          if (data.slides && data.slides.length > 0) {
+          if (data.slides) {
             setSlides(data.slides);
           }
         }
       } catch (err) {
         console.error("Failed to load hero slides from DB", err);
+      } finally {
+        setLoading(false);
       }
     }
     loadHeroSlides();
@@ -66,6 +69,14 @@ export default function Hero() {
     if (slides.length === 0) return;
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
+
+  if (loading) {
+    return (
+      <div className="h-[60vh] lg:h-[85vh] flex items-center justify-center bg-[#081736] text-white">
+        <span className="animate-pulse font-bold tracking-widest text-sm uppercase">Loading Campus Showcase...</span>
+      </div>
+    );
+  }
 
   if (slides.length === 0) {
     return null;

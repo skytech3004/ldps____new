@@ -7,17 +7,20 @@ type DisclosureItem = {
   _id: string;
   title: string;
   pdfUrl: string;
+  category: string;
   createdAt: string;
 };
 
 type DisclosureForm = {
   title: string;
   pdfUrl: string;
+  category: string;
 };
 
 const initialForm: DisclosureForm = {
   title: "",
   pdfUrl: "",
+  category: "documents",
 };
 
 export default function AdminDisclosuresPage() {
@@ -30,6 +33,8 @@ export default function AdminDisclosuresPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<DisclosureForm>(initialForm);
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [customCategoryName, setCustomCategoryName] = useState("");
 
   async function fetchItems() {
     try {
@@ -55,18 +60,24 @@ export default function AdminDisclosuresPage() {
 
   function openCreateModal() {
     setEditingId(null);
-    setForm(initialForm);
+    setForm({ ...initialForm, category: "documents" });
+    setIsCustomCategory(false);
+    setCustomCategoryName("");
     setError("");
     setSuccess("");
     setModalOpen(true);
   }
 
   function openEditModal(item: DisclosureItem) {
+    const isPreset = ["general", "documents", "academics", "staff", "infrastructure"].includes(item.category);
     setEditingId(item._id);
     setForm({
       title: item.title ?? "",
       pdfUrl: item.pdfUrl ?? "",
+      category: isPreset ? (item.category ?? "documents") : "custom",
     });
+    setIsCustomCategory(!isPreset);
+    setCustomCategoryName(isPreset ? "" : (item.category ?? ""));
     setError("");
     setSuccess("");
     setModalOpen(true);
@@ -124,9 +135,16 @@ export default function AdminDisclosuresPage() {
         throw new Error("Please upload a PDF or enter a PDF URL first.");
       }
 
+      const finalCategory = form.category === "custom" ? customCategoryName.trim() : form.category;
+      if (form.category === "custom" && !customCategoryName.trim()) {
+        throw new Error("Please enter a custom category / tab name.");
+      }
+
       const payload = {
         id: editingId,
-        ...form,
+        title: form.title,
+        pdfUrl: form.pdfUrl,
+        category: finalCategory || "documents",
       };
 
       const response = await fetch("/api/admin/disclosures", {
@@ -200,6 +218,7 @@ export default function AdminDisclosuresPage() {
             <thead>
               <tr className="text-left text-xs uppercase tracking-wider text-gray-400 border-b border-gray-100">
                 <th className="py-3 pr-4">Document Title</th>
+                <th className="py-3 pr-4">Category / Tab</th>
                 <th className="py-3 pr-4">PDF Link</th>
                 <th className="py-3 pr-4">Uploaded Date</th>
                 <th className="py-3 pr-4">Actions</th>
@@ -208,14 +227,14 @@ export default function AdminDisclosuresPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td className="py-5 text-gray-400" colSpan={4}>
+                  <td className="py-5 text-gray-400" colSpan={5}>
                     Loading documents...
                   </td>
                 </tr>
               ) : null}
               {!loading && items.length === 0 ? (
                 <tr>
-                  <td className="py-5 text-gray-400" colSpan={4}>
+                  <td className="py-5 text-gray-400" colSpan={5}>
                     No documents found. Click &quot;Add Document&quot; to begin.
                   </td>
                 </tr>
@@ -224,6 +243,11 @@ export default function AdminDisclosuresPage() {
                 <tr key={item._id} className="border-b border-gray-50 align-middle hover:bg-gray-50/50 transition-colors">
                   <td className="py-4 pr-4">
                     <p className="font-bold text-primary">{item.title}</p>
+                  </td>
+                  <td className="py-4 pr-4">
+                    <span className="inline-block bg-primary/5 text-primary text-[10px] font-black uppercase px-2.5 py-1 rounded-md tracking-wider">
+                      {item.category || "documents"}
+                    </span>
                   </td>
                   <td className="py-4 pr-4">
                     <a
@@ -297,6 +321,43 @@ export default function AdminDisclosuresPage() {
                   className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-primary font-bold focus:border-accent focus:outline-none transition-all"
                 />
               </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-wider text-primary/60 ml-2">
+                  Category / Tab *
+                </label>
+                <select
+                  value={form.category}
+                  onChange={(event) => {
+                    const val = event.target.value;
+                    setForm((prev) => ({ ...prev, category: val }));
+                    setIsCustomCategory(val === "custom");
+                  }}
+                  className="w-full border-2 border-gray-100 bg-white rounded-xl px-4 py-3 text-primary font-bold focus:border-accent focus:outline-none transition-all animate-none"
+                >
+                  <option value="documents">Documents & Compliance</option>
+                  <option value="academics">Results & Academics</option>
+                  <option value="staff">Staff Details</option>
+                  <option value="infrastructure">Infrastructure</option>
+                  <option value="general">General Info</option>
+                  <option value="custom">+ Add Custom Tab...</option>
+                </select>
+              </div>
+
+              {isCustomCategory && (
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-wider text-primary/60 ml-2">
+                    Custom Tab Name *
+                  </label>
+                  <input
+                    value={customCategoryName}
+                    onChange={(event) => setCustomCategoryName(event.target.value)}
+                    required
+                    placeholder="e.g. Audit Reports"
+                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-primary font-bold focus:border-accent focus:outline-none transition-all"
+                  />
+                </div>
+              )}
 
               <div className="space-y-4 p-5 bg-gray-50 border border-gray-100 rounded-2xl">
                 <div className="space-y-2">

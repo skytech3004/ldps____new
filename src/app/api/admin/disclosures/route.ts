@@ -33,6 +33,7 @@ export async function POST(request: Request) {
     const created = await DisclosureDocumentModel.create({
       title: body.title,
       pdfUrl: body.pdfUrl,
+      category: body.category || "documents",
     });
 
     return NextResponse.json(created, { status: 201 });
@@ -60,6 +61,7 @@ export async function PUT(request: Request) {
       {
         title: body.title,
         pdfUrl: body.pdfUrl,
+        category: body.category || "documents",
       },
       { new: true, runValidators: true }
     );

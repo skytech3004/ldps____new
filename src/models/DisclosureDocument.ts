@@ -4,6 +4,7 @@ const DisclosureDocumentSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
     pdfUrl: { type: String, required: true, trim: true },
+    category: { type: String, default: "documents", trim: true },
   },
   { timestamps: true }
 );

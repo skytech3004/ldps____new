@@ -59,6 +59,7 @@ const navLinks = [
       { label: "Video Gallery", href: "/video-gallery" },
     ],
   },
+  { name: "CBSC Mandatory Disclosur", href: "/cbsc-mandatory-disclosure" },
   {
     name: "More",
     href: "/",
