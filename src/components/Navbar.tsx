@@ -15,9 +15,9 @@ const navLinks = [
     href: "/about-lps",
     dropdown: [
       { label: "About LPS", href: "/about-lps" },
-      { label: "Leadership Team", href: "/leadership" },
+      { label: "Management Committee", href: "/leadership" },
       { label: "Principal's Desk", href: "/principals-desk" },
-      { label: "Managing Committee", href: "/managing-committee" },
+      { label: "Academic Excellence Team", href: "/managing-committee" },
     ],
   },
   {
@@ -30,7 +30,7 @@ const navLinks = [
       { label: "Result 2024-25", href: "/result-2024-25" },
       { label: "Result 2023-24", href: "/result-2023-24" },
       { label: "School Planner", href: "/school-planner" },
-      { label: "Eligibility Criteria", href: "/eligibility-criteria" },
+      { label: "Admission Guideline", href: "/eligibility-criteria" },
       { label: "Fee Structure", href: "/fee-structure" },
       { label: "Fee Policy", href: "/fee-policy" },
       { label: "Apply For Admission", href: "/apply-for-admission" },

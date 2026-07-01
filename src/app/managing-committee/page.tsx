@@ -20,7 +20,7 @@ async function loadRoster() {
 
   const roster: RosterMember[] = [];
 
-  for (let index = 0; index < lines.length; ) {
+  for (let index = 0; index < lines.length;) {
     const name = lines[index];
     const repeatedName = lines[index + 1];
     const designation = lines[index + 2];
@@ -65,11 +65,10 @@ export default async function ManagingCommittee() {
             <span>/</span>
             <span>About</span>
             <span>/</span>
-            <span className="text-white/80">Managing Committee</span>
+            <span className="text-white/80">Our Team</span>
           </div>
           <h1 className="text-3xl md:text-5xl font-black font-montserrat uppercase tracking-tight text-accent">
-            Managing Committee
-          </h1>
+            Meet Our Academic Excellence Team          </h1>
           <p className="text-white/60 font-medium text-xs md:text-sm max-w-2xl">
             Names and designations are loaded directly from `teacher.txt` so the roster stays aligned with the source file.
           </p>

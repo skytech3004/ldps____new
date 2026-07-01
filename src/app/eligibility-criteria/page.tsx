@@ -34,10 +34,10 @@ export default function EligibilityCriteria() {
             <span>/</span>
             <span>Academics</span>
             <span>/</span>
-            <span className="text-white/80">Eligibility Criteria</span>
+            <span className="text-white/80">Admission Guideline</span>
           </div>
           <h1 className="text-3xl md:text-5xl font-black font-montserrat uppercase tracking-tight text-accent">
-            Admission & Eligibility
+            Admission Guideline
           </h1>
           <p className="text-white/60 font-medium text-xs md:text-sm max-w-xl">
             Complete details on guidelines, requirements, and required documents.

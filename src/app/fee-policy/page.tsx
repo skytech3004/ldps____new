@@ -142,7 +142,7 @@ export default function FeePolicy() {
         {/* Dynamic Quick Navigation Links */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-10">
           {[
-            { title: "Eligibility Criteria", slug: "/eligibility-criteria", desc: "View the required documents checklist and timeline policies." },
+            { title: "Admission Guideline", slug: "/eligibility-criteria", desc: "View the required documents checklist and timeline policies." },
             { title: "Fee Structure", slug: "/fee-structure", desc: "View ICICI direct bank account details and deposits." },
             { title: "Apply For Admission", slug: "/apply-for-admission", desc: "Access the interactive inquiry form for online registration." }
           ].map((item, idx) => (

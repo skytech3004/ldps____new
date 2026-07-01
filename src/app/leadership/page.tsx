@@ -47,14 +47,13 @@ export default function LeadershipPage() {
         <div className="max-w-7xl mx-auto relative z-10 space-y-4">
           <div className="inline-flex items-center gap-2 text-accent font-black uppercase tracking-[0.35em] text-[10px] md:text-xs">
             <Users2 size={14} />
-            <span>Leadership & Trustees</span>
+            <span>Management Committee & Trustees</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-accent">
-            Leadership Team
+            Management Committee
           </h1>
           <p className="text-white/65 max-w-2xl text-sm md:text-base leading-relaxed">
-            One page for the CEO, chairman, president, vice presidents, secretary, and treasurer with names,
-            designations, and image support.
+            Meet the dedicated members of our governing board, trustees, and administrative officers.
           </p>
         </div>
       </section>
@@ -62,7 +61,7 @@ export default function LeadershipPage() {
       <section className="px-6 py-20 max-w-7xl mx-auto">
         {loading ? (
           <div className="bg-white border border-primary/10 rounded-[2rem] p-10 text-center text-primary font-black uppercase tracking-wider">
-            Loading leadership...
+            Loading Management Committee...
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -110,7 +109,7 @@ export default function LeadershipPage() {
             href="/managing-committee"
             className="inline-flex items-center gap-2 rounded-xl bg-primary text-white px-6 py-3 font-black uppercase tracking-wider text-xs hover:bg-secondary transition-colors"
           >
-            View Managing Committee
+            View Academic Excellence Team
             <ArrowRight size={14} />
           </Link>
         </div>

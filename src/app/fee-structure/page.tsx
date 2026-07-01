@@ -10,6 +10,23 @@ import { motion } from "framer-motion";
 export default function FeeStructure() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
+  const feeList = [
+    { class: "Nursery", annualFee: "₹17,700", installment: "₹8,850" },
+    { class: "KG-Prep", annualFee: "₹18,400", installment: "₹9,200" },
+    { class: "Class I – II", annualFee: "₹21,300", installment: "₹10,650" },
+    { class: "Class III – IV", annualFee: "₹21,300", installment: "₹10,650" },
+    { class: "Class V", annualFee: "₹29,300", installment: "₹14,650" },
+    { class: "Class VI", annualFee: "₹30,800", installment: "₹15,400" },
+    { class: "Class VII – VIII", annualFee: "₹34,900", installment: "₹17,450" },
+    { class: "Class IX – X", annualFee: "₹36,000", installment: "₹18,000" },
+    { class: "Class XI – XII (Science - PCM)", annualFee: "₹49,600", installment: "₹24,800" },
+    { class: "Class XI – XII (Science - PCB)", annualFee: "₹52,200", installment: "₹26,100" },
+    { class: "Class XI – XII (Science - General)", annualFee: "₹41,200", installment: "₹20,600" },
+    { class: "Class XI – XII (Commerce - Comp. Sc.)", annualFee: "₹42,400", installment: "₹21,200" },
+    { class: "Class XI – XII (Commerce - General)", annualFee: "₹41,500", installment: "₹20,750" },
+    { class: "Class XI – XII (Arts)", annualFee: "₹43,600", installment: "₹21,800" }
+  ];
+
   const bankDetails = [
     { label: "Account Name", value: "Leeladevi Parasmal Sancheti English Medium Sr. Sec. School Vidyawadi", key: "name" },
     { label: "Account Number", value: "684601424110", key: "number" },
@@ -56,7 +73,68 @@ export default function FeeStructure() {
       </section>
 
       {/* Content Details Section */}
-      <section className="py-20 px-6 max-w-7xl mx-auto space-y-16">
+      <section className="py-20 px-6 max-w-7xl mx-auto space-y-20">
+        
+        {/* Section 1: Fee Structure Table (Full Width) */}
+        <div className="space-y-8">
+          <div className="space-y-4 text-center">
+            <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">Fee Structure</span>
+            <h2 className="text-3xl md:text-4xl font-black text-primary uppercase font-montserrat tracking-tight">
+              Academic Session Annual Fee Details
+            </h2>
+            <div className="h-1.5 w-24 bg-accent rounded-full mx-auto" />
+            <p className="text-gray-600 font-medium text-sm md:text-base max-w-2xl mx-auto">
+              Below is the structured annual fee schedule for the current academic session. Tuition fees are payable in two equal installments.
+            </p>
+          </div>
+
+          {/* Table Container */}
+          <div className="bg-white border border-primary/10 rounded-[2.5rem] p-6 md:p-8 shadow-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-100 text-[10px] font-black text-primary uppercase tracking-wider">
+                    <th className="py-4 px-4">Class</th>
+                    <th className="py-4 px-4 text-right">Total Annual Fee</th>
+                    <th className="py-4 px-4 text-right">Installment (2x)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50 text-xs font-semibold text-gray-600">
+                  {feeList.map((item, idx) => (
+                    <tr key={idx} className="hover:bg-primary/5 transition-colors">
+                      <td className="py-4 px-4 font-bold text-primary">{item.class}</td>
+                      <td className="py-4 px-4 text-right text-primary font-black">{item.annualFee}</td>
+                      <td className="py-4 px-4 text-right text-gray-500">{item.installment}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* One-time Admission Fee Note Card */}
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10 rounded-2xl p-6">
+              <div className="space-y-1">
+                <span className="text-accent font-black uppercase tracking-wider text-[10px] block">New Admissions Only</span>
+                <h4 className="text-sm font-black text-primary uppercase">Admission Fee (One-Time)</h4>
+                <p className="text-xs text-gray-500">
+                  Charged only once at the time of new admission into the school.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-4 divide-x divide-gray-200/50">
+                <div className="pl-0 md:pl-4 space-y-1">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase">Nursery to Class V</span>
+                  <p className="text-lg font-black text-primary">₹2,000</p>
+                </div>
+                <div className="pl-4 space-y-1">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase">Class VI to XII</span>
+                  <p className="text-lg font-black text-primary">₹4,000</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 2: Bank details and guidelines (Grid layout) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
           {/* Left Column: Direct Deposit Bank Details (The Bank Card) */}
@@ -181,7 +259,7 @@ export default function FeeStructure() {
         {/* Dynamic Quick Navigation Links */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-10">
           {[
-            { title: "Eligibility Criteria", slug: "/eligibility-criteria", desc: "View the required documents checklist and timeline policies." },
+            { title: "Admission Guideline", slug: "/eligibility-criteria", desc: "View the required documents checklist and timeline policies." },
             { title: "Fee Policy", slug: "/fee-policy", desc: "Understand withdrawals, calendar deadlines, and refund policies." },
             { title: "Apply For Admission", slug: "/apply-for-admission", desc: "Access the interactive inquiry form for online registration." }
           ].map((item, idx) => (
