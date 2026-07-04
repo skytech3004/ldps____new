@@ -1,10 +1,14 @@
 import Link from "next/link";
-import { Bell, Database, FileText, FolderKanban, Images, LayoutDashboard, LogOut, ClipboardList, LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar, Download } from "lucide-react";
+import { Bell, Database, FileText, FolderKanban, Images, LayoutDashboard, LogOut, ClipboardList, LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar, Download, Award, GraduationCap, Trophy } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/notices", label: "Notice Board", icon: Bell },
   { href: "/admin/leadership", label: "Leadership Team", icon: ShieldCheck },
+  { href: "/admin/investiture", label: "Investiture Cabinet", icon: Award },
+  { href: "/admin/alumni", label: "Alumni Registrations", icon: GraduationCap },
+  { href: "/admin/facilities", label: "Advanced Facilities", icon: LayoutGrid },
+  { href: "/admin/results", label: "Board Results", icon: Trophy },
   { href: "/admin/pages", label: "More Pages", icon: FileText },
   { href: "/admin/carousel", label: "Home Carousel", icon: Images },
   { href: "/admin/hero", label: "Hero Carousel", icon: Images },

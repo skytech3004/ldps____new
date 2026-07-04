@@ -3,85 +3,114 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, ChevronDown, Phone, Mail, CreditCard, UserPlus } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronRight, Phone, Mail, CreditCard, UserPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { schoolDatabase } from "@/data/lpsVidhyawadiDatabase";
 
-const navLinks = [
-  { name: "Home", href: "/" },
-  {
-    name: "About",
-    href: "/about-lps",
-    dropdown: [
-      { label: "About LPS", href: "/about-lps" },
-      { label: "Management Committee", href: "/leadership" },
-      { label: "Principal's Desk", href: "/principals-desk" },
-      { label: "Academic Excellence Team", href: "/managing-committee" },
-    ],
-  },
-  {
-    name: "Academics",
-    href: "/scholastic",
-    dropdown: [
-      { label: "Scholastic", href: "/scholastic" },
-      { label: "Co-Scholastic", href: "/co-scholastic" },
-      { label: "Sports", href: "/sports" },
-      { label: "Result 2024-25", href: "/result-2024-25" },
-      { label: "Result 2023-24", href: "/result-2023-24" },
-      { label: "School Planner", href: "/school-planner" },
-      { label: "Admission Guideline", href: "/eligibility-criteria" },
-      { label: "Fee Structure", href: "/fee-structure" },
-      { label: "Fee Policy", href: "/fee-policy" },
-      { label: "Apply For Admission", href: "/apply-for-admission" },
-      { label: "Downloads", href: "/downloads" },
-      { label: "Download TC", href: "/download-tc" },
-    ],
-  },
-  {
-    name: "Schooling",
-    href: "/pre-primary",
-    dropdown: [
-      { label: "Pre-Primary", href: "/pre-primary" },
-      { label: "Day Schooling", href: "/day-schooling" },
-      { label: "Hostel", href: "/hostel" },
-      { label: "Hostel Care", href: "/hostel-care" },
-      { label: "Meals", href: "/meals" },
-      { label: "A Day at School", href: "/a-day-at-school" },
-      { label: "Items Required By Boarders", href: "/items-required-by-boarders" },
-    ],
-  },
-  {
-    name: "Gallery",
-    href: "/photo-gallery",
-    dropdown: [
-      { label: "Photo Gallery", href: "/photo-gallery" },
-      { label: "Video Gallery", href: "/video-gallery" },
-    ],
-  },
-  { name: "CBSC Mandatory Disclosur", href: "/cbsc-mandatory-disclosure" },
-  {
-    name: "More",
-    href: "/",
-    dropdown: [
-      { label: "Magazine", href: "/magazine" },
-      { label: "News", href: "/news" },
-      { label: "Transport", href: "/transport" },
-      { label: "Public Disclosures", href: "/public-disclosures-cbse" },
-      { label: "G.R. Mechanism", href: "/g-r-mechanism" },
-      { label: "Holiday List", href: "/holiday-list" },
-      { label: "Announcements", href: "/announcements" },
-    ],
-  },
-  { name: "Blog", href: "/blog" },
-  { name: "Contact", href: "/contact" },
-];
+
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [logo, setLogo] = useState("/lps-vidhyawadi/logo.jpg");
   const [openMobileDropdowns, setOpenMobileDropdowns] = useState<Record<string, boolean>>({});
+  const [resultYears, setResultYears] = useState<string[]>([]);
+
+  useEffect(() => {
+    async function fetchResultYears() {
+      try {
+        const res = await fetch("/api/admin/results?list=years");
+        if (res.ok) {
+          const data = await res.json();
+          setResultYears(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch result years for navbar:", err);
+      }
+    }
+    fetchResultYears();
+  }, []);
+
+  const navLinks = [
+    { name: "Home", href: "/" },
+    {
+      name: "About",
+      href: "/about-lps",
+      dropdown: [
+        { label: "About LPS", href: "/about-lps" },
+        { label: "Management Committee", href: "/leadership" },
+        { label: "Principal's Desk", href: "/principals-desk" },
+        { label: "Academic Excellence Team", href: "/managing-committee" },
+        { label: "Investiture Ceremony", href: "/investiture-ceremony" },
+      ],
+    },
+    {
+      name: "Academics",
+      href: "/scholastic",
+      dropdown: [
+        { label: "Scholastic", href: "/scholastic" },
+        { label: "Co-Scholastic", href: "/co-scholastic" },
+        { label: "Sports", href: "/sports" },
+        {
+          label: "Result",
+          href: "#",
+          subItems: resultYears.length > 0 ? resultYears.map((year) => ({
+            label: `Result ${year}`,
+            href: `/result/${year}`,
+          })) : [
+            { label: "Result 2024-25", href: "/result/2024-25" },
+            { label: "Result 2023-24", href: "/result/2023-24" },
+          ],
+        },
+        { label: "School Planner", href: "/school-planner" },
+        { label: "Admission Guideline", href: "/eligibility-criteria" },
+        { label: "Fee Structure", href: "/fee-structure" },
+        { label: "Fee Policy", href: "/fee-policy" },
+        { label: "Apply For Admission", href: "/apply-for-admission" },
+        { label: "Downloads", href: "/downloads" },
+        { label: "Download TC", href: "/download-tc" },
+      ],
+    },
+    {
+      name: "Schooling",
+      href: "/pre-primary",
+      dropdown: [
+        { label: "Pre-Primary", href: "/pre-primary" },
+        { label: "Day Schooling", href: "/day-schooling" },
+        { label: "Hostel", href: "/hostel" },
+        { label: "Hostel Care", href: "/hostel-care" },
+        { label: "Meals", href: "/meals" },
+        { label: "A Day at School", href: "/a-day-at-school" },
+        { label: "Items Required By Boarders", href: "/items-required-by-boarders" },
+      ],
+    },
+    {
+      name: "Gallery",
+      href: "/photo-gallery",
+      dropdown: [
+        { label: "Photo Gallery", href: "/photo-gallery" },
+        { label: "Video Gallery", href: "/video-gallery" },
+      ],
+    },
+    { name: "CBSC Mandatory Disclosur", href: "/cbsc-mandatory-disclosure" },
+    {
+      name: "More",
+      href: "/",
+      dropdown: [
+        { label: "Magazine", href: "/magazine" },
+        { label: "News", href: "/news" },
+        { label: "Transport", href: "/transport" },
+        { label: "Public Disclosures", href: "/public-disclosures-cbse" },
+        { label: "G.R. Mechanism", href: "/g-r-mechanism" },
+        { label: "Holiday List", href: "/holiday-list" },
+        { label: "Announcements", href: "/announcements" },
+        { label: "Alumni Registration", href: "/alumni" },
+      ],
+    },
+    { name: "Blog", href: "/blog" },
+    { name: "Contact", href: "/contact" },
+  ];
 
   const toggleMobileDropdown = (name: string) => {
     setOpenMobileDropdowns((prev) => ({
@@ -126,7 +155,7 @@ export default function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-t-[3px] border-primary">
       <div className="bg-primary text-white py-2 hidden md:block border-b border-white/10">
-        <div className="w-full px-6 flex justify-between items-center text-sm">
+        <div className="w-full px-6 flex justify-between items-center text-[13px]">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
               <Phone size={14} className="text-accent" />
@@ -137,8 +166,24 @@ export default function Navbar() {
               <span className="font-medium">lpsvidhyawadi@gmail.com</span>
             </div>
           </div>
-          <div className="font-bold text-accent uppercase tracking-[0.15em] text-[11px]">
-            {schoolDatabase.site.affiliation}
+          <div className="flex items-center gap-4">
+            <span className="font-bold text-accent uppercase tracking-[0.15em] text-[10px] hidden xl:inline-block">
+              {schoolDatabase.site.affiliation}
+            </span>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/fee-structure"
+                className="bg-accent text-primary font-black text-[10px] uppercase tracking-wider px-3.5 py-1.5 rounded-lg hover:bg-accent-hover transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.15)] hover:scale-[1.02] whitespace-nowrap"
+              >
+                Fee Payment
+              </Link>
+              <button
+                onClick={() => window.dispatchEvent(new Event("open-admission-modal"))}
+                className="bg-accent text-primary font-black text-[10px] uppercase tracking-wider px-3.5 py-1.5 rounded-lg hover:bg-accent-hover transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.15)] hover:scale-[1.02] whitespace-nowrap"
+              >
+                Admission Query
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -202,16 +247,39 @@ export default function Navbar() {
 
                 {link.dropdown && (
                   <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0 z-[60]">
-                    <div className="bg-white shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-xl p-3 min-w-[220px] border border-gray-100/50">
-                      {link.dropdown.map((item) => (
-                        <Link
-                          key={item.label}
-                          href={item.href}
-                          className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
-                        >
-                          {item.label}
-                        </Link>
-                      ))}
+                    <div className="bg-white shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-xl p-3 min-w-[220px] border border-gray-100/50 flex flex-col gap-0.5">
+                      {link.dropdown.map((item) => {
+                        if (item.subItems) {
+                          return (
+                            <div key={item.label} className="relative group/sub px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-all cursor-pointer flex items-center justify-between">
+                              <span>{item.label}</span>
+                              <ChevronRight size={12} className="opacity-60" />
+                              <div className="absolute left-full top-0 ml-1 pt-0 opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all duration-200 z-[70]">
+                                <div className="bg-white shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-xl p-2 min-w-[170px] border border-gray-100/50 flex flex-col gap-0.5">
+                                  {item.subItems.map((sub) => (
+                                    <Link
+                                      key={sub.label}
+                                      href={sub.href}
+                                      className="block px-4 py-2 text-[12px] font-semibold text-gray-500 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+                                    >
+                                      {sub.label}
+                                    </Link>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return (
+                          <Link
+                            key={item.label}
+                            href={item.href}
+                            className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+                          >
+                            {item.label}
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -220,22 +288,6 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <div className="hidden xl:flex items-center gap-1.5 sm:gap-3">
-              <Link
-                href="/fee-structure"
-                className="bg-accent text-primary font-extrabold text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wider px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-accent-hover hover:scale-[1.03] transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.25)] hover:shadow-[0_6px_16px_rgba(247,184,1,0.35)] whitespace-nowrap"
-              >
-                Fee Payment
-              </Link>
-
-              <button
-                onClick={() => window.dispatchEvent(new Event("open-admission-modal"))}
-                className="bg-accent text-primary font-extrabold text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wider px-2 py-1.5 xs:px-3 xs:py-2 sm:px-4 sm:py-2.5 rounded-lg hover:bg-accent-hover hover:scale-[1.03] transition-all duration-300 shadow-[0_4px_12px_rgba(247,184,1,0.25)] hover:shadow-[0_6px_16px_rgba(247,184,1,0.35)] whitespace-nowrap"
-              >
-                <span className="xs:hidden">Admission</span>
-                <span className="hidden xs:inline">Admission Query</span>
-              </button>
-            </div>
 
             <button
               className="xl:hidden flex items-center justify-center w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 border border-gray-200 rounded-lg text-primary hover:bg-primary/5 transition-all shrink-0 ml-0.5 xs:ml-1"
@@ -341,16 +393,39 @@ export default function Navbar() {
                           transition={{ duration: 0.2 }}
                           className="my-2 flex flex-col gap-1 pl-4 border-l-2 border-accent/30 overflow-hidden"
                         >
-                          {link.dropdown.map((item) => (
-                            <Link
-                              key={item.label}
-                              href={item.href}
-                              className="py-2 text-[14px] font-medium text-gray-500 hover:text-primary transition-colors"
-                              onClick={() => setIsOpen(false)}
-                            >
-                              {item.label}
-                            </Link>
-                          ))}
+                          {link.dropdown.map((item) => {
+                            if (item.subItems) {
+                              return (
+                                <div key={item.label} className="py-2 flex flex-col gap-1">
+                                  <span className="text-[12px] font-black uppercase tracking-wider text-primary/70 px-2">
+                                    {item.label}
+                                  </span>
+                                  <div className="flex flex-col gap-1 pl-3 border-l border-gray-100 mt-1">
+                                    {item.subItems.map((sub) => (
+                                      <Link
+                                        key={sub.label}
+                                        href={sub.href}
+                                        className="py-1.5 text-[13px] font-bold text-gray-500 hover:text-primary transition-colors block"
+                                        onClick={() => setIsOpen(false)}
+                                      >
+                                        {sub.label}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return (
+                              <Link
+                                key={item.label}
+                                href={item.href}
+                                className="py-2 text-[14px] font-medium text-gray-500 hover:text-primary transition-colors block"
+                                onClick={() => setIsOpen(false)}
+                              >
+                                {item.label}
+                              </Link>
+                            );
+                          })}
                         </motion.div>
                       )}
                     </AnimatePresence>

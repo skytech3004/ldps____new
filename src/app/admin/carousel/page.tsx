@@ -28,6 +28,7 @@ interface Slide {
 
 export default function AdminCarouselPage() {
   const [slides, setSlides] = useState<Slide[]>([]);
+  const [transition, setTransition] = useState("fade");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -48,6 +49,9 @@ export default function AdminCarouselPage() {
       if (!res.ok) throw new Error("Failed to fetch carousel.");
       const data = await res.json();
       setSlides(data.slides || []);
+      if (data.transition) {
+        setTransition(data.transition);
+      }
     } catch (err) {
       console.error(err);
       alert("Error loading carousel data.");
@@ -66,11 +70,28 @@ export default function AdminCarouselPage() {
       const res = await fetch("/api/admin/carousel", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slides: nextSlides }),
+        body: JSON.stringify({ slides: nextSlides, transition }),
       });
       if (!res.ok) throw new Error("Failed to save.");
     } catch (err) {
       console.error("Auto-save failed:", err);
+    } finally {
+      setTimeout(() => setSaving(false), 500);
+    }
+  };
+
+  const handleTransitionChange = async (newTransition: string) => {
+    setTransition(newTransition);
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/carousel", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slides, transition: newTransition }),
+      });
+      if (!res.ok) throw new Error("Failed to save.");
+    } catch (err) {
+      console.error("Save failed:", err);
     } finally {
       setTimeout(() => setSaving(false), 500);
     }
@@ -235,6 +256,29 @@ export default function AdminCarouselPage() {
               </>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Carousel Configuration Settings */}
+      <div className="rounded-2xl border border-white/15 bg-[#0f234f]/80 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <Sparkles size={20} className="text-accent" />
+            <span>Transition Effect Option</span>
+          </h2>
+          <p className="text-xs text-white/60 mt-1">Choose how the home page hero slides animate during transitions.</p>
+        </div>
+        <div>
+          <select
+            value={transition}
+            onChange={(e) => handleTransitionChange(e.target.value)}
+            className="bg-[#0b1738] border border-white/15 text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl outline-none cursor-pointer focus:border-accent"
+          >
+            <option value="fade">Fade Transition</option>
+            <option value="slideLeft">Slide Left Transition</option>
+            <option value="slideRight">Slide Right Transition</option>
+            <option value="zoom">Zoom Scale Transition</option>
+          </select>
         </div>
       </div>
 

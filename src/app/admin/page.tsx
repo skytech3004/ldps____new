@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle, ClipboardList, LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar, Download } from "lucide-react";
+import { Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle, ClipboardList, LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar, Download, Award, GraduationCap, Trophy } from "lucide-react";
 
 const modules = [
   {
@@ -13,6 +13,30 @@ const modules = [
     description: "Manage the public leadership page with names, designations, and portrait images.",
     href: "/admin/leadership",
     icon: ShieldCheck,
+  },
+  {
+    title: "Investiture Cabinet",
+    description: "Manage Student Cabinet portfolios (Head Girl, Prefects) for the Investiture Ceremony.",
+    href: "/admin/investiture",
+    icon: Award,
+  },
+  {
+    title: "Alumni Registrations",
+    description: "Review, filter, and track registrations submitted by school alumni.",
+    href: "/admin/alumni",
+    icon: GraduationCap,
+  },
+  {
+    title: "Advanced Facilities",
+    description: "Manage structural elements and images shown in the advanced facilities showcase grid.",
+    href: "/admin/facilities",
+    icon: LayoutGrid,
+  },
+  {
+    title: "Board Results Hub",
+    description: "Manage board exam years, stats, student toppers, and marks directories.",
+    href: "/admin/results",
+    icon: Trophy,
   },
   {
     title: "More Pages",

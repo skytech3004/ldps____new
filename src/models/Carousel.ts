@@ -21,6 +21,11 @@ const CarouselSchema = new Schema(
       type: [CarouselSlideSchema],
       default: [],
     },
+    transition: {
+      type: String,
+      default: "fade",
+      trim: true,
+    },
   },
   {
     timestamps: true,

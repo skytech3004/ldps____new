@@ -57,15 +57,19 @@ export async function PUT(request: Request) {
     await connectToDatabase();
     const body = await request.json();
 
-    if (!body.slides || !Array.isArray(body.slides)) {
-      return NextResponse.json({ error: "Slides array is required." }, { status: 400 });
-    }
-
     const key = body.key || "homepage";
+
+    const updateFields: any = {};
+    if (body.slides && Array.isArray(body.slides)) {
+      updateFields.slides = body.slides;
+    }
+    if (body.transition) {
+      updateFields.transition = body.transition;
+    }
 
     const updated = await CarouselModel.findOneAndUpdate(
       { key },
-      { slides: body.slides },
+      updateFields,
       { new: true, runValidators: true, upsert: true }
     );
 

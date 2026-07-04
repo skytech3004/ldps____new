@@ -33,6 +33,7 @@ export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slides, setSlides] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [transitionStyle, setTransitionStyle] = useState("fade");
  
   useEffect(() => {
     async function loadHeroSlides() {
@@ -42,6 +43,9 @@ export default function Hero() {
           const data = await res.json();
           if (data.slides) {
             setSlides(data.slides);
+          }
+          if (data.transition) {
+            setTransitionStyle(data.transition);
           }
         }
       } catch (err) {
@@ -101,57 +105,36 @@ export default function Hero() {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
+            initial={
+              transitionStyle === "slideLeft" ? { opacity: 0, x: "100%" } :
+              transitionStyle === "slideRight" ? { opacity: 0, x: "-100%" } :
+              transitionStyle === "zoom" ? { opacity: 0, scale: 1.15 } :
+              { opacity: 0 }
+            }
+            animate={
+              transitionStyle === "zoom" ? { opacity: 1, scale: 1 } :
+              { opacity: 1, x: 0 }
+            }
+            exit={
+              transitionStyle === "slideLeft" ? { opacity: 0, x: "-100%" } :
+              transitionStyle === "slideRight" ? { opacity: 0, x: "100%" } :
+              transitionStyle === "zoom" ? { opacity: 0, scale: 0.95 } :
+              { opacity: 0 }
+            }
+            transition={{
+              duration: transitionStyle === "zoom" ? 1.2 : 0.8,
+              ease: "easeInOut"
+            }}
             className="absolute inset-0"
           >
-            <div className="absolute inset-0 bg-navy/40 z-10" />
             <Image 
               src={slides[currentSlide].image}
               alt={`LPS Vidyawadi campus ${currentSlide + 1}`}
               fill
               sizes="100vw"
               priority
-              className="object-cover scale-105 animate-slow-zoom"
+              className="object-cover"
             />
-            
-            {/* Text Overlay */}
-            <div className="absolute inset-0 z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col justify-center items-start pointer-events-none">
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="w-full max-w-lg md:max-w-2xl lg:max-w-3xl bg-white/10 backdrop-blur-md p-6 sm:p-8 lg:p-12 rounded-[2.5rem] border border-white/20 shadow-2xl pointer-events-auto"
-              >
-                {slides[currentSlide].subtitle && (
-                  <span className="text-mint font-black uppercase tracking-[0.4em] text-xs lg:text-sm mb-4 lg:mb-6 block">
-                    {slides[currentSlide].subtitle}
-                  </span>
-                )}
-                <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white leading-[1.1] md:leading-[0.9] mb-6 lg:mb-8 uppercase break-words">
-                  {slides[currentSlide].title} <br />
-                  {slides[currentSlide].highlight && (
-                    <span className="text-yellow-accent">{slides[currentSlide].highlight}</span>
-                  )}
-                </h1>
-                {slides[currentSlide].description && (
-                  <p className="text-white/80 text-sm md:text-lg lg:text-xl font-medium mb-8 lg:mb-10 max-w-xl leading-relaxed">
-                    {slides[currentSlide].description}
-                  </p>
-                )}
-                <div className="flex flex-wrap gap-4">
-                  <button className="bg-green-primary text-navy px-8 py-4 rounded-full font-black text-sm uppercase tracking-wider flex items-center gap-3 hover:bg-yellow-accent transition-all hover:scale-105 shadow-xl">
-                    Explore School
-                    <ArrowRight size={18} />
-                  </button>
-                  <button className="bg-transparent border-2 border-white/30 text-white px-8 py-4 rounded-full font-black text-sm uppercase tracking-wider hover:bg-green-primary hover:text-navy transition-all">
-                    Admission Details
-                  </button>
-                </div>
-              </motion.div>
-            </div>
           </motion.div>
         </AnimatePresence>
 

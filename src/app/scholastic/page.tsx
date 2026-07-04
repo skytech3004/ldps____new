@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -21,6 +21,26 @@ import {
 import { curriculumPage, getSection } from "@/data/lpsVidhyawadiDatabase";
 
 export default function ScholasticPage() {
+  const [facilities, setFacilities] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchFacilities() {
+      try {
+        const res = await fetch("/api/admin/facilities");
+        if (res.ok) {
+          const data = await res.json();
+          setFacilities(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch facilities:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchFacilities();
+  }, []);
+
   const primaryCurriculum = getSection(curriculumPage, "The Curriculum");
   const secondaryWings = getSection(curriculumPage, "Secondary and Senior Secondary Wings");
 
@@ -318,52 +338,49 @@ export default function ScholasticPage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {[
-              { name: "Artificial Intelligence", img: "DSC05229", fallback: "/lps-vidhyawadi/gallery-01.jpg" },
-              { name: "Robotics Lab", img: "DSC05252", fallback: "/lps-vidhyawadi/gallery-02.jpg" },
-              { name: "Aeronautics Lab", img: "ENTP", fallback: "/lps-vidhyawadi/gallery-03.jpg" },
-              { name: "Financial Literacy and Entrepreneurship", img: "DSC07324", fallback: "/lps-vidhyawadi/gallery-04.jpg" },
-              { name: "Abacus and Vedic Maths", img: "DSC08576", fallback: "/lps-vidhyawadi/gallery-05.jpg" },
-              { name: "Smart Classes", img: "DSC08589", fallback: "/lps-vidhyawadi/gallery-06.jpg" },
-              { name: "English Communication", img: "DSC05324", fallback: "/lps-vidhyawadi/gallery-07.jpg" },
-              { name: "Physics Lab", img: "DSC08551", fallback: "/lps-vidhyawadi/gallery-08.jpg" },
-              { name: "Chemistry Lab", img: "DSC05352", fallback: "/lps-vidhyawadi/gallery-09.jpg" },
-              { name: "Biology Lab", img: "C8397T01", fallback: "/lps-vidhyawadi/gallery-10.jpg" },
-              { name: "Computer Lab", img: "C8429T01", fallback: "/lps-vidhyawadi/gallery-11.jpg" },
-              { name: "Mathematics Lab", img: "remedial class", fallback: "/lps-vidhyawadi/gallery-12.jpg" },
-              { name: "Remedial classes", img: "Taekwondo", fallback: "/lps-vidhyawadi/gallery-01.jpg" },
-              { name: "Taekwondo", img: "C8262T01", fallback: "/lps-vidhyawadi/gallery-02.jpg" },
-              { name: "Library", img: "Library", fallback: "/lps-vidhyawadi/gallery-03.jpg" },
-            ].map((item, idx) => (
-              <motion.div 
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.05 }}
-                className="group relative bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 aspect-[4/5]"
-              >
-                <Image 
-                  src={item.fallback} 
-                  alt={item.name}
-                  fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-700 brightness-90 group-hover:brightness-100"
-                />
-                
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-                
-                {/* Content */}
-                <div className="absolute inset-0 p-6 flex flex-col justify-end transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                  <p className="text-[10px] font-black text-accent uppercase tracking-widest mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {item.img}
-                  </p>
-                  <h4 className="text-white font-black text-sm md:text-base uppercase leading-tight">
-                    {item.name}
-                  </h4>
-                </div>
-              </motion.div>
-            ))}
+            {loading ? (
+              <div className="col-span-full py-12 text-center text-primary">
+                <div className="w-8 h-8 border-4 border-[#3D348B] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                <p className="font-bold text-xs uppercase tracking-wider animate-pulse">Loading Advanced Facilities...</p>
+              </div>
+            ) : facilities.length === 0 ? (
+              <div className="col-span-full text-center py-12 text-gray-400 font-medium">
+                No facilities available.
+              </div>
+            ) : (
+              facilities.map((item, idx) => (
+                <motion.div 
+                  key={item._id || idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.05 }}
+                  className="group relative bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 aspect-[4/5]"
+                >
+                  <Image 
+                    src={item.fallback} 
+                    alt={item.name}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-700 brightness-90 group-hover:brightness-100"
+                  />
+                  
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                  
+                  {/* Content */}
+                  <div className="absolute inset-0 p-6 flex flex-col justify-end transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                    {item.code && (
+                      <p className="text-[10px] font-black text-accent uppercase tracking-widest mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {item.code}
+                      </p>
+                    )}
+                    <h4 className="text-white font-black text-sm md:text-base uppercase leading-tight">
+                      {item.name}
+                    </h4>
+                  </div>
+                </motion.div>
+              ))
+            )}
           </div>
 
           <div className="text-center pt-8">
