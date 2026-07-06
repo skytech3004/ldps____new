@@ -2,7 +2,7 @@
 set -euo pipefail
 
 APP_NAME="${APP_NAME:-lps-local}"
-PORT="${PORT:-3004}"
+PORT="${PORT:-3003}"
 HOST="${HOST:-0.0.0.0}"
 
 echo "==> Starting deploy in: $(pwd)"
