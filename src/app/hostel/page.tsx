@@ -10,7 +10,7 @@ import GsapCounter from "@/components/ui/GsapCounter";
 import { 
   Shield, Tv, Sparkles, CheckCircle2, ChevronRight, HelpCircle, 
   Dumbbell, Users, Star, ChevronDown, Download, ArrowRight, 
-  History, Shirt, Ban, CalendarRange 
+  History, Shirt, Ban, CalendarRange, X, ChevronLeft, ImageIcon
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -41,10 +41,32 @@ type HostelData = {
   rules: Rule[];
 };
 
+type HostelPhoto = {
+  _id?: string;
+  title: string;
+  src: string;
+  category: string;
+};
+
+const defaultHostelPhotos: HostelPhoto[] = [
+  { src: "/uploads/hostel/hostel.jpg", title: "Premium Residence", category: "Campus" },
+  { src: "/uploads/hostel/Cafeteria.png", title: "Student Cafeteria", category: "Mess" },
+  { src: "/uploads/hostel/Hostels.png", title: "Hostel View", category: "Campus" },
+  { src: "/uploads/hostel/Hostels_1.png", title: "Comfortable Living", category: "Rooms" },
+  { src: "/uploads/hostel/Hostels_2.png", title: "Modern Facilities", category: "Rooms" },
+  { src: "/uploads/hostel/Hostels_3.png", title: "Nurturing Environment", category: "Campus" },
+  { src: "/uploads/hostel/Hostels_4.png", title: "Safe & Secure", category: "Campus" }
+];
+
 export default function HostelPage() {
   const [data, setData] = useState<HostelData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeRuleIdx, setActiveRuleIdx] = useState<number | null>(null);
+  const [hostelPhotos, setHostelPhotos] = useState<HostelPhoto[]>([]);
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [activePhoto, setActivePhoto] = useState<number | null>(null);
+
+  const [filters, setFilters] = useState<string[]>(["All", "Rooms", "Mess", "Campus"]);
 
   useEffect(() => {
     async function fetchHostelData() {
@@ -56,22 +78,87 @@ export default function HostelPage() {
         }
       } catch (err) {
         console.error("Failed to fetch hostel data:", err);
+      }
+    }
+
+    async function fetchHostelPhotos() {
+      try {
+        const res = await fetch("/api/admin/media-items?type=hostel-photo");
+        if (res.ok) {
+          const items = await res.json();
+          if (items && items.length > 0) {
+            setHostelPhotos(items);
+          } else {
+            setHostelPhotos(defaultHostelPhotos);
+          }
+        } else {
+          setHostelPhotos(defaultHostelPhotos);
+        }
+      } catch (err) {
+        console.error("Failed to fetch hostel photos:", err);
+        setHostelPhotos(defaultHostelPhotos);
       } finally {
         setLoading(false);
       }
     }
-    fetchHostelData();
+
+    async function fetchHostelFilters() {
+      try {
+        const res = await fetch("/api/admin/filters?type=hostel");
+        if (res.ok) {
+          const items = await res.json();
+          if (items && items.length > 0) {
+            setFilters(["All", ...items.map((f: any) => f.name)]);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch hostel filters:", err);
+      }
+    }
+
+    Promise.all([fetchHostelData(), fetchHostelPhotos(), fetchHostelFilters()]);
   }, []);
 
-  const galleryItems = [
-    { src: "/uploads/hostel/hostel.jpg", label: "Premium Residence" },
-    { src: "/uploads/hostel/Cafeteria.png", label: "Student Cafeteria" },
-    { src: "/uploads/hostel/Hostels.png", label: "Hostel View" },
-    { src: "/uploads/hostel/Hostels_1.png", label: "Comfortable Living" },
-    { src: "/uploads/hostel/Hostels_2.png", label: "Modern Facilities" },
-    { src: "/uploads/hostel/Hostels_3.png", label: "Nurturing Environment" },
-    { src: "/uploads/hostel/Hostels_4.png", label: "Safe & Secure" }
-  ];
+  const filteredPhotos = activeFilter === "All"
+    ? hostelPhotos
+    : hostelPhotos.filter((p) => p.category === activeFilter);
+
+  // Lightbox handlers
+  const handlePrev = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (activePhoto === null) return;
+    setActivePhoto((prev) => (prev === 0 ? filteredPhotos.length - 1 : (prev ?? 0) - 1));
+  };
+
+  const handleNext = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (activePhoto === null) return;
+    setActivePhoto((prev) => (prev === filteredPhotos.length - 1 ? 0 : (prev ?? 0) + 1));
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (activePhoto === null) return;
+      if (e.key === "ArrowLeft") handlePrev();
+      if (e.key === "ArrowRight") handleNext();
+      if (e.key === "Escape") setActivePhoto(null);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activePhoto, filteredPhotos]);
+
+  // Lock scroll
+  useEffect(() => {
+    if (activePhoto !== null) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [activePhoto]);
 
   if (loading) {
     return (
@@ -246,7 +333,7 @@ export default function HostelPage() {
         <div className="absolute top-1/4 left-1/2 w-96 h-96 bg-[#7678ED]/5 rounded-full blur-[100px] -z-10 -translate-x-1/2"></div>
         
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20 space-y-4">
+          <div className="text-center mb-16 space-y-4">
             <Reveal>
               <span className="text-[#3D348B] font-black uppercase tracking-[0.4em] text-xs block">Visual Journey</span>
             </Reveal>
@@ -257,33 +344,166 @@ export default function HostelPage() {
             </Reveal>
             <div className="h-1 w-16 bg-accent mx-auto mt-2 rounded-full" />
           </div>
+
+          {/* Dynamic Hostel Gallery category filters */}
+          <div className="flex flex-wrap gap-2 justify-center mb-12">
+            {filters.map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className={`px-5 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-300 ${
+                  activeFilter === filter
+                    ? "bg-[#3D348B] text-white shadow-premium-sm"
+                    : "bg-white text-[#3D348B] border border-slate-100 hover:bg-[#F1F2F6]"
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
           
           {/* Asymmetric composition gallery grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
-            {galleryItems.map((item, idx) => (
-              <FadeIn key={idx} delay={idx * 0.05}>
-                <div 
-                  className={`group relative rounded-[2.2rem] overflow-hidden shadow-premium-md border-4 border-white bg-slate-50 transition-all duration-500 hover:-translate-y-2 hover:shadow-premium-lg ${
-                    idx === 0 ? "lg:aspect-[3/4] lg:row-span-2" : "aspect-square sm:aspect-[4/3] lg:aspect-square"
+            <AnimatePresence mode="popLayout">
+              {filteredPhotos.map((item, idx) => (
+                <motion.div 
+                  layout
+                  key={item.src}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.4 }}
+                  onClick={() => setActivePhoto(idx)}
+                  className={`group relative rounded-[2.2rem] overflow-hidden shadow-premium-md border-4 border-white bg-slate-50 transition-all duration-500 hover:-translate-y-2 hover:shadow-premium-lg cursor-pointer ${
+                    idx % 4 === 0 ? "lg:aspect-[3/4] lg:row-span-2" : "aspect-square sm:aspect-[4/3] lg:aspect-square"
                   }`}
                 >
                   <img 
                     src={item.src} 
-                    alt={item.label}
+                    alt={item.title}
                     className="w-full h-full object-cover p-1.5 rounded-[2rem] transition-transform duration-750 group-hover:scale-105"
                     onError={(e) => {
                       e.currentTarget.src = "/lps-vidhyawadi/gallery-01.jpg";
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#3D348B]/95 via-[#3D348B]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
-                    <p className="text-white font-black uppercase tracking-widest text-xs">{item.label}</p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#3D348B]/95 via-[#3D348B]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
+                    <span className="inline-block self-start px-2 py-0.5 bg-[#F7B801] text-[#3D348B] text-[8px] font-black uppercase tracking-widest rounded mb-1">
+                      {item.category}
+                    </span>
+                    <p className="text-white font-black uppercase tracking-widest text-[11px] leading-tight">{item.title}</p>
                   </div>
-                </div>
-              </FadeIn>
-            ))}
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
+
+          {filteredPhotos.length === 0 && (
+            <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm max-w-md mx-auto mt-6">
+              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ImageIcon size={32} className="text-slate-300" />
+              </div>
+              <h3 className="text-xl font-bold text-[#3D348B] mb-2">No Photos Found</h3>
+              <p className="text-slate-500 text-xs font-semibold">
+                There are no gallery photos in category &quot;{activeFilter}&quot;. Add some via the Hostel Admin panel!
+              </p>
+            </div>
+          )}
         </div>
       </section>
+
+      {/* Premium Lightbox Modal Viewer */}
+      <AnimatePresence>
+        {activePhoto !== null && filteredPhotos[activePhoto] && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setActivePhoto(null)}
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex flex-col justify-between items-center py-6 px-4"
+          >
+            {/* Top Bar */}
+            <div className="w-full max-w-6xl flex justify-between items-center text-white px-2">
+              <span className="text-xs md:text-sm font-bold tracking-widest text-[#F7B801] uppercase">
+                LPS Boarding Residences
+              </span>
+              <button
+                onClick={() => setActivePhoto(null)}
+                className="p-2.5 bg-white/5 hover:bg-white/15 hover:scale-105 border border-white/10 rounded-full text-white/80 hover:text-white transition-all cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Media Area */}
+            <div className="flex-1 w-full flex items-center justify-center relative my-4 max-h-[75vh]">
+              {/* Left Navigation Arrow */}
+              <button
+                onClick={handlePrev}
+                className="absolute left-2 md:left-4 z-10 p-3 bg-white/5 hover:bg-white/15 border border-white/10 text-white/80 hover:text-white rounded-full transition-all cursor-pointer hidden sm:block"
+              >
+                <ChevronLeft size={24} />
+              </button>
+
+              {/* Central Active Image with organic zoom */}
+              <motion.div
+                key={activePhoto}
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 28 }}
+                onClick={(e) => e.stopPropagation()}
+                className="relative max-h-full max-w-full md:max-w-4xl flex flex-col items-center justify-center"
+              >
+                <img
+                  src={filteredPhotos[activePhoto].src}
+                  alt={filteredPhotos[activePhoto].title}
+                  className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl border border-white/5 shadow-2xl"
+                />
+              </motion.div>
+
+              {/* Right Navigation Arrow */}
+              <button
+                onClick={handleNext}
+                className="absolute right-2 md:right-4 z-10 p-3 bg-white/5 hover:bg-white/15 border border-white/10 text-white/80 hover:text-white rounded-full transition-all cursor-pointer hidden sm:block"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </div>
+
+            {/* Bottom Info Bar & Mobile Swiper Controls */}
+            <div 
+              onClick={(e) => e.stopPropagation()} 
+              className="w-full max-w-3xl text-center flex flex-col items-center gap-4 text-white px-4"
+            >
+              {/* Title display */}
+              <div className="space-y-1">
+                <p className="text-sm md:text-lg font-black text-white tracking-wide max-w-2xl leading-snug">
+                  {filteredPhotos[activePhoto].title}
+                </p>
+                <p className="text-[11px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  Photo {activePhoto + 1} of {filteredPhotos.length} | Category: {filteredPhotos[activePhoto].category}
+                </p>
+              </div>
+
+              {/* Mobile Arrows (Visible only on small screens) */}
+              <div className="flex sm:hidden items-center gap-6 mt-1">
+                <button
+                  onClick={handlePrev}
+                  className="p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full cursor-pointer text-white"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button
+                  onClick={handleNext}
+                  className="p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full cursor-pointer text-white"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Hostel Facilities - Asymmetric Grid & Spacing */}
       <section className="py-32 md:py-40 px-6 bg-white">
@@ -302,7 +522,7 @@ export default function HostelPage() {
             {facilities.map((fac, idx) => (
               <FadeIn key={fac._id || idx} delay={idx * 0.04}>
                 <div 
-                  className="group relative flex flex-col bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 hover:shadow-premium-lg transition-all duration-500 hover:-translate-y-1 h-full"
+                  className="group relative flex flex-col bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 hover:shadow-premium-lg transition-all duration-500 hover:-translate-y-2 h-full cursor-pointer"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <img 
@@ -313,13 +533,19 @@ export default function HostelPage() {
                         e.currentTarget.src = "/lps-vidhyawadi/gallery-03.jpg";
                       }}
                     />
-                    <div className="absolute inset-0 bg-[#3D348B]/10 group-hover:bg-[#3D348B]/30 transition-colors"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#3D348B]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end p-6">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#F7B801] flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                        <CheckCircle2 size={12} />
+                        LPS Boarding Amenity
+                      </span>
+                    </div>
+                    <div className="absolute inset-0 bg-[#3D348B]/10 group-hover:bg-[#3D348B]/20 transition-colors"></div>
                   </div>
                   <div className="p-6 flex flex-col flex-1 space-y-2">
-                    <h3 className="text-lg text-[#3D348B] font-black uppercase tracking-tight group-hover:text-secondary transition-colors">
+                    <h3 className="text-lg text-[#3D348B] font-black uppercase tracking-tight group-hover:text-[#7678ED] transition-colors">
                       {fac.name}
                     </h3>
-                    <p className="text-gray-500 text-xs font-bold leading-relaxed line-clamp-3">
+                    <p className="text-gray-500 text-xs font-bold leading-relaxed line-clamp-3 group-hover:text-gray-700 transition-colors">
                       {fac.description}
                     </p>
                   </div>

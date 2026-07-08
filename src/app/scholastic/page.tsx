@@ -16,7 +16,17 @@ import {
   ArrowRight,
   Microscope,
   Languages,
-  Calculator
+  Calculator,
+  Atom,
+  Coins,
+  Compass,
+  Cpu,
+  Wrench,
+  Sparkles,
+  Satellite,
+  Brain,
+  Palmtree,
+  Gem
 } from "lucide-react";
 import { curriculumPage, getSection } from "@/data/lpsVidhyawadiDatabase";
 
@@ -222,6 +232,164 @@ export default function ScholasticPage() {
         </div>
       </section>
 
+      {/* Senior Secondary Streams & Vocational Courses - Academic Excellence */}
+      <section className="py-24 px-6 bg-[#F8F9FC] border-t border-slate-100">
+        <div className="max-w-7xl mx-auto space-y-24">
+          
+          {/* Senior Secondary Streams Header */}
+          <div className="text-center space-y-4">
+            <span className="text-accent font-black uppercase tracking-[0.4em] text-xs">Pathways to Success</span>
+            <h2 className="text-4xl md:text-5xl font-black text-primary uppercase font-montserrat tracking-tight">
+              Senior Secondary Streams (XI & XII)
+            </h2>
+            <p className="text-gray-500 font-medium max-w-2xl mx-auto">
+              Offering specialized academic channels designed to support higher education aspirations and career readiness.
+            </p>
+            <div className="h-1 w-16 bg-accent mx-auto mt-2 rounded-full" />
+          </div>
+
+          {/* Streams Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {[
+              {
+                title: "Science",
+                icon: Atom,
+                color: "from-blue-600/10 to-blue-700/5",
+                borderColor: "border-blue-500/10 hover:border-blue-500/30",
+                iconColor: "text-blue-600 bg-blue-50",
+                subjects: [
+                  "English Core",
+                  "Physics",
+                  "Chemistry",
+                  "Maths / Biology",
+                  "Economics",
+                  "Computer Science / Multimedia / Painting / Dance / PE"
+                ]
+              },
+              {
+                title: "Commerce",
+                icon: Coins,
+                color: "from-green-600/10 to-green-700/5",
+                borderColor: "border-green-500/10 hover:border-green-500/30",
+                iconColor: "text-green-600 bg-green-50",
+                subjects: [
+                  "English Core",
+                  "Accountancy",
+                  "Business Studies",
+                  "Economics",
+                  "Maths",
+                  "Computer Science / Multimedia / Painting / Dance / PE"
+                ]
+              },
+              {
+                title: "Humanities",
+                icon: Compass,
+                color: "from-amber-600/10 to-amber-700/5",
+                borderColor: "border-amber-500/10 hover:border-amber-500/30",
+                iconColor: "text-amber-600 bg-amber-50",
+                subjects: [
+                  "English Elective / Core",
+                  "Political Science",
+                  "History",
+                  "Geography / Music / Economics",
+                  "Hindi Core / Computer Science / Multimedia",
+                  "Painting / Dance (Kathak)"
+                ]
+              }
+            ].map((stream, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className={`bg-white border rounded-[2.5rem] p-8 md:p-10 shadow-premium-sm hover:shadow-premium-lg transition-all duration-300 flex flex-col justify-between ${stream.borderColor}`}
+              >
+                <div className="space-y-8">
+                  {/* Icon & Title Header */}
+                  <div className="flex items-center gap-4">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-md ${stream.iconColor} shrink-0`}>
+                      <stream.icon size={26} />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Secondary Wing</span>
+                      <h3 className="text-xl md:text-2xl font-black text-primary uppercase tracking-tight leading-none mt-0.5">{stream.title}</h3>
+                    </div>
+                  </div>
+
+                  {/* Subject List */}
+                  <div className="space-y-4">
+                    <p className="text-[10px] font-black text-accent uppercase tracking-widest border-b border-gray-100 pb-2">Subjects & Options</p>
+                    <ul className="space-y-3.5">
+                      {stream.subjects.map((sub, sIdx) => (
+                        <li key={sIdx} className="flex items-start gap-3 text-xs sm:text-sm text-gray-600 font-bold leading-relaxed">
+                          <span className="h-1.5 w-1.5 bg-[#7678ED] rounded-full shrink-0 mt-2" />
+                          <span>{sub}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Skill & Vocational Courses Sub-Section */}
+          <div className="space-y-16 pt-12">
+            <div className="text-center space-y-4">
+              <span className="text-[#7678ED] font-black uppercase tracking-[0.4em] text-xs block">Practical Learning</span>
+              <h2 className="text-3xl md:text-4xl font-black text-primary uppercase font-montserrat tracking-tight">
+                Skill & Vocational Courses
+              </h2>
+              <p className="text-gray-500 font-medium max-w-xl mx-auto">
+                Promoting experiential skill cultivation alongside traditional studies to build a diverse capability profile.
+              </p>
+              <div className="h-1 w-12 bg-accent mx-auto mt-2 rounded-full" />
+            </div>
+
+            {/* Grid of 13 Skill Badges */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+              {[
+                { name: "Information Technology", icon: Cpu, color: "from-cyan-500/10 to-cyan-500/5", text: "text-cyan-600" },
+                { name: "Food Nutrition & Dietetics", icon: Brain, color: "from-pink-500/10 to-pink-500/5", text: "text-pink-600" },
+                { name: "AI (Artificial Intelligence)", icon: Sparkles, color: "from-indigo-500/10 to-indigo-500/5", text: "text-indigo-600" },
+                { name: "Block Printing", icon: Gem, color: "from-teal-500/10 to-teal-500/5", text: "text-teal-600" },
+                { name: "Rockets", icon: Compass, color: "from-red-500/10 to-red-500/5", text: "text-red-600" },
+                { name: "Design Thinking", icon: Brain, color: "from-purple-500/10 to-purple-500/5", text: "text-purple-600" },
+                { name: "Satellites", icon: Satellite, color: "from-sky-500/10 to-sky-500/5", text: "text-sky-600" },
+                { name: "Financial Literacy", icon: Coins, color: "from-emerald-500/10 to-emerald-500/5", text: "text-emerald-600" },
+                { name: "Handicraft", icon: Wrench, color: "from-amber-500/10 to-amber-500/5", text: "text-amber-600" },
+                { name: "Marketing", icon: Users, color: "from-blue-500/10 to-blue-500/5", text: "text-blue-600" },
+                { name: "Tourism", icon: Palmtree, color: "from-green-500/10 to-green-500/5", text: "text-green-600" },
+                { name: "Digital Citizenship", icon: Cpu, color: "from-violet-500/10 to-violet-500/5", text: "text-violet-600" },
+                { name: "Beauty & Wellness", icon: Sparkles, color: "from-rose-500/10 to-rose-500/5", text: "text-rose-600" }
+              ].map((skill, idx) => {
+                const Icon = skill.icon;
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.3, delay: (idx % 6) * 0.05 }}
+                    whileHover={{ scale: 1.05, y: -4 }}
+                    className="bg-white border border-slate-100 hover:border-accent p-5 rounded-2xl shadow-premium-xs hover:shadow-premium-md transition-all duration-300 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group"
+                  >
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${skill.color} ${skill.text} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon size={20} />
+                    </div>
+                    <span className="text-xs font-black text-primary uppercase tracking-tight leading-tight line-clamp-2">
+                      {skill.name}
+                    </span>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       {/* Curriculum Details Section */}
       <section className="py-24 px-6 bg-white border-y border-primary/5">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
@@ -388,6 +556,81 @@ export default function ScholasticPage() {
               Discover more at LPS Vidyawadi
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Fee Structure Section */}
+      <section className="py-24 px-6 bg-white border-t border-slate-100">
+        <div className="max-w-4xl mx-auto space-y-12">
+          
+          <div className="text-center space-y-4">
+            <span className="text-accent font-black uppercase tracking-[0.4em] text-xs">Investment in Excellence</span>
+            <h2 className="text-4xl md:text-5xl font-black text-primary uppercase font-montserrat tracking-tight">
+              Fee Structure 2026-27
+            </h2>
+            <div className="inline-block bg-primary/10 text-primary px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider">
+              2 Easy Installments
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-[2rem] border border-slate-100 shadow-premium-lg bg-white">
+            <div className="bg-primary p-6 text-white text-center">
+              <h3 className="font-montserrat font-black text-lg uppercase tracking-wider">
+                Senior Secondary (XI–XII)
+              </h3>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[500px]">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-100">
+                    <th className="p-5 text-xs font-black uppercase tracking-wider text-primary">Stream</th>
+                    <th className="p-5 text-xs font-black uppercase tracking-wider text-primary">Installments</th>
+                    <th className="p-5 text-xs font-black uppercase tracking-wider text-primary">Total Fee</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {[
+                    { stream: "Science (PCM)", installments: "₹27,300 × 2", total: "₹54,600" },
+                    { stream: "Science (PCB)", installments: "₹28,700 × 2", total: "₹57,400" },
+                    { stream: "Commerce (General)", installments: "₹22,650 × 2", total: "₹45,300" },
+                    { stream: "Commerce (Comp Sci)", installments: "₹23,300 × 2", total: "₹46,600" },
+                    { stream: "Arts (General)", installments: "₹22,800 × 2", total: "₹45,600" },
+                    { stream: "Arts (Music/Geo/Comp)", installments: "₹24,000 × 2", total: "₹48,000" },
+                  ].map((row, idx) => (
+                    <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="p-5 text-sm font-black text-primary uppercase tracking-tight">{row.stream}</td>
+                      <td className="p-5 text-sm font-semibold text-gray-500">{row.installments}</td>
+                      <td className="p-5 text-sm font-black text-accent">{row.total}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Admission Fee Note */}
+          <div className="bg-[#F8F9FC] border border-slate-100 p-8 rounded-[2rem] space-y-4">
+            <h4 className="font-montserrat font-black text-xs uppercase tracking-widest text-[#7678ED] text-center sm:text-left">
+              Admission Fee (One-Time)
+            </h4>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center sm:text-left">
+              {[
+                { label: "Science (PCM)", fee: "₹5,000" },
+                { label: "Science (PCB)", fee: "₹5,000" },
+                { label: "Commerce (Gen)", fee: "₹5,000" },
+                { label: "Commerce (CS)", fee: "₹5,000" },
+                { label: "Arts (General)", fee: "₹5,000" },
+                { label: "Arts (Spl)", fee: "₹5,000" },
+              ].map((item, idx) => (
+                <div key={idx} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">{item.label}</span>
+                  <span className="text-sm font-black text-primary mt-0.5">{item.fee}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       </section>
 

@@ -3,42 +3,42 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import NoticeBoard from "@/components/NoticeBoard";
 import IntroSection from "@/components/IntroSection";
-import CorePillars from "@/components/CorePillars";
 import CategoryGrid from "@/components/CategoryGrid";
-import VideoBento from "@/components/VideoBento";
-import TestimonialSlider from "@/components/TestimonialSlider";
+import ResidentialHostels from "@/components/ResidentialHostels";
 import StaggeredStats from "@/components/StaggeredStats";
-import LifeAtGis from "@/components/LifeAtGis";
+import LifeAtVidyawadi from "@/components/LifeAtVidyawadi";
+import UpcomingEventsAndBlogs from "@/components/UpcomingEventsAndBlogs";
+import TestimonialSlider from "@/components/TestimonialSlider";
 import Footer from "@/components/Footer";
 import AdmissionQueryModal from "@/components/AdmissionQueryModal";
 import FloatingAdmissionButton from "@/components/FloatingAdmissionButton";
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-[#F8F9FC]">
       <Navbar />
       <Hero />
-      
+
       {/* Notice Board Section */}
       <NoticeBoard />
 
       {/* Intro Description & Banner Carousel */}
       <IntroSection />
 
-      {/* Core Pillars Details Section */}
-      <CorePillars />
+      {/* 8 Residential Hostels Section */}
+      <ResidentialHostels />
 
       {/* Category Grid Section */}
-      <CategoryGrid />
-
-      {/* 360 Video Bento Tour Section */}
-      <VideoBento />
+      {/* <CategoryGrid /> */}
 
       {/* Staggered Stats Section */}
       <StaggeredStats />
 
-      {/* Life at GIS Section */}
-      <LifeAtGis />
+      {/* Life @ Vidyawadi Section */}
+      <LifeAtVidyawadi />
+
+      {/* Journal & Upcoming Events Section */}
+      <UpcomingEventsAndBlogs />
 
       {/* Parent & Alumni Testimonial Slider */}
       <TestimonialSlider />

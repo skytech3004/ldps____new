@@ -1,19 +1,69 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useParams, notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { connectToDatabase } from "@/lib/mongodb";
-import { BlogModel } from "@/models/Blog";
-import { notFound } from "next/navigation";
 import { Calendar, User, ArrowLeft, Tag } from "lucide-react";
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  await connectToDatabase();
-  const { slug } = await params;
-  
-  const blog = await BlogModel.findOne({ slug, status: "Published" }).lean() as any;
-  
-  if (!blog) {
+type BlogType = {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  image: string;
+  author: string;
+  tags: string[];
+  status: "Draft" | "Published";
+  publishedAt: string;
+};
+
+export default function BlogPostPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+
+  const [blog, setBlog] = useState<BlogType | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (!slug) return;
+    async function fetchBlog() {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/blogs/${slug}`);
+        if (res.ok) {
+          const data = await res.json();
+          setBlog(data);
+        } else {
+          setError(true);
+        }
+      } catch (err) {
+        console.error("Failed to load blog detail:", err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBlog();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#F8F9FC] text-gray-800 font-sans">
+        <Navbar />
+        <div className="pt-48 pb-32 text-center">
+          <div className="w-8 h-8 border-4 border-[#3D348B] border-t-accent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-3 text-xs text-gray-400 font-bold uppercase tracking-widest animate-pulse">Loading Article...</p>
+        </div>
+        <Footer />
+      </main>
+    );
+  }
+
+  if (error || !blog || blog.status === "Draft") {
     notFound();
   }
 
@@ -31,7 +81,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div className="flex justify-start">
           <Link 
             href="/blog" 
-            className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-teal hover:text-navy transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#3D348B] hover:text-[#7678ED] transition-colors"
           >
             <ArrowLeft size={14} />
             Back to Articles

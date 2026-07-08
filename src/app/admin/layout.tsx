@@ -10,6 +10,7 @@ import {
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/filters", label: "Filter Tags Manager", icon: LayoutGrid },
   { href: "/admin/hostel", label: "Hostel & Residence", icon: Home },
   { href: "/admin/blog", label: "Blog Posts", icon: BookOpen },
   { href: "/admin/pre-primary", label: "Pre-Primary Showcase", icon: Images },

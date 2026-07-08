@@ -9,7 +9,8 @@ interface MediaItem {
   title: string;
   src: string;
   alt: string;
-  type: "photo" | "video";
+  type: "photo" | "video" | "hostel-photo";
+  category?: string;
 }
 
 export default function AdminMediaGallery() {
@@ -22,10 +23,52 @@ export default function AdminMediaGallery() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [inputMode, setInputMode] = useState<"url" | "upload">("url");
   const [uploading, setUploading] = useState(false);
+  const [categories, setCategories] = useState<string[]>(["Others", "Events", "Fun & Food Fest", "Hostel", "Infrastructure", "Laboratories"]);
   const [formData, setFormData] = useState({
     title: "",
     src: "",
+    category: "Others",
   });
+
+  const fetchFilters = async () => {
+    try {
+      const res = await fetch("/api/admin/filters?type=gallery");
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.length > 0) {
+          setCategories(data.map((f: any) => f.name));
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load gallery filters:", e);
+    }
+  };
+
+  const handleCreateNewCategory = async () => {
+    const newCat = window.prompt("Enter new gallery category name:");
+    if (!newCat || !newCat.trim()) return;
+    const trimmed = newCat.trim();
+    try {
+      const res = await fetch("/api/admin/filters", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmed, type: "gallery" })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (!categories.includes(data.name)) {
+          setCategories([...categories, data.name]);
+        }
+        setFormData(prev => ({ ...prev, category: data.name }));
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to create category");
+      }
+    } catch (error) {
+      console.error("Failed to create category:", error);
+      alert("Error creating category.");
+    }
+  };
 
   const getYouTubeThumbnail = (url: string) => {
     try {
@@ -71,6 +114,7 @@ export default function AdminMediaGallery() {
   // Load on mount
   useEffect(() => {
     fetchMediaItems();
+    fetchFilters();
   }, []);
 
   // Navigate preview
@@ -168,6 +212,7 @@ export default function AdminMediaGallery() {
         src: formData.src,
         alt: formData.title,
         type: activeTab,
+        category: formData.category,
       };
 
       const res = await fetch("/api/admin/media-items", {
@@ -186,7 +231,7 @@ export default function AdminMediaGallery() {
         setVideoItems([...videoItems, savedItem]);
       }
 
-      setFormData({ title: "", src: "" });
+      setFormData({ title: "", src: "", category: "Others" });
       setShowAddForm(false);
     } catch (error) {
       console.error("Save failed:", error);
@@ -319,37 +364,63 @@ export default function AdminMediaGallery() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <input
-                  type="text"
-                  placeholder="Title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="px-4 py-2 border bg-[#081736] text-white border-white/10 rounded-lg focus:outline-none focus:border-accent"
-                />
-                
-                {inputMode === "url" ? (
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+                <div className="md:col-span-4">
                   <input
                     type="text"
-                    placeholder={activeTab === "photo" ? "Image URL" : "YouTube Embed URL"}
-                    value={formData.src}
-                    onChange={(e) => setFormData({ ...formData, src: e.target.value })}
-                    className="px-4 py-2 border bg-[#081736] text-white border-white/10 rounded-lg focus:outline-none focus:border-accent"
+                    placeholder="Title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className="w-full px-4 py-2 border bg-[#081736] text-white border-white/10 rounded-lg focus:outline-none focus:border-accent"
                   />
-                ) : (
-                  <label className="relative px-4 py-2 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-accent transition-colors flex items-center justify-center bg-[#081736]">
+                </div>
+
+                <div className="md:col-span-4 flex gap-2">
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="flex-1 px-4 py-2 border bg-[#081736] text-white border-white/10 rounded-lg focus:outline-none focus:border-accent font-semibold"
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat} className="bg-[#081736] text-white font-semibold">
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={handleCreateNewCategory}
+                    className="px-3 bg-[#F7B801] hover:bg-[#F18701] text-[#3D348B] rounded-lg font-black transition-colors"
+                    title="Add new category"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+                
+                <div className="md:col-span-4">
+                  {inputMode === "url" ? (
                     <input
-                      type="file"
-                      accept={activeTab === "photo" ? "image/*" : "video/*"}
-                      onChange={handleFileUpload}
-                      disabled={uploading}
-                      className="hidden"
+                      type="text"
+                      placeholder={activeTab === "photo" ? "Image URL" : "YouTube Embed URL"}
+                      value={formData.src}
+                      onChange={(e) => setFormData({ ...formData, src: e.target.value })}
+                      className="w-full px-4 py-2 border bg-[#081736] text-white border-white/10 rounded-lg focus:outline-none focus:border-accent"
                     />
-                    <span className="text-white/60 font-semibold">
-                      {uploading ? "Uploading..." : formData.src ? `✓ ${activeTab === "photo" ? "Image" : "Video"} Uploaded` : `Click to Upload ${activeTab === "photo" ? "Image" : "Video"}`}
-                    </span>
-                  </label>
-                )}
+                  ) : (
+                    <label className="relative w-full h-[40px] px-4 py-2 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-accent transition-colors flex items-center justify-center bg-[#081736]">
+                      <input
+                        type="file"
+                        accept={activeTab === "photo" ? "image/*" : "video/*"}
+                        onChange={handleFileUpload}
+                        disabled={uploading}
+                        className="hidden"
+                      />
+                      <span className="text-white/60 font-semibold truncate text-xs">
+                        {uploading ? "Uploading..." : formData.src ? `✓ ${activeTab === "photo" ? "Image" : "Video"} Uploaded` : `Click to Upload ${activeTab === "photo" ? "Image" : "Video"}`}
+                      </span>
+                    </label>
+                  )}
+                </div>
               </div>
               <div className="flex gap-3">
                 <button
@@ -362,7 +433,7 @@ export default function AdminMediaGallery() {
                 <button
                   onClick={() => {
                     setShowAddForm(false);
-                    setFormData({ title: "", src: "" });
+                    setFormData({ title: "", src: "", category: "Others" });
                     setInputMode("url");
                   }}
                   className="px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-colors"
@@ -426,10 +497,17 @@ export default function AdminMediaGallery() {
                 </div>
 
                 {/* Title and Controls */}
-                <div className="p-4">
-                  <h3 className="text-white font-bold line-clamp-2 mb-3 text-sm">
-                    {item.title}
-                  </h3>
+                <div className="p-4 space-y-3">
+                  <div className="flex justify-between items-center gap-2">
+                    <h3 className="text-white font-bold line-clamp-1 text-sm">
+                      {item.title}
+                    </h3>
+                    {item.category && (
+                      <span className="px-2 py-0.5 bg-accent/25 text-[#F7B801] text-[9px] font-black uppercase rounded shrink-0">
+                        {item.category}
+                      </span>
+                    )}
+                  </div>
                   <button
                     onClick={() => handleDeleteItem(item._id!)}
                     className="w-full px-3 py-2 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white rounded transition-colors flex items-center justify-center gap-2 font-semibold text-sm"

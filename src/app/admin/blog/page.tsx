@@ -40,6 +40,7 @@ export default function AdminBlogPage() {
   const [formStatus, setFormStatus] = useState<"Draft" | "Published">("Published");
   const [formPublishedAt, setFormPublishedAt] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [suggestedTags, setSuggestedTags] = useState<string[]>(["Academic", "Events", "Hostel"]);
 
   async function fetchBlogs() {
     try {
@@ -57,8 +58,53 @@ export default function AdminBlogPage() {
     }
   }
 
+  async function fetchFilters() {
+    try {
+      const res = await fetch("/api/admin/filters?type=blog");
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.length > 0) {
+          setSuggestedTags(data.map((f: any) => f.name));
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load blog filters:", e);
+    }
+  }
+
+  async function handleAddCustomTag() {
+    const newTag = window.prompt("Enter new category tag name:");
+    if (!newTag || !newTag.trim()) return;
+    const trimmed = newTag.trim();
+    try {
+      const res = await fetch("/api/admin/filters", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmed, type: "blog" })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (!suggestedTags.includes(data.name)) {
+          setSuggestedTags([...suggestedTags, data.name]);
+        }
+        // Append tag to tags input text
+        const tags = formTagsText.split(",").map((t) => t.trim()).filter(Boolean);
+        if (!tags.includes(data.name)) {
+          setFormTagsText([...tags, data.name].join(", "));
+        }
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to create tag");
+      }
+    } catch (error) {
+      console.error("Failed to create tag:", error);
+      alert("Error creating tag.");
+    }
+  }
+
   useEffect(() => {
     fetchBlogs();
+    fetchFilters();
   }, []);
 
   function generateSlug(title: string) {
@@ -412,6 +458,36 @@ export default function AdminBlogPage() {
                   placeholder="Academics, Early Childhood, Events" 
                   className="w-full border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-bold bg-[#081a3a] focus:outline-none focus:border-[#F7B801]"
                 />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {suggestedTags.map((tag) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => {
+                        const tags = formTagsText.split(",").map((t) => t.trim()).filter(Boolean);
+                        if (tags.includes(tag)) {
+                          setFormTagsText(tags.filter((t) => t !== tag).join(", "));
+                        } else {
+                          setFormTagsText([...tags, tag].join(", "));
+                        }
+                      }}
+                      className={`px-3 py-1 text-[10px] rounded-lg font-black uppercase tracking-wider border transition-all ${
+                        formTagsText.split(",").map((t) => t.trim()).includes(tag)
+                          ? "bg-[#F7B801] border-[#F7B801] text-[#3D348B]"
+                          : "border-white/10 text-white/60 hover:text-white"
+                      }`}
+                    >
+                      + {tag}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={handleAddCustomTag}
+                    className="px-3 py-1 text-[10px] bg-white/10 hover:bg-white/20 border border-dashed border-white/20 hover:border-white/40 text-white/80 rounded-lg font-black uppercase tracking-wider transition-all flex items-center gap-1"
+                  >
+                    + Add Custom Tag
+                  </button>
+                </div>
               </div>
 
               <div>

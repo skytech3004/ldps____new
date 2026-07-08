@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PhotoGalleryClient from "@/components/PhotoGalleryClient";
@@ -43,7 +43,14 @@ export default function PhotoGalleryPage() {
           </div>
 
           {/* Interactive Custom Photo Gallery Card Grid and Lightbox Component */}
-          <PhotoGalleryClient />
+          <Suspense fallback={
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <div className="w-12 h-12 border-4 border-[#3D348B] border-t-transparent rounded-full animate-spin" />
+              <p className="text-[#3D348B] font-bold animate-pulse">Loading Gallery...</p>
+            </div>
+          }>
+            <PhotoGalleryClient />
+          </Suspense>
         </div>
       </main>
 

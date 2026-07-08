@@ -3,19 +3,26 @@
 import React, { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSearchParams } from "next/navigation";
 
 interface MediaItem {
   _id: string;
   title: string;
   src: string;
   alt: string;
-  type: "photo" | "video";
+  type: "photo" | "video" | "hostel-photo";
+  category?: string;
 }
 
 export default function PhotoGalleryClient() {
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get("category") || "All";
+
   const [galleryItems, setGalleryItems] = useState<MediaItem[]>([]);
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState(initialCategory);
+  const [filters, setFilters] = useState<string[]>(["All", "Events", "Fun & Food Fest", "Hostel", "Infrastructure", "Laboratories"]);
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -31,20 +38,46 @@ export default function PhotoGalleryClient() {
         setLoading(false);
       }
     };
+    const fetchFilters = async () => {
+      try {
+        const res = await fetch("/api/admin/filters?type=gallery");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setFilters(["All", ...data.map((f: any) => f.name)]);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch gallery filters:", error);
+      }
+    };
     fetchPhotos();
+    fetchFilters();
   }, []);
+
+  // Update active filter if searchParams category changes
+  useEffect(() => {
+    const categoryParam = searchParams.get("category");
+    if (categoryParam) {
+      setActiveFilter(categoryParam);
+    }
+  }, [searchParams]);
+
+  const filteredItems = activeFilter === "All"
+    ? galleryItems
+    : galleryItems.filter(item => item.category === activeFilter);
 
   // Navigate lightbox photos
   const handlePrev = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (activePhoto === null) return;
-    setActivePhoto((prev) => (prev === 0 ? galleryItems.length - 1 : (prev ?? 0) - 1));
+    setActivePhoto((prev) => (prev === 0 ? filteredItems.length - 1 : (prev ?? 0) - 1));
   };
 
   const handleNext = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (activePhoto === null) return;
-    setActivePhoto((prev) => (prev === galleryItems.length - 1 ? 0 : (prev ?? 0) + 1));
+    setActivePhoto((prev) => (prev === filteredItems.length - 1 ? 0 : (prev ?? 0) + 1));
   };
 
   // Keyboard navigation
@@ -58,7 +91,7 @@ export default function PhotoGalleryClient() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activePhoto]);
+  }, [activePhoto, filteredItems]);
 
   // Lock scroll when lightbox is open
   useEffect(() => {
@@ -74,6 +107,23 @@ export default function PhotoGalleryClient() {
 
   return (
     <div className="w-full">
+      {/* Category Filter Tabs */}
+      <div className="flex flex-wrap gap-2 justify-center mb-12">
+        {filters.map((filter) => (
+          <button
+            key={filter}
+            onClick={() => setActiveFilter(filter)}
+            className={`px-5 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-300 ${
+              activeFilter === filter
+                ? "bg-[#3D348B] text-white shadow-premium-sm"
+                : "bg-white text-[#3D348B] border border-slate-100 hover:bg-[#F1F2F6]"
+            }`}
+          >
+            {filter}
+          </button>
+        ))}
+      </div>
+
       {/* Loading State */}
       {loading && (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
@@ -83,21 +133,23 @@ export default function PhotoGalleryClient() {
       )}
 
       {/* Empty State */}
-      {!loading && galleryItems.length === 0 && (
-        <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+      {!loading && filteredItems.length === 0 && (
+        <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm max-w-md mx-auto">
           <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <ImageIcon size={32} className="text-slate-300" />
           </div>
           <h3 className="text-xl font-bold text-[#3D348B] mb-2">No Photos Available</h3>
-          <p className="text-slate-500">We are currently updating our gallery. Please check back soon!</p>
+          <p className="text-slate-500 text-xs font-semibold">
+            We are currently updating our photos for category &quot;{activeFilter}&quot;. Please check back soon!
+          </p>
         </div>
       )}
 
       {/* 3-Column Polaroid-Inspired Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {galleryItems.map((item, idx) => (
+        {filteredItems.map((item, idx) => (
           <motion.div
-            key={idx}
+            key={item._id || idx}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
@@ -105,8 +157,15 @@ export default function PhotoGalleryClient() {
             onClick={() => setActivePhoto(idx)}
             className="bg-white rounded-2xl border border-slate-100 shadow-[0_15px_40px_rgba(61,52,139,0.04)] overflow-hidden p-5 flex flex-col cursor-pointer transition-all duration-300 hover:shadow-[0_25px_50px_rgba(61,52,139,0.08)] hover:-translate-y-1.5 group"
           >
-            {/* Top custom gold line */}
-            <div className="w-8 h-1 bg-[#F7B801] mb-4 rounded-full group-hover:w-12 transition-all duration-300" />
+            {/* Top custom line and category badge row */}
+            <div className="flex justify-between items-center mb-4">
+              <div className="w-8 h-1 bg-[#F7B801] rounded-full group-hover:w-12 transition-all duration-300" />
+              {item.category && (
+                <span className="px-2.5 py-0.5 bg-[#7678ED]/10 text-[#3D348B] text-[9px] font-black uppercase tracking-wider rounded">
+                  {item.category}
+                </span>
+              )}
+            </div>
 
             {/* Custom title placed ABOVE the image */}
             <h3 className="text-[#3D348B] text-[15px] sm:text-base font-extrabold line-clamp-2 leading-snug mb-5 group-hover:text-[#7678ED] transition-colors duration-300 min-h-[44px]">
@@ -117,8 +176,8 @@ export default function PhotoGalleryClient() {
             <div className="relative aspect-[4/3] rounded-xl overflow-hidden mt-auto bg-slate-50 border border-slate-100/50 shadow-inner flex items-center justify-center">
               <img
                 src={item.src}
-                alt={item.alt}
-                className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+                alt={item.alt || item.title}
+                className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-770 ease-out"
                 loading="lazy"
               />
               {/* Overlay visual badge */}
@@ -135,7 +194,7 @@ export default function PhotoGalleryClient() {
 
       {/* Premium Lightbox Modal Viewer */}
       <AnimatePresence>
-        {activePhoto !== null && (
+        {activePhoto !== null && filteredItems[activePhoto] && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -177,8 +236,8 @@ export default function PhotoGalleryClient() {
                 className="relative max-h-full max-w-full md:max-w-4xl flex flex-col items-center justify-center"
               >
                 <img
-                  src={galleryItems[activePhoto].src}
-                  alt={galleryItems[activePhoto].alt}
+                  src={filteredItems[activePhoto].src}
+                  alt={filteredItems[activePhoto].alt || filteredItems[activePhoto].title}
                   className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl border border-white/5 shadow-2xl"
                 />
               </motion.div>
@@ -200,10 +259,10 @@ export default function PhotoGalleryClient() {
               {/* Title display */}
               <div className="space-y-1">
                 <p className="text-sm md:text-lg font-black text-white tracking-wide max-w-2xl leading-snug">
-                  {galleryItems[activePhoto].title}
+                  {filteredItems[activePhoto].title}
                 </p>
                 <p className="text-[11px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">
-                  Photo {activePhoto + 1} of {galleryItems.length}
+                  Photo {activePhoto + 1} of {filteredItems.length} | Category: {filteredItems[activePhoto].category || "Others"}
                 </p>
               </div>
 
