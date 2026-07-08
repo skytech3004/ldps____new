@@ -4,44 +4,43 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PrePrimaryClient from "@/components/PrePrimaryClient";
-import { motion } from "framer-motion";
+import Reveal from "@/components/ui/Reveal";
+import FadeIn from "@/components/ui/FadeIn";
 
 export default function PrePrimaryPageClient() {
   return (
-    <div className="min-h-screen bg-[#3D348B] flex flex-col overflow-x-hidden">
+    <div className="min-h-screen bg-[#F8F9FC] text-gray-800 flex flex-col overflow-x-hidden selection:bg-accent selection:text-primary">
       <Navbar />
 
       <main className="flex-1">
-        {/* Modern Vibrant Hero Section */}
-        <div className="relative pt-32 md:pt-44 pb-20 px-6 overflow-hidden">
-          {/* Decorative Blobs - adjusted for dark theme */}
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#7678ED]/20 rounded-full blur-[120px] -z-10 translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#F7B801]/10 rounded-full blur-[120px] -z-10 -translate-x-1/2 translate-y-1/2" />
+        {/* Modern Vibrant Hero Section - Spacing 120-160px */}
+        <div className="relative pt-36 pb-20 md:pt-44 md:pb-24 px-6 overflow-hidden bg-gradient-to-br from-[#3D348B] to-[#7678ED] text-white">
+          <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
 
-          <div className="max-w-7xl mx-auto text-center relative">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <span className="inline-block px-6 py-2 rounded-full bg-white/10 text-[#F7B801] text-xs md:text-sm font-black tracking-[0.2em] uppercase mb-6 border border-white/10 backdrop-blur-md">
-                LPS Junior Wing
-              </span>
-              <h1 className="text-4xl md:text-7xl font-black text-white tracking-tight mb-8 leading-[1.1]">
+          <div className="max-w-7xl mx-auto text-left relative z-10 space-y-4">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-accent text-xs md:text-sm font-black tracking-[0.2em] uppercase border border-white/10 backdrop-blur-md shadow-premium-sm">
+              LPS Junior Wing
+            </span>
+            
+            <Reveal width="100%">
+              <h1 className="text-4xl md:text-7xl font-black text-white tracking-tight leading-[1.05] font-montserrat uppercase">
                 Nurturing Young Minds <br className="hidden md:block" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F7B801] to-[#FFD700]">
-                  with Joy & Creativity
-                </span>
+                with <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-[#FFE600]">Joy & Creativity</span>
               </h1>
-              <p className="text-slate-300 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed font-medium">
+            </Reveal>
+
+            <Reveal width="100%" delay={0.2}>
+              <p className="text-slate-300 text-base md:text-lg max-w-3xl leading-relaxed font-medium">
                 Step into a world of vibrant learning where every corner is designed to spark curiosity, 
                 foster social growth, and build a strong foundation for lifelong learning.
               </p>
-            </motion.div>
+            </Reveal>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 pb-24">
+        {/* Spacing limit 120-160px for section body */}
+        <div className="max-w-7xl mx-auto px-6 py-24 md:py-32">
           {/* Core Interactive Showcase Grid */}
           <PrePrimaryClient />
         </div>

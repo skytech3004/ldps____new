@@ -109,6 +109,7 @@ export default function Navbar() {
       ],
     },
     { name: "Blog", href: "/blog" },
+    { name: "Careers", href: "/career" },
     { name: "Contact", href: "/contact" },
   ];
 

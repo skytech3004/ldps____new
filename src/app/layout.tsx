@@ -64,6 +64,34 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${montserrat.variable} antialiased font-sans`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "School",
+              "name": "Leeladevi Parasmal Sancheti English Medium Sr. Sec. School (LPS Vidyawadi)",
+              "url": "https://www.lpsvidhyawadi.com/",
+              "logo": "https://www.lpsvidhyawadi.com/lps-vidhyawadi/logo.jpg",
+              "image": "https://www.lpsvidhyawadi.com/uploads/hostel/hostel.jpg",
+              "description": "Premier CBSE-affiliated girls' residential sr. sec. school in Khimel, Pali district, Rajasthan. Managed by Marudhar Mahila Shikshan Sangh.",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Vidyawadi, Khimel",
+                "addressLocality": "Rani",
+                "addressRegion": "Rajasthan",
+                "postalCode": "306115",
+                "addressCountry": "IN"
+              },
+              "telephone": "+91-9414148005",
+              "email": "lpsvidhyawadi@gmail.com",
+              "sameAs": [
+                "https://www.facebook.com/profile.php?id=61583590541462",
+                "https://www.instagram.com/vidyawadiofficial"
+              ]
+            })
+          }}
+        />
         {children}
         <Analytics />
         <SpeedInsights />

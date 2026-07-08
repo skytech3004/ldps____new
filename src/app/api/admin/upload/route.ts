@@ -15,6 +15,10 @@ const SECTION_FOLDERS: Record<string, string> = {
   logo: "logo",
   leadership: "leadership",
   "media-items": "media-items",
+  hostel: "hostel",
+  blogs: "blogs",
+  "pre-primary": "pre-primary",
+  career: "career",
 };
 
 type UploadRecord = {

@@ -127,16 +127,29 @@ export default function Hero() {
             }}
             className="absolute inset-0"
           >
-            <Image 
+            <img 
               src={slides[currentSlide].image}
               alt={`LPS Vidyawadi campus ${currentSlide + 1}`}
-              fill
-              sizes="100vw"
-              priority
-              className="object-cover"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.src = "/uploads/hostel/hostel.jpg";
+              }}
             />
           </motion.div>
         </AnimatePresence>
+
+        {/* Premium Glassmorphic Text Card Overlay */}
+        <div className="absolute bottom-16 left-6 md:left-20 z-30 max-w-xl text-left text-white bg-black/40 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-[2rem] shadow-premium-lg pointer-events-none">
+          <span className="inline-block px-3 py-1 bg-accent/20 border border-accent/30 text-accent rounded-full text-[10px] font-black uppercase tracking-wider mb-3">
+            Admissions Open 2026-27
+          </span>
+          <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight leading-tight mb-2">
+            {slides[currentSlide].title || "Empowering Girls through Quality CBSE Education"}
+          </h2>
+          <p className="text-xs md:text-sm text-white/80 font-medium leading-relaxed">
+            {slides[currentSlide].description || "Explore our sprawling lush 65-acre residential campus at Khimel, Rajasthan."}
+          </p>
+        </div>
 
         {/* Carousel Navigation Arrows */}
         <div className="absolute inset-y-0 left-0 z-30 flex items-center px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

@@ -1,8 +1,19 @@
+"use client";
+
 import Link from "next/link";
-import { Bell, Database, FileText, FolderKanban, Images, LayoutDashboard, LogOut, ClipboardList, LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar, Download, Award, GraduationCap, Trophy } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { 
+  Bell, Database, FileText, FolderKanban, Images, LayoutDashboard, LogOut, 
+  ClipboardList, LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar, Download, 
+  Award, GraduationCap, Trophy, Home, Briefcase, ChevronRight 
+} from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/hostel", label: "Hostel & Residence", icon: Home },
+  { href: "/admin/blog", label: "Blog Posts", icon: BookOpen },
+  { href: "/admin/pre-primary", label: "Pre-Primary Showcase", icon: Images },
+  { href: "/admin/career", label: "Career Listings", icon: Briefcase },
   { href: "/admin/notices", label: "Notice Board", icon: Bell },
   { href: "/admin/leadership", label: "Leadership Team", icon: ShieldCheck },
   { href: "/admin/investiture", label: "Investiture Cabinet", icon: Award },
@@ -25,52 +36,83 @@ const navItems = [
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  // Find active label for breadcrumbs
+  const activeItem = navItems.find((item) => item.href === pathname) || navItems[0];
+
   return (
-    <main className="min-h-screen bg-[#0b1738] text-white">
+    <main className="min-h-screen bg-[#07090E] text-[#E2E8F0] font-sans antialiased">
       <div className="flex min-h-screen">
-        <aside className="hidden lg:flex w-72 bg-[#081a3a] border-r border-white/10 flex-col">
-          <div className="px-6 py-6 border-b border-white/10">
-            <p className="text-lg font-black tracking-wide">LPS Admin Panel</p>
-            <p className="text-xs text-white/60 mt-1">Content Management</p>
+        
+        {/* Notion / Linear-Style Left Sidebar */}
+        <aside className="hidden lg:flex w-64 bg-[#0A0E17] border-r border-[#1F2937]/60 flex-col shrink-0">
+          <div className="px-6 py-5 border-b border-[#1F2937]/60 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-black tracking-widest text-[#F7B801] uppercase">LPS Vidyawadi</p>
+              <p className="text-[10px] font-mono text-[#94A3B8]/80 mt-0.5">Control Center</p>
+            </div>
+            <span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
           </div>
-          <nav className="p-4 space-y-2">
+
+          {/* Navigation with custom styling and overflow handling */}
+          <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto no-scrollbar max-h-[calc(100vh-10rem)]">
             {navItems.map((item) => {
               const Icon = item.icon;
+              const isActive = pathname === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="w-full inline-flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-white/80 hover:text-white hover:bg-white/10"
+                  className={`w-full inline-flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                    isActive 
+                      ? "bg-[#1F2937]/50 text-white border border-[#374151]/70 shadow-sm font-black" 
+                      : "text-[#94A3B8] hover:text-white hover:bg-[#111827]/40"
+                  }`}
                 >
-                  <Icon size={18} />
-                  {item.label}
+                  <Icon size={14} className={isActive ? "text-[#F7B801]" : "text-[#94A3B8]"} />
+                  <span>{item.label}</span>
                 </Link>
               );
             })}
           </nav>
-          <div className="p-4 mt-auto border-t border-white/10">
-            <button className="w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-red-500/90 hover:bg-red-500 font-black">
-              <LogOut size={16} />
+
+          <div className="p-3 border-t border-[#1F2937]/60">
+            <button className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-lg bg-[#EF4444]/10 hover:bg-[#EF4444]/20 border border-[#EF4444]/20 text-[#FCA5A5] font-black text-xs uppercase tracking-wider transition-colors cursor-pointer">
+              <LogOut size={12} />
               Logout
             </button>
           </div>
         </aside>
 
-        <section className="flex-1 min-w-0">
-          <header className="h-20 px-4 md:px-8 border-b border-white/10 bg-[#0c1f46] flex items-center justify-between">
-            <div className="inline-flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-                <FolderKanban size={16} />
-              </div>
-              <div>
-                <p className="text-sm font-black tracking-wider uppercase">Admin Workspace</p>
-                <p className="text-xs text-white/60">Manage website data and media</p>
+        {/* Workspace Canvas Area */}
+        <section className="flex-1 min-w-0 flex flex-col">
+          {/* Translucent Vercel-Style Header */}
+          <header className="h-16 px-6 md:px-8 border-b border-[#1F2937]/60 bg-[#0A0E17]/80 backdrop-blur-md flex items-center justify-between z-40 sticky top-0">
+            <div className="inline-flex items-center gap-2.5 text-xs text-[#94A3B8] font-bold">
+              <span className="font-mono text-[#F7B801]">root</span>
+              <ChevronRight size={10} />
+              <span className="font-mono text-[#94A3B8]/80">admin</span>
+              <ChevronRight size={10} />
+              <span className="text-white font-mono">{activeItem.label.toLowerCase().replace(/\s+/g, "-")}</span>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-xs font-mono bg-[#111827]/80 border border-[#1F2937]/80 px-3 py-1.5 rounded-full text-[#94A3B8]">
+                <Database size={10} />
+                <span>MongoDB Connected</span>
               </div>
             </div>
           </header>
 
-          <div className="p-4 md:p-8 bg-gradient-to-b from-[#152c62] to-[#0c1e46] min-h-[calc(100vh-5rem)]">{children}</div>
+          {/* Main workspace container with fine border layout */}
+          <div className="p-6 md:p-8 bg-gradient-to-b from-[#0A0E17] to-[#07090E] flex-1">
+            <div className="bg-[#090D16] border border-[#1F2937]/50 rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden min-h-[calc(100vh-10rem)]">
+              {children}
+            </div>
+          </div>
         </section>
+
       </div>
     </main>
   );

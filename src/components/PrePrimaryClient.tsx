@@ -189,19 +189,40 @@ const prePrimaryShowcaseItems = [
 
 export default function PrePrimaryClient() {
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
+  const [showcaseItems, setShowcaseItems] = useState(prePrimaryShowcaseItems);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchShowcase() {
+      try {
+        const res = await fetch("/api/pre-primary");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setShowcaseItems(data);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch pre-primary items from DB:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchShowcase();
+  }, []);
 
   // Navigate lightbox photos
   const handlePrev = React.useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (activePhoto === null) return;
-    setActivePhoto((prev) => (prev === 0 ? prePrimaryShowcaseItems.length - 1 : (prev ?? 0) - 1));
-  }, [activePhoto]);
+    setActivePhoto((prev) => (prev === 0 ? showcaseItems.length - 1 : (prev ?? 0) - 1));
+  }, [activePhoto, showcaseItems]);
 
   const handleNext = React.useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (activePhoto === null) return;
-    setActivePhoto((prev) => (prev === prePrimaryShowcaseItems.length - 1 ? 0 : (prev ?? 0) + 1));
-  }, [activePhoto]);
+    setActivePhoto((prev) => (prev === showcaseItems.length - 1 ? 0 : (prev ?? 0) + 1));
+  }, [activePhoto, showcaseItems]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -230,24 +251,16 @@ export default function PrePrimaryClient() {
 
   // Group items by section to make rendering structured and clean
   const getSectionItems = (sectionName: string) => {
-    return prePrimaryShowcaseItems
+    return showcaseItems
       .map((item, originalIndex) => ({ ...item, originalIndex }))
       .filter((item) => item.section === sectionName);
   };
 
-  const renderSectionHeader = (title: string, colorClass: string) => (
-    <div className="flex flex-col items-center mb-16">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
-        className={`px-8 py-3 rounded-2xl ${colorClass} shadow-xl mb-4 border border-white/20`}
-      >
-        <h2 className="text-xl md:text-2xl font-black text-white tracking-widest uppercase text-center">
-          {title}
-        </h2>
-      </motion.div>
-      <div className="w-24 h-1.5 bg-[#F7B801] rounded-full shadow-sm" />
+  const renderSectionHeader = (title: string) => (
+    <div className="flex flex-col items-center mb-16 space-y-2">
+      <span className="text-xs font-black uppercase tracking-[0.3em] text-[#7678ED]">Learning Modules</span>
+      <h2 className="text-3xl md:text-5xl font-black text-[#3D348B] uppercase font-montserrat tracking-tight">{title}</h2>
+      <div className="w-16 h-1 bg-accent rounded-full mt-2" />
     </div>
   );
 
@@ -257,39 +270,37 @@ export default function PrePrimaryClient() {
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay: (item.originalIndex % 3) * 0.05 }}
+      transition={{ duration: 0.6, delay: (item.originalIndex % 3) * 0.05 }}
       onClick={() => setActivePhoto(item.originalIndex)}
-      className="group relative cursor-pointer"
+      className="group relative cursor-pointer h-full"
     >
-      {/* Gold Offset Shadow Backing - Keeping for depth */}
-      <div className="absolute -inset-1 bg-[#F7B801] rounded-[2.2rem] -z-10 opacity-0 group-hover:opacity-40 transition-all duration-500 shadow-[4px_4px_20px_rgba(247,184,1,0.2)] group-hover:rotate-1" />
-      
-      {/* Main Card: Transitions from Navy to Yellow */}
-      <div className="bg-[#3D348B] group-hover:bg-[#F7B801] p-4 rounded-[2rem] shadow-[0_12px_40px_rgba(0,0,0,0.1)] border border-white/10 flex flex-col h-full transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_25px_60px_rgba(247,184,1,0.25)]">
-        
+      <div className="bg-white p-4 rounded-[2rem] border border-slate-100 flex flex-col h-full hover:shadow-premium-lg transition-all duration-500 hover:-translate-y-1.5 shadow-premium-sm">
         {/* Polaroid Style Image Frame */}
-        <div className="relative w-full aspect-[4/3] rounded-[1.5rem] overflow-hidden bg-slate-800 border-[6px] border-white shadow-md">
+        <div className="relative w-full aspect-[4/3] rounded-[1.5rem] overflow-hidden bg-slate-100 shadow-sm">
           <img
             src={item.src}
             alt={item.alt}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-750 ease-out"
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.src = "/lps-vidhyawadi/gallery-02.jpg";
+            }}
           />
           {/* Overlay hover badge */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#3D348B]/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-start p-3">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-white uppercase bg-[#3D348B] px-3 py-1.5 rounded-full shadow-lg">
-              <ImageIcon size={12} />
+          <div className="absolute inset-0 bg-[#3D348B]/10 group-hover:bg-[#3D348B]/30 transition-colors duration-300 flex items-end justify-start p-3">
+            <span className="inline-flex items-center gap-1.5 text-[9px] font-black text-[#3D348B] uppercase bg-accent px-3 py-1.5 rounded-full shadow-md transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+              <ImageIcon size={10} />
               Enlarge
             </span>
           </div>
         </div>
 
-        {/* Text Area: Colors transition based on card background */}
-        <div className="mt-5 px-1 flex-1 flex flex-col">
-          <h3 className="text-white group-hover:text-[#3D348B] text-base md:text-lg font-black line-clamp-1 leading-none mb-2 transition-colors duration-300">
+        {/* Text Area */}
+        <div className="mt-5 px-1 flex-1 flex flex-col space-y-1 text-left">
+          <h3 className="text-[#3D348B] text-base md:text-lg font-black line-clamp-1 leading-snug tracking-tight">
             {item.title}
           </h3>
-          <p className="text-slate-300 group-hover:text-[#3D348B]/70 text-xs line-clamp-2 leading-relaxed font-medium transition-colors duration-300">
+          <p className="text-gray-500 text-xs font-bold leading-relaxed line-clamp-2">
             {item.description}
           </p>
         </div>
@@ -306,8 +317,8 @@ export default function PrePrimaryClient() {
       <div className="absolute top-[50%] -left-20 w-96 h-96 bg-[#3D348B]/5 rounded-full blur-3xl -z-20 animate-pulse" />
 
       {/* SECTION 1: Pre School */}
-      <section className="w-full bg-[#7678ED]/5 backdrop-blur-sm rounded-[3rem] p-8 md:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-white/50">
-        {renderSectionHeader("Pre School Showcase", "bg-[#7678ED]")}
+      <section className="w-full py-16 md:py-24 border-b border-slate-100">
+        {renderSectionHeader("Pre School Showcase")}
         {/* Grid of 5 horizontal cards in a row */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8">
           {getSectionItems("Pre School").map((item) => renderImageCard(item))}
@@ -315,8 +326,8 @@ export default function PrePrimaryClient() {
       </section>
 
       {/* SECTION 2: Academics */}
-      <section className="w-full bg-[#3D348B]/5 backdrop-blur-sm rounded-[3rem] p-8 md:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-white/50">
-        {renderSectionHeader("Interactive Academics", "bg-[#3D348B]")}
+      <section className="w-full py-16 md:py-24 border-b border-slate-100">
+        {renderSectionHeader("Interactive Academics")}
         <div className="space-y-8">
           {/* Row 1: 2 large cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -330,8 +341,8 @@ export default function PrePrimaryClient() {
       </section>
 
       {/* SECTION 3: Co-Curricular Activities */}
-      <section className="w-full bg-[#F7B801]/5 backdrop-blur-sm rounded-[3rem] p-8 md:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-white/50">
-        {renderSectionHeader("Co-Curricular Exploration", "bg-[#F7B801]")}
+      <section className="w-full py-16 md:py-24 border-b border-slate-100">
+        {renderSectionHeader("Co-Curricular Exploration")}
         {/* Grid of 4 horizontal cards in a row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {getSectionItems("Co-Curricular Activities").map((item) => renderImageCard(item))}
@@ -339,8 +350,8 @@ export default function PrePrimaryClient() {
       </section>
 
       {/* SECTION 4: Sports Activities */}
-      <section className="w-full bg-[#FF6B6B]/5 backdrop-blur-sm rounded-[3rem] p-8 md:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-white/50">
-        {renderSectionHeader("Active Sports & Fun", "bg-[#FF6B6B]")}
+      <section className="w-full py-16 md:py-24 border-b border-slate-100">
+        {renderSectionHeader("Active Sports & Fun")}
         <div className="space-y-8">
           {/* Row 1: 3 cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
@@ -354,8 +365,8 @@ export default function PrePrimaryClient() {
       </section>
 
       {/* SECTION 5: Projector Class */}
-      <section className="w-full bg-[#4ECDC4]/5 backdrop-blur-sm rounded-[3rem] p-8 md:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-white/50">
-        {renderSectionHeader("Digital Projector Learning", "bg-[#4ECDC4]")}
+      <section className="w-full py-16 md:py-24 border-b border-slate-100">
+        {renderSectionHeader("Digital Projector Learning")}
         {/* Grid of 2 large horizontal cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {getSectionItems("Projector Class").map((item) => renderImageCard(item))}
@@ -363,8 +374,8 @@ export default function PrePrimaryClient() {
       </section>
 
       {/* SECTION 6: Skill Classes */}
-      <section className="w-full bg-[#3D348B]/5 backdrop-blur-sm rounded-[3rem] p-8 md:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-white/50">
-        {renderSectionHeader("Life Skill Development", "bg-[#3D348B]")}
+      <section className="w-full py-16 md:py-24">
+        {renderSectionHeader("Life Skill Development")}
         {/* Grid of 2 large horizontal cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {getSectionItems("Skill Classes").map((item) => renderImageCard(item))}
@@ -415,8 +426,8 @@ export default function PrePrimaryClient() {
                 className="relative max-h-full max-w-full md:max-w-4xl flex flex-col items-center justify-center"
               >
                 <img
-                  src={prePrimaryShowcaseItems[activePhoto].src}
-                  alt={prePrimaryShowcaseItems[activePhoto].alt}
+                  src={showcaseItems[activePhoto].src}
+                  alt={showcaseItems[activePhoto].alt}
                   className="max-h-[65vh] w-auto max-w-full object-contain rounded-xl border border-white/5 shadow-2xl"
                 />
               </motion.div>
@@ -438,16 +449,16 @@ export default function PrePrimaryClient() {
               {/* Title display */}
               <div className="space-y-1">
                 <span className="text-[11px] font-black tracking-widest text-[#F7B801] uppercase bg-[#3D348B] px-3 py-1 rounded-full">
-                  {prePrimaryShowcaseItems[activePhoto].section}
+                  {showcaseItems[activePhoto].section}
                 </span>
                 <p className="text-base md:text-xl font-black text-white tracking-wide max-w-2xl leading-snug mt-2">
-                  {prePrimaryShowcaseItems[activePhoto].title}
+                  {showcaseItems[activePhoto].title}
                 </p>
                 <p className="text-xs md:text-sm text-slate-300 max-w-xl leading-relaxed">
-                  {prePrimaryShowcaseItems[activePhoto].description}
+                  {showcaseItems[activePhoto].description}
                 </p>
                 <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
-                  Photo {activePhoto + 1} of {prePrimaryShowcaseItems.length}
+                  Photo {activePhoto + 1} of {showcaseItems.length}
                 </p>
               </div>
 
