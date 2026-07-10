@@ -102,7 +102,7 @@ export default function LifeAtGis() {
         {/* Video Thumbnails */}
         <div className="max-w-6xl mx-auto px-6 relative z-10">
           <div className="flex gap-6 overflow-x-auto pb-8 snap-x no-scrollbar items-center justify-center">
-            {videoItems.slice(1).map((video, i) => {
+            {videoItems.map((video, i) => {
               const isYT = isYouTubeUrl(video.src);
               const thumb = isYT ? getYouTubeThumbnail(video.src) : null;
               const isActive = activeVideo === video.src;
