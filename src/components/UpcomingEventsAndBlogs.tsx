@@ -71,7 +71,7 @@ export default function UpcomingEventsAndBlogs() {
   };
 
   // Fallback events if database events are empty
-  const fallbackEvents = [
+  const fallbackEvents: EventItem[] = [
     {
       _id: "default-1",
       title: "Investiture Ceremony 2026",
@@ -175,7 +175,7 @@ export default function UpcomingEventsAndBlogs() {
               <div className="space-y-4">
                 {activeEvents.map((evt, idx) => (
                   <FadeIn key={evt._id} delay={idx * 0.05}>
-                    <div className="flex gap-4 p-5 bg-[#F8F9FC] border border-slate-100 rounded-3xl text-left items-start">
+                    <div className="flex gap-4 p-5 bg-[#F8F9FC] border border-slate-100 rounded-3xl text-left items-center group">
                       <div className="w-12 h-12 rounded-2xl bg-[#3D348B]/10 flex flex-col items-center justify-center text-[#3D348B] shrink-0 font-montserrat">
                         <span className="text-[10px] font-black uppercase tracking-tighter">
                           {new Date(evt.date).toLocaleDateString("en-US", { month: "short" })}
@@ -184,11 +184,26 @@ export default function UpcomingEventsAndBlogs() {
                           {new Date(evt.date).getDate()}
                         </span>
                       </div>
-                      <div className="space-y-1">
+
+                      {evt.imageUrl && (
+                        <div className="relative w-20 h-14 rounded-xl overflow-hidden bg-slate-900 shrink-0 border border-slate-100/50">
+                          <img
+                            src={evt.imageUrl}
+                            alt={evt.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onError={(e) => {
+                              // Hide image container on error
+                              e.currentTarget.parentElement?.classList.add('hidden');
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      <div className="space-y-1 flex-1">
                         <h4 className="font-black text-[#3D348B] uppercase text-sm tracking-tight font-montserrat">
                           {evt.title}
                         </h4>
-                        <p className="text-xs text-gray-500 font-bold leading-relaxed">
+                        <p className="text-xs text-gray-500 font-bold leading-relaxed line-clamp-2">
                           {evt.description}
                         </p>
                       </div>

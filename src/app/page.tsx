@@ -4,7 +4,7 @@ import Hero from "@/components/Hero";
 import NoticeBoard from "@/components/NoticeBoard";
 import IntroSection from "@/components/IntroSection";
 import CategoryGrid from "@/components/CategoryGrid";
-import ResidentialHostels from "@/components/ResidentialHostels";
+import HostelSection from "@/components/HostelSection";
 import StaggeredStats from "@/components/StaggeredStats";
 import LifeAtVidyawadi from "@/components/LifeAtVidyawadi";
 import UpcomingEventsAndBlogs from "@/components/UpcomingEventsAndBlogs";
@@ -26,7 +26,7 @@ export default function Home() {
       <IntroSection />
 
       {/* 8 Residential Hostels Section */}
-      <ResidentialHostels />
+      <HostelSection />
 
       {/* Category Grid Section */}
       {/* <CategoryGrid /> */}

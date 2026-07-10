@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Trash2, X, Upload } from "lucide-react";
 
 type EventItem = {
   _id: string;
@@ -40,6 +40,32 @@ export default function AdminEventsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<EventForm>(initialForm);
+  const [uploading, setUploading] = useState(false);
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("page", "events");
+      formData.append("section", "events");
+      formData.append("title", `Event - ${form.title || "New Event"}`);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Upload failed.");
+      const json = await res.json();
+      setForm((previous) => ({ ...previous, imageUrl: json.upload.src }));
+    } catch (err) {
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function fetchItems() {
     try {
@@ -243,12 +269,27 @@ export default function AdminEventsPage() {
                 />
               </div>
               <div>
-                <label className="text-xs font-black uppercase tracking-wider text-teal block mb-2">Image URL</label>
-                <input
-                  value={form.imageUrl}
-                  onChange={(event) => setForm((previous) => ({ ...previous, imageUrl: event.target.value }))}
-                  className="w-full border border-teal/20 rounded-lg px-3 py-2 text-navy font-semibold"
-                />
+                <label className="text-xs font-black uppercase tracking-wider text-teal block mb-2">Event Image</label>
+                <div className="flex gap-2">
+                  <input
+                    value={form.imageUrl}
+                    onChange={(event) => setForm((previous) => ({ ...previous, imageUrl: event.target.value }))}
+                    placeholder="Image URL or upload a file"
+                    className="flex-1 border border-teal/20 rounded-lg px-3 py-2 text-navy font-semibold focus:outline-none focus:border-teal"
+                  />
+                  <div className="relative shrink-0">
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+                    <button type="button" disabled={uploading} className="h-full px-4 bg-navy hover:bg-teal text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors disabled:opacity-50 inline-flex items-center gap-1.5">
+                      <Upload size={14} />
+                      {uploading ? "Uploading..." : "Upload"}
+                    </button>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="text-xs font-black uppercase tracking-wider text-teal block mb-2">Date</label>

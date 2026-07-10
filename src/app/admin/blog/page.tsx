@@ -491,14 +491,14 @@ export default function AdminBlogPage() {
               </div>
 
               <div>
-                <label className="text-[10px] font-black uppercase tracking-wider text-white/60 block mb-2">Blog Content * (HTML format supported)</label>
+                <label className="text-[10px] font-black uppercase tracking-wider text-white/60 block mb-2">Blog Content * (Plain text or HTML supported)</label>
                 <textarea 
                   rows={12} 
                   required
                   value={formContent} 
                   onChange={(e) => setFormContent(e.target.value)}
-                  placeholder="<p>Write your detailed blog contents here...</p>" 
-                  className="w-full border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-bold bg-[#081a3a] focus:outline-none focus:border-[#F7B801] resize-y font-mono"
+                  placeholder="Write your blog contents here. Use double newlines to start a new paragraph." 
+                  className="w-full border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-bold bg-[#081a3a] focus:outline-none focus:border-[#F7B801] resize-y"
                 />
               </div>
 

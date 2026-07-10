@@ -129,10 +129,17 @@ export default function BlogPostPage() {
         </div>
 
         {/* Content Area */}
-        <div 
-          className="prose prose-lg max-w-none text-gray-600 font-medium leading-relaxed space-y-6 pt-4"
-          dangerouslySetInnerHTML={{ __html: blog.content }}
-        />
+        <div className="prose prose-lg max-w-none text-gray-600 font-medium leading-relaxed space-y-6 pt-4">
+          {/<[a-z][\s\S]*>/i.test(blog.content) ? (
+            <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+          ) : (
+            <div className="space-y-4 whitespace-pre-wrap">
+              {blog.content.split(/\n\s*\n/).map((para, i) => (
+                <p key={i}>{para.trim()}</p>
+              ))}
+            </div>
+          )}
+        </div>
       </article>
       
       <Footer />

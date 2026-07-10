@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Pencil, Plus, Trash2, X, Bell, Save } from "lucide-react";
+import { Pencil, Plus, Trash2, X, Bell, Save, Upload } from "lucide-react";
 
 type NoticeItem = {
   _id: string;
@@ -57,6 +57,32 @@ export default function AdminNoticesPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<NoticeForm>(initialForm);
+  const [uploading, setUploading] = useState(false);
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("page", "notice");
+      formData.append("section", "notice");
+      formData.append("title", `Notice - ${form.title || "File"}`);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Upload failed.");
+      const json = await res.json();
+      setForm((previous) => ({ ...previous, link: json.upload.src }));
+    } catch (err) {
+      alert("Failed to upload file. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function fetchItems() {
     try {
@@ -345,13 +371,26 @@ export default function AdminNoticesPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-wider text-primary/60 ml-2">External Link (Optional)</label>
-                  <input
-                    value={form.link}
-                    onChange={(event) => setForm((previous) => ({ ...previous, link: event.target.value }))}
-                    placeholder="https://..."
-                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-primary font-bold focus:border-accent focus:outline-none transition-all"
-                  />
+                  <label className="text-xs font-black uppercase tracking-wider text-primary/60 ml-2">Document / External Link (Optional)</label>
+                  <div className="flex gap-2">
+                    <input
+                      value={form.link}
+                      onChange={(event) => setForm((previous) => ({ ...previous, link: event.target.value }))}
+                      placeholder="https://... or uploaded file path"
+                      className="flex-1 border-2 border-gray-100 rounded-xl px-4 py-3 text-primary font-bold focus:border-accent focus:outline-none transition-all"
+                    />
+                    <div className="relative shrink-0">
+                      <input 
+                        type="file" 
+                        onChange={handleFileUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      />
+                      <button type="button" disabled={uploading} className="h-[52px] px-5 bg-primary hover:bg-secondary text-white font-black text-xs uppercase tracking-wider rounded-xl transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 shadow-sm">
+                        <Upload size={14} />
+                        {uploading ? "Uploading..." : "Upload File"}
+                      </button>
+                    </div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-2xl border border-primary/5 h-[62px] mt-6">
                   <input

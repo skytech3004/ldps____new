@@ -31,6 +31,7 @@ interface BoardResult {
   batchAverage: string;
   toppers: Topper[];
   students: Student[];
+  images?: string[];
 }
 
 export default function AdminResultsPage() {
@@ -70,7 +71,9 @@ export default function AdminResultsPage() {
   const [editingStudentIndex, setEditingStudentIndex] = useState<number | null>(null);
 
   // Active tab within editor
-  const [editorTab, setEditorTab] = useState<"stats" | "toppers" | "students">("stats");
+  const [editorTab, setEditorTab] = useState<"stats" | "toppers" | "students" | "images">("stats");
+  const [images, setImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   const fetchResults = async () => {
     try {
@@ -108,6 +111,7 @@ export default function AdminResultsPage() {
     setBatchAverage(result.batchAverage);
     setToppers(result.toppers || []);
     setStudents(result.students || []);
+    setImages(result.images || []);
     resetTopperForm();
     resetStudentForm();
   };
@@ -163,6 +167,7 @@ export default function AdminResultsPage() {
           batchAverage,
           toppers,
           students,
+          images,
         }),
       });
 
@@ -296,6 +301,40 @@ export default function AdminResultsPage() {
     setEditingStudentIndex(null);
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("section", "results");
+      fd.append("page", "results");
+      fd.append("title", `Result ${selectedResult?.year || "Year"}`);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: fd,
+      });
+
+      if (!res.ok) throw new Error("Upload failed.");
+      const data = await res.json();
+      if (data.ok && data.upload?.src) {
+        setImages((prev) => [...prev, data.upload.src]);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error uploading image.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeleteImage = (imgUrl: string) => {
+    setImages((prev) => prev.filter((img) => img !== imgUrl));
+  };
+
   return (
     <section className="space-y-6 text-white font-montserrat">
       {/* Header Banner */}
@@ -414,7 +453,7 @@ export default function AdminResultsPage() {
                     <span className="font-extrabold text-sm uppercase tracking-wider">Currently Editing: Result {selectedResult.year}</span>
                   </div>
                   <span className="text-[10px] font-black uppercase bg-white/10 px-3 py-1 rounded-full border border-white/5">
-                    {toppers.length} Toppers • {students.length} Registry Entries
+                    {toppers.length} Toppers • {students.length} Registry Entries • {images.length} Images
                   </span>
                 </div>
 
@@ -443,6 +482,14 @@ export default function AdminResultsPage() {
                     }`}
                   >
                     3. Student Directory ({students.length})
+                  </button>
+                  <button
+                    onClick={() => setEditorTab("images")}
+                    className={`flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
+                      editorTab === "images" ? "border-accent text-accent font-black" : "border-transparent text-white/60 hover:text-white"
+                    }`}
+                  >
+                    4. Results Images ({images.length})
                   </button>
                 </div>
 
@@ -816,6 +863,83 @@ export default function AdminResultsPage() {
                         </div>
                       </div>
 
+                    </div>
+                  )}
+
+                  {/* Tab 4: Results Images */}
+                  {editorTab === "images" && (
+                    <div className="space-y-6">
+                      <div className="bg-[#0b1738]/50 p-6 border border-white/5 rounded-2xl space-y-4">
+                        <h4 className="text-xs font-black uppercase tracking-widest text-accent flex items-center gap-1.5">
+                          <Sparkles size={14} className="animate-pulse" />
+                          <span>Upload Board Results Charts / Images</span>
+                        </h4>
+                        <p className="text-xs text-white/60 leading-relaxed">
+                          Upload high-resolution result posters, charts, pass listings, or toppers board graphics for the academic session. Uploaded images will be featured on the dynamic results page for this year.
+                        </p>
+                        
+                        <div className="pt-2">
+                          <label className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-dashed border-white/20 hover:border-accent bg-white/5 hover:bg-white/10 text-white font-extrabold text-xs uppercase tracking-wider cursor-pointer transition-all">
+                            {uploading ? (
+                              <>
+                                <Loader2 className="animate-spin" size={14} />
+                                <span>Uploading File...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Plus size={14} />
+                                <span>Select & Upload Image</span>
+                              </>
+                            )}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              disabled={uploading}
+                              onChange={handleImageUpload}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Uploaded Images List */}
+                      <div className="space-y-3">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-white/50">Uploaded Charts ({images.length})</h3>
+                        {images.length === 0 ? (
+                          <div className="bg-[#0b1738]/20 border border-white/5 rounded-2xl p-8 text-center text-white/40 text-xs font-semibold uppercase tracking-wider">
+                            No result charts uploaded yet.
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                            {images.map((imgUrl, idx) => (
+                              <div key={idx} className="bg-[#0b1738]/50 border border-white/5 rounded-2xl overflow-hidden group flex flex-col justify-between">
+                                <div className="aspect-[4/3] w-full bg-slate-950/40 relative overflow-hidden flex items-center justify-center p-2">
+                                  <img src={imgUrl} alt={`Chart ${idx+1}`} className="w-full h-full object-contain" />
+                                </div>
+                                <div className="p-3 border-t border-white/5 bg-[#0b1738] flex items-center justify-between">
+                                  <span className="text-[10px] font-bold text-white/50">Chart #{idx + 1}</span>
+                                  <div className="flex gap-2">
+                                    <a
+                                      href={imgUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="p-1 text-white/60 hover:text-accent hover:bg-accent/10 rounded transition-all text-[10px] font-black uppercase tracking-wider px-2 py-1 border border-white/5"
+                                    >
+                                      View
+                                    </a>
+                                    <button
+                                      onClick={() => handleDeleteImage(imgUrl)}
+                                      className="p-1 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-all text-[10px] font-black uppercase tracking-wider px-2 py-1 border border-white/5"
+                                    >
+                                      Remove
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 

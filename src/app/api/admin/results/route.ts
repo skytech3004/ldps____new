@@ -67,6 +67,7 @@ export async function POST(request: Request) {
       batchAverage: body.batchAverage || "0.0%",
       toppers: body.toppers || [],
       students: body.students || [],
+      images: body.images || [],
     });
 
     return NextResponse.json(created, { status: 201 });
@@ -96,6 +97,7 @@ export async function PUT(request: Request) {
         batchAverage: body.batchAverage,
         toppers: body.toppers,
         students: body.students,
+        images: body.images || [],
       },
       { new: true, runValidators: true }
     );

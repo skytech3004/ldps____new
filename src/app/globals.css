@@ -15,6 +15,10 @@
   --color-accent-hover: #F18701;
   --color-error: #F35B04;
 
+  --color-oxford: #0B132B;
+  --color-sandstone: #E6C594;
+  --color-sandstone-light: #F1DEC9;
+
   --font-montserrat: "Montserrat", sans-serif;
   
   /* Upgraded shadow properties for Stripe/Linear elegance */

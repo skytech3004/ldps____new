@@ -1,6 +1,26 @@
 {
-  "updatedAt": "2026-07-08T06:07:03.386Z",
+  "updatedAt": "2026-07-10T07:36:24.068Z",
   "uploads": [
+    {
+      "id": "1783668984071",
+      "page": "pre-primary",
+      "section": "pre-primary",
+      "title": "PrePrimary - Bead Maze Learning",
+      "description": "",
+      "fileName": "2026-07-10T07-36-24-068Z-whatsapp-image-2026-04-30-at-10.avif",
+      "src": "/uploads/pre-primary/2026-07-10T07-36-24-068Z-whatsapp-image-2026-04-30-at-10.avif",
+      "uploadedAt": "2026-07-10T07:36:24.068Z"
+    },
+    {
+      "id": "1783668807184",
+      "page": "blog",
+      "section": "blogs",
+      "title": "Blog - JAL PAKHWADA 2026",
+      "description": "",
+      "fileName": "2026-07-10T07-33-27-180Z-whatsapp-image-2026-04-30-at-10.avif",
+      "src": "/uploads/blogs/2026-07-10T07-33-27-180Z-whatsapp-image-2026-04-30-at-10.avif",
+      "uploadedAt": "2026-07-10T07:33:27.180Z"
+    },
     {
       "id": "1783490823389",
       "page": "career",
