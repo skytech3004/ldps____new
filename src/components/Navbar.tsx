@@ -42,7 +42,6 @@ export default function Navbar() {
         { label: "Management Committee", href: "/leadership" },
         { label: "Principal's Desk", href: "/principals-desk" },
         { label: "Academic Excellence Team", href: "/managing-committee" },
-        { label: "Investiture Ceremony", href: "/investiture-ceremony" },
       ],
     },
     {
@@ -83,6 +82,8 @@ export default function Navbar() {
         { label: "Meals", href: "/meals" },
         { label: "A Day at School", href: "/a-day-at-school" },
         { label: "Items Required By Boarders", href: "/items-required-by-boarders" },
+        { label: "Investiture Ceremony", href: "/investiture-ceremony" },
+
       ],
     },
     {

@@ -9,6 +9,7 @@ import { Trophy, Loader2 } from "lucide-react";
 interface BoardResultData {
   _id: string;
   year: string;
+  title?: string;
   images?: string[];
 }
 
@@ -85,50 +86,65 @@ export default function ResultYearPage({ params }: { params: Promise<{ year: str
     <main className="min-h-screen bg-[#F8F9FC] text-gray-800">
       <Navbar />
 
-      {/* Hero Banner Section */}
-      <section className="relative pt-36 pb-16 md:pt-44 md:pb-20 px-6 bg-gradient-to-br from-primary to-[#2c246b] text-white">
-        <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto relative z-10 space-y-3">
-          <div className="flex items-center gap-2 text-xs md:text-sm text-accent font-bold uppercase tracking-wider">
-            <Link href="/" className="hover:underline hover:text-white transition-all">Home</Link>
-            <span>/</span>
-            <span>Academics</span>
-            <span>/</span>
-            <span className="text-white/80">Result {data.year}</span>
-          </div>
-          <h1 className="text-4xl md:text-6xl font-black font-montserrat uppercase tracking-tight text-accent">
-            Board Exam Results <span className="text-white">{data.year}</span>
-          </h1>
-          <p className="text-white/70 font-medium text-sm md:text-base max-w-xl">
-            Celebrating the academic milestones and board distinctions achieved by Leeladevi Parasmal Sancheti School boarders.
-          </p>
-        </div>
-      </section>
-
       {/* Main Content Area */}
-      <div className="py-16 px-6 max-w-7xl mx-auto space-y-16">
-        {data.images && data.images.length > 0 ? (
-          <div className="space-y-8">
-            <div className="text-center space-y-2">
-              <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">Official Record</span>
-              <h2 className="text-3xl font-black text-primary uppercase font-montserrat tracking-tight">Board Results Charts</h2>
-              <div className="h-1.5 w-24 bg-accent mx-auto rounded-full" />
-            </div>
+      <div className="pt-40 pb-24 px-6 max-w-7xl mx-auto space-y-12 text-center">
+        
+        {/* Dynamic Centered Heading */}
+        <div className="space-y-4">
+          <h1 className="text-3xl md:text-4xl font-extrabold uppercase font-montserrat text-primary tracking-tight">
+            {data.title ? data.title.toUpperCase() : `BOARD RESULTS ${data.year}`}
+          </h1>
+          <div className="h-1 bg-accent mx-auto w-24 rounded-full" />
+        </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-              {data.images.map((imgUrl: string, i: number) => (
-                <div key={i} className="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-premium-lg group hover:scale-[1.01] transition-all duration-300">
-                  <a href={imgUrl} target="_blank" rel="noopener noreferrer" className="block relative aspect-[4/3] w-full">
-                    <img src={imgUrl} alt={`Result chart ${i + 1}`} className="w-full h-full object-contain p-4 bg-slate-50" />
-                  </a>
-                  <div className="p-4 border-t border-slate-50 flex items-center justify-between bg-white">
-                    <span className="text-xs font-black text-primary uppercase tracking-wider">Page {i + 1}</span>
-                    <a href={imgUrl} download className="text-xs font-black text-[#7678ED] hover:text-[#3D348B] uppercase tracking-wider">Download Image</a>
+        {data.images && data.images.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto pt-6">
+            {data.images.map((imgUrl: string, i: number) => {
+              // Determine class labels matching screenshot patterns
+              let label = "BOARD RESULT";
+              if (data.title) {
+                const titleLower = data.title.toLowerCase();
+                if (titleLower.includes("xii") || titleLower.includes("class 12") || titleLower.includes("12th")) {
+                  label = "XII RESULT";
+                } else if (titleLower.includes("x ") || titleLower.includes("class 10") || titleLower.includes("10th")) {
+                  label = "X RESULT";
+                } else {
+                  label = data.title.toUpperCase();
+                }
+              }
+
+              return (
+                <div 
+                  key={i} 
+                  className="bg-[#0b1736] rounded-3xl p-5 shadow-2xl flex flex-col group transition-all duration-300 hover:scale-[1.01]"
+                >
+                  {/* Image Container with White Background for Results Charts */}
+                  <div className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden bg-white flex items-center justify-center p-3">
+                    <a href={imgUrl} target="_blank" rel="noopener noreferrer" className="w-full h-full flex items-center justify-center">
+                      <img 
+                        src={imgUrl} 
+                        alt={`${label} Page ${i + 1}`} 
+                        className="max-w-full max-h-full object-contain" 
+                      />
+                    </a>
+                  </div>
+
+                  {/* Caption & Download Footer */}
+                  <div className="pt-5 pb-2 text-left flex justify-between items-center px-2">
+                    <span className="text-white text-xl font-black uppercase tracking-wider font-montserrat">
+                      {label}
+                    </span>
+                    <a 
+                      href={imgUrl} 
+                      download 
+                      className="text-accent hover:text-white font-black text-xs uppercase tracking-wider transition-colors"
+                    >
+                      Download Image
+                    </a>
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-20 bg-white border border-slate-100 rounded-[2.5rem] p-16 max-w-2xl mx-auto shadow-premium-sm">
