@@ -96,7 +96,7 @@ export default function StaggeredStats() {
             transition={{ delay: 0.1 }}
             className="text-3xl lg:text-4xl font-extrabold text-[#3D348B] mt-4 tracking-tight"
           >
-            Why Choose Our LPS Vidyawadi?
+            Why Choose LPS Vidyawadi?
           </motion.h2>
           <motion.div
             initial={{ width: 0 }}
