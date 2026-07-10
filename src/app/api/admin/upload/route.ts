@@ -21,6 +21,7 @@ const SECTION_FOLDERS: Record<string, string> = {
   career: "career",
   events: "events",
   results: "results",
+  sports: "sports",
 };
 
 type UploadRecord = {

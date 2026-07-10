@@ -26,6 +26,11 @@ const BoardResultSchema = new Schema(
       unique: true,
       trim: true,
     },
+    title: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     passPercentage: {
       type: String,
       default: "100%",

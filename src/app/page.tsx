@@ -7,6 +7,7 @@ import CategoryGrid from "@/components/CategoryGrid";
 import HostelSection from "@/components/HostelSection";
 import StaggeredStats from "@/components/StaggeredStats";
 import LifeAtVidyawadi from "@/components/LifeAtVidyawadi";
+import LifeAtGis from "@/components/LifeAtGis";
 import UpcomingEventsAndBlogs from "@/components/UpcomingEventsAndBlogs";
 import TestimonialSlider from "@/components/TestimonialSlider";
 import Footer from "@/components/Footer";
@@ -34,15 +35,18 @@ export default function Home() {
       {/* Staggered Stats Section */}
       <StaggeredStats />
 
-      {/* Life @ Vidyawadi Section */}
-      <LifeAtVidyawadi />
+
 
       {/* Journal & Upcoming Events Section */}
       <UpcomingEventsAndBlogs />
 
       {/* Parent & Alumni Testimonial Slider */}
       <TestimonialSlider />
+      {/* Life @ Vidyawadi Section */}
+      <LifeAtVidyawadi />
 
+      {/* Campus Video Highlights Section */}
+      <LifeAtGis />
       <Footer />
 
       {/* Modern Admissions Overlays */}

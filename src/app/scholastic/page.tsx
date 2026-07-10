@@ -6,13 +6,13 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
-import { 
-  BookOpen, 
-  GraduationCap, 
-  Library, 
-  Users, 
-  CheckCircle, 
-  Award, 
+import {
+  BookOpen,
+  GraduationCap,
+  Library,
+  Users,
+  CheckCircle,
+  Award,
   ArrowRight,
   Microscope,
   Languages,
@@ -100,10 +100,10 @@ export default function ScholasticPage() {
       {/* Hero Section */}
       <section className="relative pt-36 pb-24 md:pt-48 md:pb-32 px-6 overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#3D348B_1px,transparent_1px)] [background-size:24px_24px]" />
-        
+
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -113,26 +113,26 @@ export default function ScholasticPage() {
                 <Library size={14} className="text-accent" />
                 <span>Academic Excellence</span>
               </div>
-              
+
               <h1 className="text-5xl md:text-7xl font-black text-primary leading-[0.95] uppercase font-montserrat tracking-tight">
                 Scholastic <br />
                 <span className="text-accent">Curriculum.</span>
               </h1>
-              
+
               <p className="text-gray-500 text-lg md:text-xl font-medium leading-relaxed max-w-xl">
                 Nurturing young minds through a balanced, child-centered approach that blends traditional values with modern educational methodologies.
               </p>
-              
+
               <div className="flex flex-wrap gap-4 pt-4">
-                <Link 
-                  href="/apply-for-admission" 
+                <Link
+                  href="/apply-for-admission"
                   className="bg-primary text-white font-black px-8 py-4 rounded-2xl hover:bg-secondary hover:shadow-2xl hover:shadow-secondary/20 transition-all flex items-center gap-3 group text-sm uppercase tracking-widest"
                 >
                   <span>Admission Query</span>
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
-                <Link 
-                  href="/school-planner" 
+                <Link
+                  href="/school-planner"
                   className="bg-white border-2 border-primary/10 text-primary font-black px-8 py-4 rounded-2xl hover:bg-primary/5 transition-all text-sm uppercase tracking-widest"
                 >
                   School Planner
@@ -140,7 +140,7 @@ export default function ScholasticPage() {
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1 }}
@@ -148,12 +148,12 @@ export default function ScholasticPage() {
             >
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-accent/20 rounded-full blur-3xl animate-pulse" />
               <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl" />
-              
+
               <div className="relative aspect-[4/3] rounded-[3rem] overflow-hidden border-[12px] border-white shadow-2xl">
-                <Image 
-                  src="/lps-vidhyawadi/gallery-04.jpg" 
-                  alt="Students in classroom" 
-                  fill 
+                <Image
+                  src="/lps-vidhyawadi/gallery-04.jpg"
+                  alt="Students in classroom"
+                  fill
                   className="object-cover"
                   priority
                 />
@@ -166,7 +166,7 @@ export default function ScholasticPage() {
       {/* Academic Philosophy */}
       <section className="py-24 px-6 bg-primary text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-accent/5 -skew-x-12 translate-x-1/4" />
-        
+
         <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
           <div className="lg:col-span-5 space-y-6">
             <span className="text-accent font-black uppercase tracking-[0.4em] text-xs">Our Foundation</span>
@@ -176,7 +176,7 @@ export default function ScholasticPage() {
             </h2>
             <div className="h-1.5 w-24 bg-accent rounded-full" />
           </div>
-          
+
           <div className="lg:col-span-7">
             <p className="text-white/80 text-lg md:text-xl font-medium leading-relaxed">
               {primaryCurriculum[0] || "We follow a child-centered methodology where 'Learning by Doing' is at the core. Our approach identifies the unique potential of each girl child, providing them with the tools for self-education and a strong fundamental knowledge base."}
@@ -197,27 +197,27 @@ export default function ScholasticPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {academicWings.map((wing, idx) => (
-            <motion.div 
+            <motion.div
               key={idx}
               whileHover={{ y: -10 }}
               className={`bg-white border border-primary/5 rounded-[2.5rem] p-10 shadow-xl shadow-primary/5 relative overflow-hidden group`}
             >
               <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${wing.color} rounded-bl-[5rem] -z-0`} />
-              
+
               <div className="relative z-10 space-y-6">
                 <div className={`w-16 h-16 rounded-2xl bg-white shadow-lg flex items-center justify-center ${wing.iconColor}`}>
                   <wing.icon size={32} />
                 </div>
-                
+
                 <div className="space-y-2">
                   <h3 className="text-2xl font-black text-primary uppercase tracking-tight">{wing.title}</h3>
                   <p className="text-accent font-black text-xs uppercase tracking-widest">{wing.subtitle}</p>
                 </div>
-                
+
                 <p className="text-gray-500 font-medium leading-relaxed">
                   {wing.description}
                 </p>
-                
+
                 <div className="grid grid-cols-2 gap-y-3 pt-4 border-t border-gray-100">
                   {wing.features.map((feature, fIdx) => (
                     <div key={fIdx} className="flex items-center gap-2">
@@ -235,7 +235,7 @@ export default function ScholasticPage() {
       {/* Senior Secondary Streams & Vocational Courses - Academic Excellence */}
       <section className="py-24 px-6 bg-[#F8F9FC] border-t border-slate-100">
         <div className="max-w-7xl mx-auto space-y-24">
-          
+
           {/* Senior Secondary Streams Header */}
           <div className="text-center space-y-4">
             <span className="text-accent font-black uppercase tracking-[0.4em] text-xs">Pathways to Success</span>
@@ -400,7 +400,7 @@ export default function ScholasticPage() {
                 Our curriculum is meticulously designed to ensure holistic development, balancing academics with practical skills and values.
               </p>
             </div>
-            
+
             <div className="space-y-6">
               {primaryCurriculum.slice(1, 6).map((item, idx) => (
                 <div key={idx} className="flex gap-6 p-6 rounded-3xl bg-gray-50 border border-gray-100 hover:border-primary/20 transition-all group">
@@ -416,10 +416,10 @@ export default function ScholasticPage() {
           <div className="bg-primary rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-accent/20 rounded-full blur-[80px]" />
             <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-secondary/20 rounded-full blur-[80px]" />
-            
+
             <div className="relative z-10 space-y-10">
               <h3 className="text-3xl font-black uppercase font-montserrat tracking-tight text-accent">Beyond Board Exams</h3>
-              
+
               <div className="space-y-8">
                 {secondaryWings.slice(0, 5).map((item, idx) => (
                   <div key={idx} className="flex gap-4 items-start border-b border-white/10 pb-6 last:border-0">
@@ -432,10 +432,10 @@ export default function ScholasticPage() {
                   </div>
                 ))}
               </div>
-              
+
               <div className="pt-6">
-                <Link 
-                  href="/contact" 
+                <Link
+                  href="/contact"
                   className="inline-flex items-center gap-2 text-accent font-black uppercase tracking-widest text-sm hover:translate-x-2 transition-transform"
                 >
                   Download Detailed Prospectus <ArrowRight size={18} />
@@ -450,7 +450,7 @@ export default function ScholasticPage() {
       <section className="py-32 px-6">
         <div className="max-w-7xl mx-auto bg-gradient-to-br from-white to-gray-50 border border-primary/5 rounded-[4rem] p-12 md:p-20 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-[100px]" />
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
             <div className="space-y-8">
               <div className="space-y-4">
@@ -460,11 +460,11 @@ export default function ScholasticPage() {
                   <span className="text-accent">Global Careers.</span>
                 </h2>
               </div>
-              
+
               <p className="text-gray-500 font-medium text-lg leading-relaxed">
                 {secondaryWings[5] || "In the secondary and senior secondary wings, students are prepared not just for exams, but for life beyond school. We emphasize conceptual understanding, career alignment, and the development of leadership qualities."}
               </p>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   { icon: Languages, label: "Language Excellence" },
@@ -479,12 +479,12 @@ export default function ScholasticPage() {
                 ))}
               </div>
             </div>
-            
+
             <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl rotate-2">
-              <Image 
-                src="/lps-vidhyawadi/gallery-06.jpg" 
-                alt="Senior students" 
-                fill 
+              <Image
+                src="/lps-vidhyawadi/gallery-06.jpg"
+                alt="Senior students"
+                fill
                 className="object-cover"
               />
             </div>
@@ -517,7 +517,7 @@ export default function ScholasticPage() {
               </div>
             ) : (
               facilities.map((item, idx) => (
-                <motion.div 
+                <motion.div
                   key={item._id || idx}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -525,16 +525,16 @@ export default function ScholasticPage() {
                   transition={{ delay: idx * 0.05 }}
                   className="group relative bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 aspect-[4/5]"
                 >
-                  <Image 
-                    src={item.fallback} 
+                  <Image
+                    src={item.fallback}
                     alt={item.name}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-700 brightness-90 group-hover:brightness-100"
                   />
-                  
+
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-                  
+
                   {/* Content */}
                   <div className="absolute inset-0 p-6 flex flex-col justify-end transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
                     {item.code && (
@@ -553,86 +553,14 @@ export default function ScholasticPage() {
 
           <div className="text-center pt-8">
             <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">
-              Discover more at LPS Vidyawadi
+              {/* Discover more at LPS Vidyawadi */}
             </p>
           </div>
         </div>
       </section>
 
       {/* Fee Structure Section */}
-      <section className="py-24 px-6 bg-white border-t border-slate-100">
-        <div className="max-w-4xl mx-auto space-y-12">
-          
-          <div className="text-center space-y-4">
-            <span className="text-accent font-black uppercase tracking-[0.4em] text-xs">Investment in Excellence</span>
-            <h2 className="text-4xl md:text-5xl font-black text-primary uppercase font-montserrat tracking-tight">
-              Fee Structure 2026-27
-            </h2>
-            <div className="inline-block bg-primary/10 text-primary px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider">
-              2 Easy Installments
-            </div>
-          </div>
 
-          <div className="overflow-hidden rounded-[2rem] border border-slate-100 shadow-premium-lg bg-white">
-            <div className="bg-primary p-6 text-white text-center">
-              <h3 className="font-montserrat font-black text-lg uppercase tracking-wider">
-                Senior Secondary (XI–XII)
-              </h3>
-            </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[500px]">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="p-5 text-xs font-black uppercase tracking-wider text-primary">Stream</th>
-                    <th className="p-5 text-xs font-black uppercase tracking-wider text-primary">Installments</th>
-                    <th className="p-5 text-xs font-black uppercase tracking-wider text-primary">Total Fee</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {[
-                    { stream: "Science (PCM)", installments: "₹27,300 × 2", total: "₹54,600" },
-                    { stream: "Science (PCB)", installments: "₹28,700 × 2", total: "₹57,400" },
-                    { stream: "Commerce (General)", installments: "₹22,650 × 2", total: "₹45,300" },
-                    { stream: "Commerce (Comp Sci)", installments: "₹23,300 × 2", total: "₹46,600" },
-                    { stream: "Arts (General)", installments: "₹22,800 × 2", total: "₹45,600" },
-                    { stream: "Arts (Music/Geo/Comp)", installments: "₹24,000 × 2", total: "₹48,000" },
-                  ].map((row, idx) => (
-                    <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="p-5 text-sm font-black text-primary uppercase tracking-tight">{row.stream}</td>
-                      <td className="p-5 text-sm font-semibold text-gray-500">{row.installments}</td>
-                      <td className="p-5 text-sm font-black text-accent">{row.total}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Admission Fee Note */}
-          <div className="bg-[#F8F9FC] border border-slate-100 p-8 rounded-[2rem] space-y-4">
-            <h4 className="font-montserrat font-black text-xs uppercase tracking-widest text-[#7678ED] text-center sm:text-left">
-              Admission Fee (One-Time)
-            </h4>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center sm:text-left">
-              {[
-                { label: "Science (PCM)", fee: "₹5,000" },
-                { label: "Science (PCB)", fee: "₹5,000" },
-                { label: "Commerce (Gen)", fee: "₹5,000" },
-                { label: "Commerce (CS)", fee: "₹5,000" },
-                { label: "Arts (General)", fee: "₹5,000" },
-                { label: "Arts (Spl)", fee: "₹5,000" },
-              ].map((item, idx) => (
-                <div key={idx} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">{item.label}</span>
-                  <span className="text-sm font-black text-primary mt-0.5">{item.fee}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-        </div>
-      </section>
 
       {/* Call to Action */}
       <section className="bg-primary py-20 px-6">
@@ -645,8 +573,8 @@ export default function ScholasticPage() {
             Admissions for the upcoming academic session are now open. Experience the unique residential learning environment at LPS Vidyawadi.
           </p>
           <div className="pt-4">
-            <Link 
-              href="/apply-for-admission" 
+            <Link
+              href="/apply-for-admission"
               className="inline-flex items-center gap-3 bg-accent text-primary font-black uppercase tracking-widest px-10 py-5 rounded-2xl hover:bg-white hover:scale-105 transition-all shadow-xl shadow-accent/10"
             >
               Start Admission Process

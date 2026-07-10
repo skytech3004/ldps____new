@@ -1,33 +1,103 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Trophy, Award, CheckCircle, Shield, ArrowRight, Activity, Users, Star } from "lucide-react";
-import { motion } from "framer-motion";
+import { Trophy, Award, CheckCircle, Shield, ArrowRight, Activity, Users, Star, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface Player {
+  name: string;
+  role: string;
+  achievement: string;
+  image?: string;
+}
+
+interface Game {
+  title: string;
+  desc: string;
+}
+
+interface Stat {
+  count: string;
+  label: string;
+}
+
+interface SportsData {
+  complexImages: string[];
+  players: Player[];
+  games: Game[];
+  stats: Stat[];
+}
 
 export default function SportsPage() {
-  const stars = [
-    { name: "Ms. Manisha Kanwar Deora", role: "XII Humanities", achievement: "8 Times National Player (Softball)" },
-    { name: "Ms. Monika Kanwar Ranawat", role: "XII Science", achievement: "3 Times National Player (Softball)" },
-    { name: "Ms. Renu Bhati", role: "XII Science", achievement: "National Player (Softball)" },
-    { name: "Ms. Shivranjani", role: "Class X", achievement: "National Player (Softball)" }
-  ];
+  const [data, setData] = useState<SportsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Sports Complex Carousel State
+  const [activeComplexSlide, setActiveComplexSlide] = useState(0);
+  
+  // Players Carousel State
+  const [activePlayerSlide, setActivePlayerSlide] = useState(0);
 
-  const stats = [
-    { count: "67", label: "District Selections" },
-    { count: "23", label: "State Selections" },
-    { count: "4", label: "National Selections" },
-    { count: "94", label: "Total Selections" }
-  ];
+  useEffect(() => {
+    const fetchSports = async () => {
+      try {
+        const res = await fetch("/api/admin/sports");
+        if (res.ok) {
+          const json = await res.json();
+          setData(json);
+        }
+      } catch (err) {
+        console.error("Failed to load sports data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSports();
+  }, []);
 
-  const games = [
-    { title: "Basketball Champions", desc: "District Champions in U-14 & U-19 divisions. State Selections include Ms. Rambala, Ms. Jaisal, and Ms. Durga." },
-    { title: "Softball Giants", desc: "Dominant state and national selections, training under professional coaches in expansive softball fields." },
-    { title: "Table Tennis & Badminton", desc: "Dual district position II. State selection list includes Ms. Kritika, Ms. Ranjana Dave, and Ms. Divya." },
-    { title: "Athletics Complex", desc: "Extensive track & field events. State selection includes champion athlete Ms. Priyanka Sirvi." }
-  ];
+  const handlePrevComplexSlide = () => {
+    if (!data?.complexImages || data.complexImages.length === 0) return;
+    setActiveComplexSlide((prev) => (prev === 0 ? data.complexImages.length - 1 : prev - 1));
+  };
+
+  const handleNextComplexSlide = () => {
+    if (!data?.complexImages || data.complexImages.length === 0) return;
+    setActiveComplexSlide((prev) => (prev === data.complexImages.length - 1 ? 0 : prev + 1));
+  };
+
+  // Players Carousel slide actions (showing 4 cards at once on desktop, sliding by 1 card)
+  const handlePrevPlayerSlide = () => {
+    if (!data?.players || data.players.length === 0) return;
+    setActivePlayerSlide((prev) => (prev === 0 ? data.players.length - 1 : prev - 1));
+  };
+
+  const handleNextPlayerSlide = () => {
+    if (!data?.players || data.players.length === 0) return;
+    setActivePlayerSlide((prev) => (prev === data.players.length - 1 ? 0 : prev + 1));
+  };
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#F8F9FC] text-gray-800">
+        <Navbar />
+        <div className="pt-48 pb-24 text-center max-w-7xl mx-auto px-6">
+          <Loader2 className="animate-spin text-primary mx-auto mb-4" size={40} />
+          <p className="animate-pulse text-primary font-black uppercase tracking-widest text-sm">
+            Loading Sports Showcase...
+          </p>
+        </div>
+        <Footer />
+      </main>
+    );
+  }
+
+  const complexImages = data?.complexImages || [];
+  const players = data?.players || [];
+  const games = data?.games || [];
+  const stats = data?.stats || [];
 
   return (
     <main className="min-h-screen bg-[#F8F9FC] text-gray-800">
@@ -55,7 +125,7 @@ export default function SportsPage() {
 
       {/* Sports Infrastructure Section */}
       <section className="py-20 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-6 space-y-6 text-left">
           <div className="space-y-4">
             <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">Health & Fitness</span>
             <h2 className="text-3xl md:text-4xl font-black text-primary uppercase font-montserrat tracking-tight">
@@ -86,18 +156,75 @@ export default function SportsPage() {
           </div>
         </div>
 
-        {/* Statistical Dashboard Grid */}
-        <div className="lg:col-span-6 grid grid-cols-2 gap-6 bg-[#0f234f]/5 border border-primary/10 rounded-[2.5rem] p-8">
+        {/* Dynamic Carousel for Complex Images */}
+        <div className="lg:col-span-6 space-y-4">
+          {complexImages.length > 0 ? (
+            <div className="relative aspect-[16/10] w-full bg-slate-900 border border-primary/10 rounded-[2.5rem] overflow-hidden shadow-premium-lg group">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeComplexSlide}
+                  src={complexImages[activeComplexSlide]}
+                  alt={`Sports Complex Frame ${activeComplexSlide + 1}`}
+                  initial={{ opacity: 0, scale: 1.05 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="w-full h-full object-cover"
+                />
+              </AnimatePresence>
+
+              {/* Navigation arrows */}
+              {complexImages.length > 1 && (
+                <>
+                  <button
+                    onClick={handlePrevComplexSlide}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 p-2.5 bg-black/40 text-white rounded-full hover:bg-black/60 transition-colors backdrop-blur-sm opacity-0 group-hover:opacity-100 duration-300"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <button
+                    onClick={handleNextComplexSlide}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2.5 bg-black/40 text-white rounded-full hover:bg-black/60 transition-colors backdrop-blur-sm opacity-0 group-hover:opacity-100 duration-300"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+
+                  {/* Bullet indicators */}
+                  <div className="absolute bottom-4 inset-x-0 flex items-center justify-center gap-1.5">
+                    {complexImages.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActiveComplexSlide(i)}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          activeComplexSlide === i ? "bg-accent w-4" : "bg-white/50 hover:bg-white"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className="aspect-[16/10] w-full bg-gray-100 border border-dashed border-gray-300 rounded-[2.5rem] flex items-center justify-center text-gray-400">
+              No complex images uploaded yet.
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Statistical Dashboard Grid */}
+      <section className="py-12 bg-white border-y border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
           {stats.map((stat, idx) => (
-            <div key={idx} className="bg-white border border-primary/10 rounded-2xl p-6 shadow-md text-center">
+            <div key={idx} className="bg-[#F8F9FC] border border-primary/5 rounded-2xl p-6 text-center shadow-sm">
               <p className="text-4xl md:text-5xl font-black text-primary">{stat.count}</p>
-              <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-gray-400 mt-2">{stat.label}</p>
+              <p className="text-[10px] md:text-xs font-black uppercase tracking-wider text-gray-400 mt-2">{stat.label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Sports National Champions Grid (Gold Star Cards) */}
+      {/* Sports National Champions Grid with Large Profile Images */}
       <section className="py-20 px-6 bg-gradient-to-br from-primary to-[#251f59] text-white overflow-hidden shadow-inner">
         <div className="max-w-7xl mx-auto space-y-12 relative z-10">
           
@@ -113,21 +240,36 @@ export default function SportsPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6">
-            {stars.map((star, idx) => (
+            {players.slice(0, 4).map((star, idx) => (
               <div 
                 key={idx} 
-                className="bg-white/5 border border-white/10 rounded-2xl p-6 shadow-lg flex flex-col justify-between h-48 hover:scale-[1.03] hover:bg-white/10 transition-all duration-300"
+                className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col h-[380px] text-left group"
               >
-                <div className="flex justify-between items-start">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-                    <Star size={20} className="text-accent fill-accent" />
-                  </div>
-                  <span className="text-[9px] font-bold text-accent uppercase tracking-widest bg-accent/15 px-2.5 py-1 rounded-full">CBSE National</span>
+                {/* Player image container */}
+                <div className="relative h-56 w-full bg-[#081736] overflow-hidden shrink-0 border-b border-white/10 flex items-center justify-center">
+                  {star.image ? (
+                    <img 
+                      src={star.image} 
+                      alt={star.name} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center text-accent/40 border border-white/5">
+                      <Users size={40} />
+                    </div>
+                  )}
+                  <span className="absolute top-3 right-3 text-[9px] font-black text-accent uppercase tracking-widest bg-[#F7B801]/10 border border-[#F7B801]/20 px-2.5 py-1 rounded-full backdrop-blur-sm">CBSE National</span>
                 </div>
-                <div>
-                  <h4 className="font-black text-base md:text-lg uppercase tracking-tight text-white">{star.name}</h4>
-                  <p className="text-xs text-white/60 font-semibold mt-0.5">{star.role}</p>
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-accent mt-2">{star.achievement}</p>
+                
+                {/* Player Details info */}
+                <div className="p-5 flex-1 flex flex-col justify-between">
+                  <div className="space-y-1">
+                    <h4 className="font-black text-base md:text-lg uppercase tracking-tight text-white leading-tight">{star.name}</h4>
+                    <p className="text-xs text-white/50 font-bold">{star.role}</p>
+                  </div>
+                  <div className="pt-2 border-t border-white/5">
+                    <p className="text-[10px] uppercase font-black tracking-wider text-accent leading-relaxed">{star.achievement}</p>
+                  </div>
                 </div>
               </div>
             ))}
@@ -136,12 +278,90 @@ export default function SportsPage() {
         </div>
       </section>
 
+      {/* Players Carousel Section for Other Players & Sports Achievers */}
+      {players.length > 0 && (
+        <section className="py-20 px-6 bg-white border-t border-slate-100 text-center relative overflow-hidden">
+          <div className="max-w-7xl mx-auto space-y-12">
+            
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-left border-b border-gray-100 pb-6">
+              <div className="space-y-2">
+                <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">Vidyawadi Stars</span>
+                <h2 className="text-2xl md:text-4xl font-black text-primary uppercase font-montserrat tracking-tight leading-none">
+                  Sports Achievers Carousel
+                </h2>
+              </div>
+              
+              {/* Sliding Controls */}
+              {players.length > 1 && (
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={handlePrevPlayerSlide}
+                    className="p-3 bg-gray-50 border border-gray-100 hover:bg-[#3D348B] hover:text-white rounded-full transition-all duration-300 text-primary cursor-pointer shadow-premium-sm"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button 
+                    onClick={handleNextPlayerSlide}
+                    className="p-3 bg-gray-50 border border-gray-100 hover:bg-[#3D348B] hover:text-white rounded-full transition-all duration-300 text-primary cursor-pointer shadow-premium-sm"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Carousel display frame */}
+            <div className="relative w-full overflow-hidden">
+              <div 
+                className="flex transition-transform duration-500 ease-out gap-6"
+                style={{ transform: `translateX(-${activePlayerSlide * 300}px)` }}
+              >
+                {players.map((star, idx) => (
+                  <div 
+                    key={idx} 
+                    className="min-w-[280px] w-[280px] bg-[#F8F9FC] border border-gray-100 rounded-3xl overflow-hidden shadow-premium-sm hover:shadow-premium-md transition-all duration-300 flex flex-col h-[380px] text-left group shrink-0"
+                  >
+                    {/* Player image */}
+                    <div className="relative h-52 w-full bg-slate-100 overflow-hidden shrink-0 border-b border-gray-100 flex items-center justify-center">
+                      {star.image ? (
+                        <img 
+                          src={star.image} 
+                          alt={star.name} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center text-primary/30 border border-primary/5">
+                          <Users size={32} />
+                        </div>
+                      )}
+                      <span className="absolute top-3 right-3 text-[9px] font-black text-white bg-primary px-2.5 py-1 rounded-full uppercase tracking-wider">Player Profile</span>
+                    </div>
+                    
+                    {/* Player info */}
+                    <div className="p-5 flex-1 flex flex-col justify-between">
+                      <div className="space-y-1">
+                        <h4 className="font-black text-sm md:text-base uppercase tracking-tight text-primary leading-tight">{star.name}</h4>
+                        <p className="text-xs text-gray-400 font-bold">{star.role}</p>
+                      </div>
+                      <div className="pt-2 border-t border-gray-100">
+                        <p className="text-[10px] uppercase font-black tracking-wider text-accent leading-relaxed">{star.achievement}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </section>
+      )}
+
       {/* Game Breakdown list */}
       <section className="py-24 px-6 max-w-7xl mx-auto space-y-12">
         <div className="text-center space-y-3">
           <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">Discipline Showcase</span>
           <h2 className="text-2xl md:text-4xl font-black text-primary uppercase font-montserrat">
-            Game Summaries & selections
+            Game Summaries & Selections
           </h2>
           <div className="h-1.5 w-24 bg-accent mx-auto rounded-full" />
         </div>
@@ -150,7 +370,7 @@ export default function SportsPage() {
           {games.map((game, idx) => (
             <div 
               key={idx} 
-              className="bg-white border border-primary/10 rounded-3xl p-8 shadow-md hover:shadow-lg transition-all duration-300 flex gap-5 items-start group"
+              className="bg-white border border-primary/10 rounded-3xl p-8 shadow-md hover:shadow-lg transition-all duration-300 flex gap-5 items-start group text-left"
             >
               <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                 <Activity size={24} />

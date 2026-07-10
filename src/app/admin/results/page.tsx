@@ -1,36 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Plus, Trash2, Edit2, Loader2, Award, Trophy, Star, FileSpreadsheet, Sparkles, ChevronRight, Check } from "lucide-react";
-
-interface Topper {
-  name: string;
-  class: "Class X" | "Class XII";
-  stream: string;
-  score: string;
-  rank: number;
-  medal: string;
-  description: string;
-}
-
-interface Student {
-  name: string;
-  class: "Class X" | "Class XII";
-  stream: string;
-  percent: number;
-  status: string;
-}
+import { Plus, Trash2, Loader2, Trophy, Upload, X, Shield, Sparkles } from "lucide-react";
 
 interface BoardResult {
   _id: string;
   year: string;
-  passPercentage: string;
-  highestScore: string;
-  highestScoreScorer: string;
-  distinctionsCount: number;
-  batchAverage: string;
-  toppers: Topper[];
-  students: Student[];
+  title?: string;
   images?: string[];
 }
 
@@ -40,39 +16,18 @@ export default function AdminResultsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // New year inputs
-  const [newYearName, setNewYearName] = useState("");
+  // Add Result Year inputs
+  const [newYear, setNewYear] = useState("");
+  const [newTitle, setNewTitle] = useState("");
 
-  // Editor states
-  const [passPercentage, setPassPercentage] = useState("100%");
-  const [highestScore, setHighestScore] = useState("0.0%");
-  const [highestScoreScorer, setHighestScoreScorer] = useState("");
-  const [distinctionsCount, setDistinctionsCount] = useState(0);
-  const [batchAverage, setBatchAverage] = useState("0.0%");
-  const [toppers, setToppers] = useState<Topper[]>([]);
-  const [students, setStudents] = useState<Student[]>([]);
-
-  // Topper form states
-  const [tName, setTName] = useState("");
-  const [tClass, setTClass] = useState<"Class X" | "Class XII">("Class XII");
-  const [tStream, setTStream] = useState("Science");
-  const [tScore, setTScore] = useState("");
-  const [tRank, setTRank] = useState(1);
-  const [tMedal, setTMedal] = useState("star");
-  const [tDesc, setTDesc] = useState("");
-  const [editingTopperIndex, setEditingTopperIndex] = useState<number | null>(null);
-
-  // Student form states
-  const [sName, setSName] = useState("");
-  const [sClass, setSClass] = useState<"Class X" | "Class XII">("Class XII");
-  const [sStream, setSStream] = useState("Science");
-  const [sPercent, setSPercent] = useState<number>(0);
-  const [sStatus, setSStatus] = useState("Distinction");
-  const [editingStudentIndex, setEditingStudentIndex] = useState<number | null>(null);
-
-  // Active tab within editor
-  const [editorTab, setEditorTab] = useState<"stats" | "toppers" | "students" | "images">("stats");
+  // Select Result Year inputs for editing
+  const [editYear, setEditYear] = useState("");
+  const [editTitle, setEditTitle] = useState("");
   const [images, setImages] = useState<string[]>([]);
+  
+  // File upload state
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadPreview, setUploadPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
   const fetchResults = async () => {
@@ -83,11 +38,7 @@ export default function AdminResultsPage() {
         const data = await res.json();
         setResultYears(data);
         if (data.length > 0) {
-          // Select first year if none is selected
-          const defaultSelect = selectedResult 
-            ? data.find((r: BoardResult) => r.year === selectedResult.year) || data[0]
-            : data[0];
-          selectResult(defaultSelect);
+          selectResult(data[0]);
         }
       }
     } catch (err) {
@@ -104,53 +55,58 @@ export default function AdminResultsPage() {
 
   const selectResult = (result: BoardResult) => {
     setSelectedResult(result);
-    setPassPercentage(result.passPercentage);
-    setHighestScore(result.highestScore);
-    setHighestScoreScorer(result.highestScoreScorer);
-    setDistinctionsCount(result.distinctionsCount);
-    setBatchAverage(result.batchAverage);
-    setToppers(result.toppers || []);
-    setStudents(result.students || []);
+    setEditYear(result.year);
+    setEditTitle(result.title || "");
     setImages(result.images || []);
-    resetTopperForm();
-    resetStudentForm();
+    // Reset file preview
+    setUploadFile(null);
+    setUploadPreview(null);
   };
 
-  const handleCreateYear = async (e: React.FormEvent) => {
+  // Add a new Result Year
+  const handleAddResultYear = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanYear = newYearName.trim();
-    if (!cleanYear) return;
+    if (!newYear.trim() || !newTitle.trim()) {
+      alert("Please fill in both the Year and Title.");
+      return;
+    }
 
     setSaving(true);
     try {
       const res = await fetch("/api/admin/results", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ year: cleanYear }),
+        body: JSON.stringify({
+          year: newYear.trim(),
+          title: newTitle.trim(),
+          images: [],
+        }),
       });
+
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to create year.");
-      }
-      setNewYearName("");
-      // Refresh list
-      const listRes = await fetch("/api/admin/results");
-      if (listRes.ok) {
-        const listData = await listRes.json();
-        setResultYears(listData);
-        const newlyCreated = listData.find((r: BoardResult) => r.year === cleanYear);
-        if (newlyCreated) selectResult(newlyCreated);
+        alert(data.error || "Failed to create result year.");
+      } else {
+        setResultYears((prev) => [data, ...prev]);
+        selectResult(data);
+        setNewYear("");
+        setNewTitle("");
       }
     } catch (err) {
       console.error(err);
-      alert(err instanceof Error ? err.message : "Error creating year.");
+      alert("Error creating result record.");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleSaveData = async () => {
+  // Save changes to current Result Year
+  const handleSaveResultYear = async () => {
     if (!selectedResult) return;
+    if (!editYear.trim() || !editTitle.trim()) {
+      alert("Please fill in both the Year and Title.");
+      return;
+    }
 
     setSaving(true);
     try {
@@ -159,34 +115,34 @@ export default function AdminResultsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: selectedResult._id,
-          year: selectedResult.year,
-          passPercentage,
-          highestScore,
-          highestScoreScorer,
-          distinctionsCount,
-          batchAverage,
-          toppers,
-          students,
-          images,
+          year: editYear.trim(),
+          title: editTitle.trim(),
+          images: images,
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to save data.");
-      
-      alert("Results updated successfully!");
-      // Reload year data
-      fetchResults();
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Failed to save changes.");
+      } else {
+        // Update local list
+        setResultYears((prev) =>
+          prev.map((item) => (item._id === data._id ? data : item))
+        );
+        setSelectedResult(data);
+      }
     } catch (err) {
       console.error(err);
-      alert("Error saving result configurations.");
+      alert("Error saving result record.");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDeleteYear = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this result year? This removes all associated toppers and student marks lists!")) return;
-
+  // Delete Result Year record
+  const handleDeleteResultYear = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this result year? All uploaded charts for this year will be detached.")) return;
+    
     setSaving(true);
     try {
       const res = await fetch("/api/admin/results", {
@@ -194,236 +150,231 @@ export default function AdminResultsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
       });
-      if (!res.ok) throw new Error("Delete failed.");
-      setSelectedResult(null);
-      fetchResults();
+      if (res.ok) {
+        const nextList = resultYears.filter((item) => item._id !== id);
+        setResultYears(nextList);
+        if (nextList.length > 0) {
+          selectResult(nextList[0]);
+        } else {
+          setSelectedResult(null);
+        }
+      }
     } catch (err) {
       console.error(err);
-      alert("Error deleting board results year.");
+      alert("Error deleting result year.");
     } finally {
       setSaving(false);
     }
   };
 
-  // Toppers array CRUD
-  const handleAddTopper = () => {
-    if (!tName.trim() || !tScore.trim()) return;
-
-    const newTopper: Topper = {
-      name: tName.trim(),
-      class: tClass,
-      stream: tStream,
-      score: tScore.trim(),
-      rank: Number(tRank) || 1,
-      medal: tMedal,
-      description: tDesc.trim(),
-    };
-
-    if (editingTopperIndex !== null) {
-      const next = [...toppers];
-      next[editingTopperIndex] = newTopper;
-      setToppers(next);
-      setEditingTopperIndex(null);
-    } else {
-      setToppers([...toppers, newTopper]);
-    }
-    resetTopperForm();
-  };
-
-  const handleEditTopper = (idx: number) => {
-    const t = toppers[idx];
-    setTName(t.name);
-    setTClass(t.class);
-    setTStream(t.stream);
-    setTScore(t.score);
-    setTRank(t.rank);
-    setTMedal(t.medal);
-    setTDesc(t.description || "");
-    setEditingTopperIndex(idx);
-  };
-
-  const handleDeleteTopper = (idx: number) => {
-    setToppers(toppers.filter((_, i) => i !== idx));
-    if (editingTopperIndex === idx) setEditingTopperIndex(null);
-  };
-
-  const resetTopperForm = () => {
-    setTName("");
-    setTScore("");
-    setTRank(1);
-    setTMedal("star");
-    setTDesc("");
-    setEditingTopperIndex(null);
-  };
-
-  // Students array CRUD
-  const handleAddStudent = () => {
-    if (!sName.trim() || !sPercent) return;
-
-    const newStudent: Student = {
-      name: sName.trim(),
-      class: sClass,
-      stream: sStream,
-      percent: Number(sPercent) || 0,
-      status: sStatus.trim(),
-    };
-
-    if (editingStudentIndex !== null) {
-      const next = [...students];
-      next[editingStudentIndex] = newStudent;
-      setStudents(next);
-      setEditingStudentIndex(null);
-    } else {
-      setStudents([...students, newStudent]);
-    }
-    resetStudentForm();
-  };
-
-  const handleEditStudent = (idx: number) => {
-    const s = students[idx];
-    setSName(s.name);
-    setSClass(s.class);
-    setSStream(s.stream);
-    setSPercent(s.percent);
-    setSStatus(s.status);
-    setEditingStudentIndex(idx);
-  };
-
-  const handleDeleteStudent = (idx: number) => {
-    setStudents(students.filter((_, i) => i !== idx));
-    if (editingStudentIndex === idx) setEditingStudentIndex(null);
-  };
-
-  const resetStudentForm = () => {
-    setSName("");
-    setSPercent(0);
-    setSStatus("Distinction");
-    setEditingStudentIndex(null);
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle image upload file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (file) {
+      setUploadFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
+  // Upload results poster image
+  const handleUploadImage = async () => {
+    if (!uploadFile || !selectedResult) return;
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("section", "results");
-      fd.append("page", "results");
-      fd.append("title", `Result ${selectedResult?.year || "Year"}`);
+      const formData = new FormData();
+      formData.append("file", uploadFile);
+      formData.append("page", "result");
+      formData.append("section", "results");
+      formData.append("title", `Result Year ${editYear}`);
 
       const res = await fetch("/api/admin/upload", {
         method: "POST",
-        body: fd,
+        body: formData,
       });
 
       if (!res.ok) throw new Error("Upload failed.");
       const data = await res.json();
-      if (data.ok && data.upload?.src) {
-        setImages((prev) => [...prev, data.upload.src]);
+
+      const updatedImages = [...images, data.upload.src];
+      setImages(updatedImages);
+
+      // Save changes to db immediately
+      const saveRes = await fetch("/api/admin/results", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selectedResult._id,
+          year: editYear.trim(),
+          title: editTitle.trim(),
+          images: updatedImages,
+        }),
+      });
+      const saveData = await saveRes.json();
+      if (saveRes.ok) {
+        setResultYears((prev) =>
+          prev.map((item) => (item._id === saveData._id ? saveData : item))
+        );
+        setSelectedResult(saveData);
       }
+
+      setUploadFile(null);
+      setUploadPreview(null);
     } catch (err) {
       console.error(err);
-      alert("Error uploading image.");
+      alert("Failed to upload image.");
     } finally {
       setUploading(false);
     }
   };
 
-  const handleDeleteImage = (imgUrl: string) => {
-    setImages((prev) => prev.filter((img) => img !== imgUrl));
+  // Remove image from list
+  const handleRemoveImage = async (idx: number) => {
+    if (!selectedResult) return;
+    const nextImages = images.filter((_, i) => i !== idx);
+    setImages(nextImages);
+
+    // Save changes to db immediately
+    try {
+      const res = await fetch("/api/admin/results", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selectedResult._id,
+          year: editYear.trim(),
+          title: editTitle.trim(),
+          images: nextImages,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setResultYears((prev) =>
+          prev.map((item) => (item._id === data._id ? data : item))
+        );
+        setSelectedResult(data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
-    <section className="space-y-6 text-white font-montserrat">
-      {/* Header Banner */}
+    <section className="space-y-6 text-white font-montserrat text-left">
+      {/* Header Panel */}
       <div className="rounded-3xl border border-white/15 bg-[#112759]/70 p-6 md:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <p className="text-xs tracking-[0.4em] text-white/70 font-black uppercase font-sans">Administration</p>
+          <p className="text-xs tracking-[0.4em] text-white/70 font-black uppercase font-sans">CMS Operations</p>
           <h1 className="text-4xl font-black mt-2 flex items-center gap-3">
             <Trophy size={36} className="text-accent" />
-            <span>Academic Results Hub</span>
+            <span>Board Results Hub</span>
           </h1>
-          <p className="text-white/70 mt-2">Manage dynamic board topper lists and full marks directories by academic year.</p>
+          <p className="text-white/70 mt-2">Manage academic years, session titles, and upload results posters / chart graphics.</p>
         </div>
-        <div className="flex items-center gap-3">
-          {saving ? (
-            <div className="px-4 py-2 rounded-xl border border-accent/20 bg-accent/10 text-accent flex items-center gap-2">
-              <Loader2 className="animate-spin" size={14} />
-              <span className="text-[10px] font-black uppercase tracking-wider">Saving Configuration...</span>
-            </div>
-          ) : (
-            <button
-              onClick={handleSaveData}
-              disabled={!selectedResult}
-              className="bg-accent hover:bg-accent-hover text-primary font-black text-xs uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all shadow-md shadow-accent/10"
-            >
-              Save Results Data
-            </button>
-          )}
+        <div className="flex items-center gap-3 shrink-0">
+          <div className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${
+            saving ? "bg-accent/10 border-accent/20 text-accent" : "bg-green-500/10 border-green-500/20 text-green-400"
+          }`}>
+            {saving ? (
+              <>
+                <Loader2 className="animate-spin" size={14} />
+                <span className="text-[10px] font-black uppercase tracking-wider">Saving Changes...</span>
+              </>
+            ) : (
+              <>
+                <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-wider">All Synced</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
       {loading ? (
         <div className="py-20 flex flex-col items-center justify-center gap-4 text-white/40">
           <Loader2 className="animate-spin text-accent" size={32} />
-          <p className="text-xs font-semibold uppercase tracking-wider">Loading boards databases...</p>
+          <p className="text-xs font-semibold uppercase tracking-wider">Loading Board Results Console...</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* Left Panel: Result Years list & Creation */}
-          <div className="lg:col-span-3 space-y-6">
+          {/* Left Column (4): Add Result Year & Select Result Year */}
+          <div className="lg:col-span-4 space-y-6">
             
-            {/* Create year */}
+            {/* Add Result Year Form */}
             <div className="rounded-2xl border border-white/15 bg-[#0f234f]/80 p-5 space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-wider border-b border-white/5 pb-2">Add Result Year</h3>
-              <form onSubmit={handleCreateYear} className="space-y-3">
-                <input
-                  type="text"
-                  required
-                  value={newYearName}
-                  onChange={(e) => setNewYearName(e.target.value)}
-                  placeholder="e.g. 2026-27"
-                  className="w-full bg-[#0b1738] border border-white/15 text-white rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:border-accent transition-colors"
-                />
-                <button
-                  type="submit"
-                  disabled={saving || !newYearName.trim()}
-                  className="w-full bg-accent hover:bg-accent-hover text-primary font-black text-[10px] uppercase tracking-widest py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5"
+              <h2 className="text-lg font-black border-b border-white/5 pb-2.5 flex items-center gap-2 text-accent">
+                <Plus size={18} />
+                <span>Add Result Year</span>
+              </h2>
+              
+              <form onSubmit={handleAddResultYear} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-white/50 uppercase">Academic Year *</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newYear}
+                    onChange={(e) => setNewYear(e.target.value)}
+                    placeholder="e.g. 2024-25"
+                    className="w-full bg-[#081736] border border-white/10 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-accent text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-white/50 uppercase">Result Title *</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    placeholder="e.g. Board Exam Results"
+                    className="w-full bg-[#081736] border border-white/10 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-accent text-white"
+                  />
+                </div>
+                <button 
+                  type="submit" 
+                  disabled={saving}
+                  className="w-full bg-white hover:bg-white/90 text-primary font-black uppercase text-xs tracking-wider py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
                 >
-                  <Plus size={12} />
-                  <span>Create Year</span>
+                  <Plus size={14} />
+                  <span>Create Record</span>
                 </button>
               </form>
             </div>
 
-            {/* List of Years */}
-            <div className="rounded-2xl border border-white/15 bg-[#0f234f]/80 p-5 space-y-3">
-              <h3 className="text-sm font-black uppercase tracking-wider border-b border-white/5 pb-2">Select Result Year</h3>
-              <div className="flex flex-col gap-2 max-h-[400px] overflow-y-auto pr-1">
+            {/* Select Result Year List */}
+            <div className="rounded-2xl border border-white/15 bg-[#0f234f]/80 p-5 space-y-4">
+              <h2 className="text-lg font-black border-b border-white/5 pb-2.5 flex items-center gap-2 text-accent">
+                <Trophy size={18} />
+                <span>Select Result Year</span>
+              </h2>
+
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
                 {resultYears.length === 0 ? (
-                  <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider text-center py-4">No records found</p>
+                  <p className="text-center py-6 text-white/40 text-xs font-semibold">No result records found.</p>
                 ) : (
-                  resultYears.map((ry) => (
-                    <div
-                      key={ry._id}
-                      onClick={() => selectResult(ry)}
-                      className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
-                        selectedResult?.year === ry.year
-                          ? "bg-accent/15 border-accent text-accent"
-                          : "bg-[#0b1738]/50 border-white/5 text-white/80 hover:bg-[#0b1738]/80"
+                  resultYears.map((item) => (
+                    <div 
+                      key={item._id}
+                      onClick={() => selectResult(item)}
+                      className={`w-full p-4 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between group ${
+                        selectedResult?._id === item._id 
+                          ? "bg-accent/15 border-accent text-white" 
+                          : "bg-[#081736]/40 border-white/5 text-white/70 hover:bg-[#081736]/80 hover:text-white"
                       }`}
                     >
-                      <span className="text-xs font-bold uppercase tracking-wider">Result {ry.year}</span>
-                      <button
+                      <div>
+                        <p className="text-sm font-black uppercase tracking-tight">{item.year}</p>
+                        <p className="text-[10px] text-white/50 font-semibold truncate max-w-[180px]">{item.title}</p>
+                      </div>
+                      <button 
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDeleteYear(ry._id);
+                          handleDeleteResultYear(item._id);
                         }}
-                        className="p-1 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
-                        title="Delete Year"
+                        className="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                       >
                         <Trash2 size={12} />
                       </button>
@@ -435,527 +386,127 @@ export default function AdminResultsPage() {
 
           </div>
 
-          {/* Right Panel: Selected Year Details Editor */}
-          <div className="lg:col-span-9">
-            {!selectedResult ? (
-              <div className="border border-dashed border-white/15 rounded-3xl p-24 text-center text-white/35 flex flex-col items-center justify-center gap-3">
-                <Trophy size={48} />
-                <h3 className="text-lg font-black uppercase tracking-wider">No Board Record Selected</h3>
-                <p className="text-xs text-white/50 max-w-sm">Create a new academic year or select an existing one on the left menu to customize toppers portfolios.</p>
+          {/* Right Column (8): Manage selected result year details and upload charts */}
+          <div className="lg:col-span-8">
+            {selectedResult ? (
+              <div className="rounded-2xl border border-white/15 bg-[#0f234f]/80 p-6 space-y-6">
+                
+                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                  <div>
+                    <h2 className="text-xl font-black uppercase tracking-tight">Modify Result details</h2>
+                    <p className="text-xs text-white/50 font-bold mt-1">Configuring year record: {selectedResult.year}</p>
+                  </div>
+                  <button 
+                    onClick={handleSaveResultYear}
+                    disabled={saving}
+                    className="bg-accent hover:bg-accent/90 text-primary font-black uppercase text-xs tracking-wider px-6 py-3 rounded-xl flex items-center gap-2 transition-all shadow-premium-sm"
+                  >
+                    <span>Save Title & Year</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-white/50 uppercase">Academic Session Year *</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={editYear}
+                      onChange={(e) => setEditYear(e.target.value)}
+                      placeholder="e.g. 2024-25"
+                      className="w-full bg-[#081736] border border-white/10 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-accent text-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-white/50 uppercase">Session Display Title *</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      placeholder="e.g. Board Exam Results"
+                      className="w-full bg-[#081736] border border-white/10 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-accent text-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Images Upload block */}
+                <div className="space-y-4 pt-4 border-t border-white/5">
+                  <h3 className="text-sm font-black uppercase tracking-wider text-accent">Uploaded Result Charts ({images.length})</h3>
+                  
+                  {/* File Selector */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-end">
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-bold text-white/50 uppercase block">Select Chart Graphic</label>
+                      <div className="relative group">
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="w-full h-24 bg-[#081736] border-2 border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center gap-2 group-hover:border-accent/40 transition-colors">
+                          <Upload size={20} className="text-white/40 group-hover:text-accent" />
+                          <p className="text-[10px] font-bold text-white/50 uppercase">Choose Result Chart Image</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {uploadPreview && (
+                      <div className="space-y-3">
+                        <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden bg-slate-900 border border-accent/20">
+                          <img src={uploadPreview} alt="Preview" className="w-full h-full object-cover" />
+                          <button 
+                            onClick={() => { setUploadFile(null); setUploadPreview(null); }}
+                            className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                        <button 
+                          onClick={handleUploadImage}
+                          disabled={uploading}
+                          className="w-full bg-white hover:bg-white/95 text-primary font-black uppercase text-xs tracking-wider py-3 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
+                        >
+                          {uploading ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
+                          <span>Upload & Attach Chart</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Attached Images Grid */}
+                  <div className="pt-4">
+                    {images.length === 0 ? (
+                      <div className="py-12 border border-dashed border-white/5 rounded-2xl text-center text-white/40 text-xs font-semibold uppercase">
+                        No results posters attached yet. Upload a chart above.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        {images.map((img, i) => (
+                          <div key={i} className="relative aspect-[4/3] rounded-xl overflow-hidden border border-white/10 bg-[#081736] group shadow-md">
+                            <img src={img} alt={`Result poster ${i + 1}`} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <button 
+                                onClick={() => handleRemoveImage(i)}
+                                className="p-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors shadow-lg"
+                                title="Remove Image"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+
               </div>
             ) : (
-              <div className="rounded-3xl border border-white/15 bg-[#0f234f]/80 overflow-hidden shadow-2xl flex flex-col">
-                
-                {/* Year Header Indicator */}
-                <div className="bg-[#112759]/60 px-6 py-4 flex items-center justify-between border-b border-white/5">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
-                    <span className="font-extrabold text-sm uppercase tracking-wider">Currently Editing: Result {selectedResult.year}</span>
-                  </div>
-                  <span className="text-[10px] font-black uppercase bg-white/10 px-3 py-1 rounded-full border border-white/5">
-                    {toppers.length} Toppers • {students.length} Registry Entries • {images.length} Images
-                  </span>
-                </div>
-
-                {/* Sub Tab Navigation */}
-                <div className="flex border-b border-white/5 bg-[#0b1738]/30">
-                  <button
-                    onClick={() => setEditorTab("stats")}
-                    className={`flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
-                      editorTab === "stats" ? "border-accent text-accent font-black" : "border-transparent text-white/60 hover:text-white"
-                    }`}
-                  >
-                    1. Statistics Overview
-                  </button>
-                  <button
-                    onClick={() => setEditorTab("toppers")}
-                    className={`flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
-                      editorTab === "toppers" ? "border-accent text-accent font-black" : "border-transparent text-white/60 hover:text-white"
-                    }`}
-                  >
-                    2. Toppers Cards ({toppers.length})
-                  </button>
-                  <button
-                    onClick={() => setEditorTab("students")}
-                    className={`flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
-                      editorTab === "students" ? "border-accent text-accent font-black" : "border-transparent text-white/60 hover:text-white"
-                    }`}
-                  >
-                    3. Student Directory ({students.length})
-                  </button>
-                  <button
-                    onClick={() => setEditorTab("images")}
-                    className={`flex-1 py-3.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
-                      editorTab === "images" ? "border-accent text-accent font-black" : "border-transparent text-white/60 hover:text-white"
-                    }`}
-                  >
-                    4. Results Images ({images.length})
-                  </button>
-                </div>
-
-                {/* Tab Contents */}
-                <div className="p-6">
-                  
-                  {/* Tab 1: Stats */}
-                  {editorTab === "stats" && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-wider text-white/60">Pass Percentage</label>
-                        <input
-                          type="text"
-                          value={passPercentage}
-                          onChange={(e) => setPassPercentage(e.target.value)}
-                          placeholder="e.g. 100%"
-                          className="w-full bg-[#0b1738] border border-white/15 text-white rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-accent transition-colors"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-wider text-white/60">School Highest Score (%)</label>
-                        <input
-                          type="text"
-                          value={highestScore}
-                          onChange={(e) => setHighestScore(e.target.value)}
-                          placeholder="e.g. 98.4%"
-                          className="w-full bg-[#0b1738] border border-white/15 text-white rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-accent transition-colors"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-wider text-white/60">School Highest Scorer</label>
-                        <input
-                          type="text"
-                          value={highestScoreScorer}
-                          onChange={(e) => setHighestScoreScorer(e.target.value)}
-                          placeholder="e.g. Ms. Bhavya Sharma (Class X)"
-                          className="w-full bg-[#0b1738] border border-white/15 text-white rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-accent transition-colors"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-wider text-white/60">Distinctions Count (&gt;90%)</label>
-                        <input
-                          type="number"
-                          value={distinctionsCount}
-                          onChange={(e) => setDistinctionsCount(Number(e.target.value))}
-                          className="w-full bg-[#0b1738] border border-white/15 text-white rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-accent transition-colors"
-                        />
-                      </div>
-
-                      <div className="space-y-2 md:col-span-2">
-                        <label className="text-[10px] font-black uppercase tracking-wider text-white/60">Batch Average Score</label>
-                        <input
-                          type="text"
-                          value={batchAverage}
-                          onChange={(e) => setBatchAverage(e.target.value)}
-                          placeholder="e.g. 91.8%"
-                          className="w-full bg-[#0b1738] border border-white/15 text-white rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-accent transition-colors"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Tab 2: Toppers */}
-                  {editorTab === "toppers" && (
-                    <div className="space-y-6">
-                      
-                      {/* Inline Form to Add/Edit Topper */}
-                      <div className="bg-[#0b1738]/50 p-4 border border-white/5 rounded-2xl space-y-4">
-                        <h4 className="text-xs font-black uppercase tracking-widest text-accent flex items-center gap-1.5">
-                          <Award size={14} />
-                          <span>{editingTopperIndex !== null ? "Edit Topper Details" : "Create New Topper Card"}</span>
-                        </h4>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-white/50">Student Name</label>
-                            <input
-                              type="text"
-                              value={tName}
-                              onChange={(e) => setTName(e.target.value)}
-                              placeholder="Ms. Name"
-                              className="w-full bg-[#0b1738] border border-white/10 text-white rounded-lg px-3 py-2 text-xs font-bold outline-none focus:border-accent"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-white/50">Class</label>
-                            <select
-                              value={tClass}
-                              onChange={(e) => setTClass(e.target.value as any)}
-                              className="w-full bg-[#0b1738] border border-white/10 text-white rounded-lg px-3 py-2 text-xs font-bold outline-none focus:border-accent"
-                            >
-                              <option value="Class XII">Class XII (Senior Secondary)</option>
-                              <option value="Class X">Class X (Secondary)</option>
-                            </select>
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-white/50">Stream/Division</label>
-                            <input
-                              type="text"
-                              value={tStream}
-                              onChange={(e) => setTStream(e.target.value)}
-                              placeholder="e.g. Science, Commerce, General"
-                              className="w-full bg-[#0b1738] border border-white/10 text-white rounded-lg px-3 py-2 text-xs font-bold outline-none focus:border-accent"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-white/50">Topper Score (%)</label>
-                            <input
-                              type="text"
-                              value={tScore}
-                              onChange={(e) => setTScore(e.target.value)}
-                              placeholder="e.g. 98.2%"
-                              className="w-full bg-[#0b1738] border border-white/10 text-white rounded-lg px-3 py-2 text-xs font-bold outline-none focus:border-accent"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-white/50">Rank</label>
-                            <input
-                              type="number"
-                              value={tRank}
-                              onChange={(e) => setTRank(Number(e.target.value))}
-                              className="w-full bg-[#0b1738] border border-white/10 text-white rounded-lg px-3 py-2 text-xs font-bold outline-none focus:border-accent"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-white/50">Medal Tier</label>
-                            <select
-                              value={tMedal}
-                              onChange={(e) => setTMedal(e.target.value)}
-                              className="w-full bg-[#0b1738] border border-white/10 text-white rounded-lg px-3 py-2 text-xs font-bold outline-none focus:border-accent"
-                            >
-                              <option value="gold">Gold Medalist</option>
-                              <option value="silver">Silver Medalist</option>
-                              <option value="bronze">Bronze Medalist</option>
-                              <option value="star">Star Distinction</option>
-                            </select>
-                          </div>
-
-                          <div className="space-y-1 md:col-span-3">
-                            <label className="text-[9px] font-black uppercase text-white/50">Description Achievement Quote</label>
-                            <input
-                              type="text"
-                              value={tDesc}
-                              onChange={(e) => setTDesc(e.target.value)}
-                              placeholder="e.g. School Topper - Honored with laptop by Chief Minister..."
-                              className="w-full bg-[#0b1738] border border-white/10 text-white rounded-lg px-3 py-2 text-xs font-bold outline-none focus:border-accent"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2 justify-end pt-1">
-                          {editingTopperIndex !== null && (
-                            <button
-                              type="button"
-                              onClick={resetTopperForm}
-                              className="px-4 py-2 border border-white/10 text-white/70 hover:bg-white/5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all"
-                            >
-                              Cancel
-                            </button>
-                          )}
-                          <button
-                            type="button"
-                            onClick={handleAddTopper}
-                            disabled={!tName || !tScore}
-                            className="bg-accent hover:bg-accent-hover text-primary font-black text-[10px] uppercase tracking-wider px-5 py-2.5 rounded-lg transition-all flex items-center gap-1 shadow-md shadow-accent/10"
-                          >
-                            {editingTopperIndex !== null ? <Check size={12} /> : <Plus size={12} />}
-                            <span>{editingTopperIndex !== null ? "Save Card" : "Add Topper Card"}</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Toppers Cards List */}
-                      <div className="space-y-3">
-                        <h4 className="text-xs font-black uppercase tracking-widest text-white/60">Currently Configured Toppers</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {toppers.length === 0 ? (
-                            <p className="col-span-2 text-center text-white/40 text-xs py-6 uppercase font-bold tracking-wider">No toppers card created yet.</p>
-                          ) : (
-                            toppers.map((t, idx) => (
-                              <div key={idx} className="bg-[#0b1738]/30 border border-white/5 p-4 rounded-xl flex items-start justify-between gap-4">
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-[9px] font-black uppercase tracking-wider bg-white/10 px-2 py-0.5 rounded text-white/80">{t.class}</span>
-                                    <span className="text-[9px] font-black uppercase bg-accent/20 border border-accent/30 text-accent px-2 py-0.5 rounded-full">Rank #{t.rank}</span>
-                                  </div>
-                                  <h5 className="font-extrabold text-sm text-white">{t.name}</h5>
-                                  <p className="text-[10px] text-white/40">{t.stream} • Score: {t.score}</p>
-                                  {t.description && <p className="text-[10px] italic text-white/60 truncate max-w-[200px] mt-1">&quot;{t.description}&quot;</p>}
-                                </div>
-                                <div className="flex gap-1.5">
-                                  <button
-                                    onClick={() => handleEditTopper(idx)}
-                                    className="p-1.5 bg-white/5 text-white/80 hover:bg-accent/25 hover:text-accent rounded border border-white/5 transition-all"
-                                    title="Edit"
-                                  >
-                                    <Edit2 size={12} />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteTopper(idx)}
-                                    className="p-1.5 bg-white/5 text-white/80 hover:bg-red-500/25 hover:text-red-400 rounded border border-white/5 transition-all"
-                                    title="Delete"
-                                  >
-                                    <Trash2 size={12} />
-                                  </button>
-                                </div>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </div>
-
-                    </div>
-                  )}
-
-                  {/* Tab 3: Student Registry */}
-                  {editorTab === "students" && (
-                    <div className="space-y-6">
-                      
-                      {/* Inline Form to Add/Edit Student Registry */}
-                      <div className="bg-[#0b1738]/50 p-4 border border-white/5 rounded-2xl space-y-4">
-                        <h4 className="text-xs font-black uppercase tracking-widest text-accent flex items-center gap-1.5">
-                          <FileSpreadsheet size={14} />
-                          <span>{editingStudentIndex !== null ? "Edit Student Record" : "Add Student Registry Row"}</span>
-                        </h4>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-white/50">Student Name</label>
-                            <input
-                              type="text"
-                              value={sName}
-                              onChange={(e) => setSName(e.target.value)}
-                              placeholder="Ms. Name"
-                              className="w-full bg-[#0b1738] border border-white/10 text-white rounded-lg px-3 py-2 text-xs font-bold outline-none focus:border-accent"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-white/50">Class</label>
-                            <select
-                              value={sClass}
-                              onChange={(e) => setSClass(e.target.value as any)}
-                              className="w-full bg-[#0b1738] border border-white/10 text-white rounded-lg px-3 py-2 text-xs font-bold outline-none focus:border-accent"
-                            >
-                              <option value="Class XII">Class XII (Senior Secondary)</option>
-                              <option value="Class X">Class X (Secondary)</option>
-                            </select>
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-white/50">Stream/Division</label>
-                            <input
-                              type="text"
-                              value={sStream}
-                              onChange={(e) => setSStream(e.target.value)}
-                              placeholder="e.g. Science, General"
-                              className="w-full bg-[#0b1738] border border-white/10 text-white rounded-lg px-3 py-2 text-xs font-bold outline-none focus:border-accent"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-white/50">Aggregate Score %</label>
-                            <input
-                              type="number"
-                              step="0.1"
-                              value={sPercent || ""}
-                              onChange={(e) => setSPercent(Number(e.target.value))}
-                              placeholder="e.g. 95.8"
-                              className="w-full bg-[#0b1738] border border-white/10 text-white rounded-lg px-3 py-2 text-xs font-bold outline-none focus:border-accent"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-black uppercase text-white/50">Merit Status</label>
-                            <input
-                              type="text"
-                              value={sStatus}
-                              onChange={(e) => setSStatus(e.target.value)}
-                              placeholder="e.g. Distinction, Merit..."
-                              className="w-full bg-[#0b1738] border border-white/10 text-white rounded-lg px-3 py-2 text-xs font-bold outline-none focus:border-accent"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2 justify-end pt-1">
-                          {editingStudentIndex !== null && (
-                            <button
-                              type="button"
-                              onClick={resetStudentForm}
-                              className="px-4 py-2 border border-white/10 text-white/70 hover:bg-white/5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all"
-                            >
-                              Cancel
-                            </button>
-                          )}
-                          <button
-                            type="button"
-                            onClick={handleAddStudent}
-                            disabled={!sName || !sPercent}
-                            className="bg-accent hover:bg-accent-hover text-primary font-black text-[10px] uppercase tracking-wider px-5 py-2.5 rounded-lg transition-all flex items-center gap-1 shadow-md shadow-accent/10"
-                          >
-                            {editingStudentIndex !== null ? <Check size={12} /> : <Plus size={12} />}
-                            <span>{editingStudentIndex !== null ? "Save Student" : "Add Student"}</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Students List Directory */}
-                      <div className="space-y-3">
-                        <h4 className="text-xs font-black uppercase tracking-widest text-white/60">Marks Directory Table</h4>
-                        <div className="border border-white/5 rounded-xl overflow-hidden bg-[#0b1738]/30 max-h-[400px] overflow-y-auto pr-1">
-                          <table className="w-full text-left text-xs text-white/80">
-                            <thead>
-                              <tr className="bg-[#0b1738]/80 text-[10px] text-white/50 uppercase tracking-widest border-b border-white/5">
-                                <th className="p-3">Index</th>
-                                <th className="p-3">Name</th>
-                                <th className="p-3">Class</th>
-                                <th className="p-3">Stream</th>
-                                <th className="p-3">Percent</th>
-                                <th className="p-3">Status</th>
-                                <th className="p-3 text-right">Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {students.length === 0 ? (
-                                <tr>
-                                  <td colSpan={7} className="p-6 text-center text-white/30 uppercase font-bold">No students registered yet.</td>
-                                </tr>
-                              ) : (
-                                students.map((s, idx) => (
-                                  <tr key={idx} className="border-b border-white/5 hover:bg-white/5">
-                                    <td className="p-3 text-white/40 font-bold">#{idx + 1}</td>
-                                    <td className="p-3 font-extrabold text-white">{s.name}</td>
-                                    <td className="p-3 text-[10px] uppercase font-bold text-white/50">{s.class}</td>
-                                    <td className="p-3 text-[10px] uppercase font-semibold text-white/50">{s.stream}</td>
-                                    <td className="p-3 font-black text-white">{s.percent}%</td>
-                                    <td className="p-3">
-                                      <span className="text-[9px] font-black uppercase bg-accent/15 text-accent border border-accent/20 px-2 py-0.5 rounded-full">
-                                        {s.status}
-                                      </span>
-                                    </td>
-                                    <td className="p-3 text-right flex gap-1 justify-end">
-                                      <button
-                                        onClick={() => handleEditStudent(idx)}
-                                        className="p-1.5 bg-white/5 text-white/80 hover:bg-accent/25 hover:text-accent rounded border border-white/5 transition-all"
-                                        title="Edit"
-                                      >
-                                        <Edit2 size={10} />
-                                      </button>
-                                      <button
-                                        onClick={() => handleDeleteStudent(idx)}
-                                        className="p-1.5 bg-white/5 text-white/80 hover:bg-red-500/25 hover:text-red-400 rounded border border-white/5 transition-all"
-                                        title="Delete"
-                                      >
-                                        <Trash2 size={10} />
-                                      </button>
-                                    </td>
-                                  </tr>
-                                ))
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-
-                    </div>
-                  )}
-
-                  {/* Tab 4: Results Images */}
-                  {editorTab === "images" && (
-                    <div className="space-y-6">
-                      <div className="bg-[#0b1738]/50 p-6 border border-white/5 rounded-2xl space-y-4">
-                        <h4 className="text-xs font-black uppercase tracking-widest text-accent flex items-center gap-1.5">
-                          <Sparkles size={14} className="animate-pulse" />
-                          <span>Upload Board Results Charts / Images</span>
-                        </h4>
-                        <p className="text-xs text-white/60 leading-relaxed">
-                          Upload high-resolution result posters, charts, pass listings, or toppers board graphics for the academic session. Uploaded images will be featured on the dynamic results page for this year.
-                        </p>
-                        
-                        <div className="pt-2">
-                          <label className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-dashed border-white/20 hover:border-accent bg-white/5 hover:bg-white/10 text-white font-extrabold text-xs uppercase tracking-wider cursor-pointer transition-all">
-                            {uploading ? (
-                              <>
-                                <Loader2 className="animate-spin" size={14} />
-                                <span>Uploading File...</span>
-                              </>
-                            ) : (
-                              <>
-                                <Plus size={14} />
-                                <span>Select & Upload Image</span>
-                              </>
-                            )}
-                            <input
-                              type="file"
-                              accept="image/*"
-                              disabled={uploading}
-                              onChange={handleImageUpload}
-                              className="hidden"
-                            />
-                          </label>
-                        </div>
-                      </div>
-
-                      {/* Uploaded Images List */}
-                      <div className="space-y-3">
-                        <h3 className="text-xs font-black uppercase tracking-widest text-white/50">Uploaded Charts ({images.length})</h3>
-                        {images.length === 0 ? (
-                          <div className="bg-[#0b1738]/20 border border-white/5 rounded-2xl p-8 text-center text-white/40 text-xs font-semibold uppercase tracking-wider">
-                            No result charts uploaded yet.
-                          </div>
-                        ) : (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                            {images.map((imgUrl, idx) => (
-                              <div key={idx} className="bg-[#0b1738]/50 border border-white/5 rounded-2xl overflow-hidden group flex flex-col justify-between">
-                                <div className="aspect-[4/3] w-full bg-slate-950/40 relative overflow-hidden flex items-center justify-center p-2">
-                                  <img src={imgUrl} alt={`Chart ${idx+1}`} className="w-full h-full object-contain" />
-                                </div>
-                                <div className="p-3 border-t border-white/5 bg-[#0b1738] flex items-center justify-between">
-                                  <span className="text-[10px] font-bold text-white/50">Chart #{idx + 1}</span>
-                                  <div className="flex gap-2">
-                                    <a
-                                      href={imgUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="p-1 text-white/60 hover:text-accent hover:bg-accent/10 rounded transition-all text-[10px] font-black uppercase tracking-wider px-2 py-1 border border-white/5"
-                                    >
-                                      View
-                                    </a>
-                                    <button
-                                      onClick={() => handleDeleteImage(imgUrl)}
-                                      className="p-1 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-all text-[10px] font-black uppercase tracking-wider px-2 py-1 border border-white/5"
-                                    >
-                                      Remove
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                </div>
-
-                {/* Footer Save Button Action */}
-                <div className="bg-[#112759]/40 border-t border-white/5 p-4 flex justify-between items-center">
-                  <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Always hit Save at the top right to commit.</span>
-                  <button
-                    onClick={handleSaveData}
-                    className="bg-accent hover:bg-accent-hover text-primary font-black text-xs uppercase tracking-widest px-6 py-3 rounded-xl transition-all shadow-md shadow-accent/10"
-                  >
-                    Commit {selectedResult.year} Board Changes
-                  </button>
-                </div>
-
+              <div className="rounded-2xl border border-white/15 bg-[#0f234f]/50 p-12 text-center text-white/40 font-semibold uppercase">
+                Please create or select a result year record to manage charts.
               </div>
             )}
           </div>

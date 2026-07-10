@@ -5,7 +5,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/ui/Reveal";
-import { Trophy, Award, BookOpen, GraduationCap, ChevronRight, School } from "lucide-react";
+import { Trophy, ChevronRight } from "lucide-react";
 
 interface BoardResult {
   _id: string;
@@ -100,68 +100,42 @@ export default function ResultIndexPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-16">
-            {results.map((result) => {
-              // Defined cards for each result year representing streams
-              const streamsList = [
-                { title: "Class XII Science Board Results", tab: "class12", stream: "Science", icon: Trophy },
-                { title: "Class XII Commerce Board Results", tab: "class12", stream: "Commerce", icon: Award },
-                { title: "Class XII Humanities Board Results", tab: "class12", stream: "Humanities", icon: BookOpen },
-                { title: "Class X Board Results", tab: "class10", stream: "", icon: GraduationCap },
-              ];
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {results.map((result, idx) => {
+              const cardHref = `/result/${result.year}`;
 
               return (
-                <div key={result._id} className="space-y-6">
-                  {/* Year Header */}
-                  <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-                    <span className="w-3 h-3 rounded-full bg-[#F7B801]" />
-                    <h2 className="text-2xl font-black text-primary uppercase font-montserrat tracking-tight">
-                      Academic Session {result.year}
-                    </h2>
+                <Link
+                  key={result._id}
+                  href={cardHref}
+                  className={`group block p-8 bg-gradient-to-br ${getGradient(idx)} border rounded-[2rem] shadow-premium-xs hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden`}
+                >
+                  {/* Decorative Background Accent */}
+                  <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-white/40 rounded-full blur-xl group-hover:scale-125 transition-transform" />
+
+                  <div className="space-y-4">
+                    {/* Icon Wrapper */}
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-premium-sm ${getIconColor(idx)}`}>
+                      <Trophy size={20} />
+                    </div>
+
+                    {/* Card Content */}
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-black text-primary uppercase tracking-tight leading-snug group-hover:text-[#7678ED] transition-colors">
+                        Board Exam Results
+                      </h3>
+                      <p className="text-sm text-gray-400 font-bold uppercase tracking-wider">
+                        Year {result.year}
+                      </p>
+                    </div>
+
+                    {/* Link text indicator */}
+                    <div className="pt-2 flex items-center gap-1 text-xs font-black text-primary uppercase tracking-widest group-hover:text-[#7678ED] transition-all">
+                      <span>View Results Charts</span>
+                      <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                    </div>
                   </div>
-
-                  {/* Cards Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {streamsList.map((stream, idx) => {
-                      const Icon = stream.icon;
-                      const cardHref = `/result/${result.year}?tab=${stream.tab}${stream.stream ? `&stream=${stream.stream}` : ""}`;
-
-                      return (
-                        <Link
-                          key={stream.title}
-                          href={cardHref}
-                          className={`group block p-6 bg-gradient-to-br ${getGradient(idx)} border rounded-[2rem] shadow-premium-xs hover:shadow-premium-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden`}
-                        >
-                          {/* Decorative Background Accent */}
-                          <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-white/40 rounded-full blur-xl group-hover:scale-125 transition-transform" />
-
-                          <div className="space-y-4">
-                            {/* Icon Wrapper */}
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-premium-sm ${getIconColor(idx)}`}>
-                              <Icon size={18} />
-                            </div>
-
-                            {/* Card Content (Only Title & Year as requested) */}
-                            <div className="space-y-1">
-                              <h3 className="text-sm font-black text-primary uppercase tracking-tight leading-snug group-hover:text-[#7678ED] transition-colors">
-                                {stream.title}
-                              </h3>
-                              <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">
-                                Year {result.year}
-                              </p>
-                            </div>
-
-                            {/* Link text indicator */}
-                            <div className="pt-2 flex items-center gap-1 text-[10px] font-black text-primary uppercase tracking-widest group-hover:text-[#7678ED] transition-all">
-                              <span>View Marks</span>
-                              <ChevronRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
-                            </div>
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
+                </Link>
               );
             })}
           </div>

@@ -8,27 +8,11 @@ import { ArrowRight, Image as ImageIcon } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 
 export default function LifeAtVidyawadi() {
+  const [moments, setMoments] = useState<any[]>([]);
   const [activeFilter, setActiveFilter] = useState("Recent");
   const [filters, setFilters] = useState<string[]>(["Recent", "Events", "Fun & Food Fest", "Hostel", "Infrastructure", "Laboratories"]);
 
-  React.useEffect(() => {
-    const fetchFilters = async () => {
-      try {
-        const res = await fetch("/api/admin/filters?type=gallery");
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.length > 0) {
-            setFilters(["Recent", ...data.map((f: any) => f.name)]);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch gallery filters:", error);
-      }
-    };
-    fetchFilters();
-  }, []);
-
-  const moments = [
+  const defaultMoments = [
     { src: "/lps-vidhyawadi/gallery-01.jpg", title: "Residential Comforts", category: "Hostel" },
     { src: "/lps-vidhyawadi/gallery-02.jpg", title: "Lush Green Pathways", category: "Infrastructure" },
     { src: "/lps-vidhyawadi/gallery-03.jpg", title: "Practical Science Lab", category: "Laboratories" },
@@ -43,9 +27,41 @@ export default function LifeAtVidyawadi() {
     { src: "/lps-vidhyawadi/gallery-12.jpg", title: "Creative Fine Arts Studio", category: "Laboratories" },
   ];
 
+  React.useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const res = await fetch("/api/admin/media-items?type=photo");
+        if (res.ok) {
+          const data = await res.json();
+          setMoments(data || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch gallery moments:", error);
+      }
+    };
+    const fetchFilters = async () => {
+      try {
+        const res = await fetch("/api/admin/filters?type=gallery");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setFilters(["Recent", ...data.map((f: any) => f.name)]);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch gallery filters:", error);
+      }
+    };
+    fetchPhotos();
+    fetchFilters();
+  }, []);
+
+  // Combine dynamic uploads with fallbacks (ensure uploaded items appear first)
+  const combinedMoments = [...moments, ...defaultMoments.filter(dm => !moments.some(m => m.src === dm.src))];
+
   const filteredMoments = activeFilter === "Recent" 
-    ? moments.slice(0, 8) // Show first 8 for 'Recent'
-    : moments.filter(item => item.category === activeFilter);
+    ? combinedMoments.slice(0, 8) // Show first 8 of the combined list
+    : combinedMoments.filter(item => item.category === activeFilter);
 
   return (
     <section className="py-32 md:py-40 px-6 bg-[#F8F9FC]">

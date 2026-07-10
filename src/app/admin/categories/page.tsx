@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { 
   LayoutGrid, 
   Plus, 
@@ -263,11 +262,10 @@ export default function AdminCategoriesPage() {
                   
                   {imagePreview ? (
                     <div className="relative w-full aspect-[4/3] max-h-48 bg-[#081736] rounded-xl overflow-hidden border-2 border-accent/50 group">
-                      <Image
+                      <img
                         src={imagePreview}
                         alt="Upload Preview"
-                        fill
-                        className="object-cover"
+                        className="object-cover w-full h-full"
                       />
                       <button
                         type="button"
@@ -361,7 +359,7 @@ export default function AdminCategoriesPage() {
                   >
                     <span className="text-xs font-black text-white/40 w-4">{idx + 1}</span>
                     <div className="relative w-16 h-12 bg-white/5 rounded-lg overflow-hidden border border-white/10 shrink-0">
-                      <Image src={item.image} alt={item.title} fill sizes="64px" className="object-cover" />
+                      <img src={item.image} alt={item.title} className="object-cover w-full h-full" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-white truncate uppercase tracking-wider">{item.title}</p>
@@ -408,11 +406,10 @@ export default function AdminCategoriesPage() {
                 <div className="space-y-6">
                   {/* Aspect Ratio Box mimicking component */}
                   <div className="relative w-full aspect-[4/3] bg-[#081736] rounded-xl overflow-hidden border border-white/10 group">
-                    <Image
+                    <img
                       src={items[currentItem].image}
                       alt="Preview"
-                      fill
-                      className="object-cover"
+                      className="object-cover w-full h-full"
                     />
                     <div className="absolute inset-0 bg-navy/60 flex items-center justify-center p-4">
                       <h3 className="text-white font-black text-xl text-center uppercase tracking-widest">

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Calendar as CalendarIcon, ArrowRight, BookOpen, Clock, MapPin } from "lucide-react";
+import { Calendar as CalendarIcon, ArrowRight, BookOpen, Clock, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import FadeIn from "@/components/ui/FadeIn";
 
@@ -30,14 +30,17 @@ export default function UpcomingEventsAndBlogs() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Calendar State (Hardcoded current view for elegance)
-  const currentYear = 2026;
-  const currentMonthName = "July";
-  const daysInMonth = 31;
-  const startDayOffset = 2; // July 2026 starts on Wednesday (offset 2 for 0-indexed Mon-Sun, wait: Wed is offset 2 if Mon is 0)
-  
-  // Highlighted event days on the calendar
-  const eventDays = [15, 22, 28];
+  // Dynamic Calendar Date State
+  const [calendarDate, setCalendarDate] = useState(new Date(2026, 6, 1)); // Default starts July 2026
+
+  const calendarYear = calendarDate.getFullYear();
+  const calendarMonth = calendarDate.getMonth();
+  const currentMonthName = calendarDate.toLocaleDateString("en-US", { month: "long" });
+
+  const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+  const rawDay = new Date(calendarYear, calendarMonth, 1).getDay();
+  // Mon=0, Tue=1, ..., Sun=6
+  const startDayOffset = (rawDay + 6) % 7;
 
   useEffect(() => {
     async function fetchData() {
@@ -54,7 +57,7 @@ export default function UpcomingEventsAndBlogs() {
 
         if (eventsRes.ok) {
           const eventsData = await eventsRes.json();
-          setEvents(eventsData.slice(0, 2)); // Get top 2 events
+          setEvents(eventsData);
         }
       } catch (err) {
         console.error("Failed to fetch events and blogs:", err);
@@ -86,7 +89,32 @@ export default function UpcomingEventsAndBlogs() {
     }
   ];
 
-  const activeEvents = events.length > 0 ? events : fallbackEvents;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Filter events to only keep upcoming ones (event date >= today)
+  const upcomingEvents = events.filter(evt => {
+    const evtDate = new Date(evt.date);
+    return evtDate.getTime() >= today.getTime();
+  });
+
+  const filteredFallbackEvents = fallbackEvents.filter(evt => {
+    const evtDate = new Date(evt.date);
+    return evtDate.getTime() >= today.getTime();
+  });
+
+  const activeEvents = upcomingEvents.length > 0 
+    ? upcomingEvents.slice(0, 2) 
+    : filteredFallbackEvents.slice(0, 2);
+
+  // Get highlighted event days for the selected month/year
+  const allEventsForCalendar = events.length > 0 ? events : fallbackEvents;
+  const eventDays = allEventsForCalendar
+    .filter(evt => {
+      const d = new Date(evt.date);
+      return d.getFullYear() === calendarYear && d.getMonth() === calendarMonth;
+    })
+    .map(evt => new Date(evt.date).getDate());
 
   return (
     <section className="py-32 md:py-40 px-6 bg-white border-t border-[#1F2937]/5">
@@ -173,43 +201,47 @@ export default function UpcomingEventsAndBlogs() {
               </h3>
               
               <div className="space-y-4">
-                {activeEvents.map((evt, idx) => (
-                  <FadeIn key={evt._id} delay={idx * 0.05}>
-                    <div className="flex gap-4 p-5 bg-[#F8F9FC] border border-slate-100 rounded-3xl text-left items-center group">
-                      <div className="w-12 h-12 rounded-2xl bg-[#3D348B]/10 flex flex-col items-center justify-center text-[#3D348B] shrink-0 font-montserrat">
-                        <span className="text-[10px] font-black uppercase tracking-tighter">
-                          {new Date(evt.date).toLocaleDateString("en-US", { month: "short" })}
-                        </span>
-                        <span className="text-lg font-black leading-none -mt-0.5">
-                          {new Date(evt.date).getDate()}
-                        </span>
-                      </div>
-
-                      {evt.imageUrl && (
-                        <div className="relative w-20 h-14 rounded-xl overflow-hidden bg-slate-900 shrink-0 border border-slate-100/50">
-                          <img
-                            src={evt.imageUrl}
-                            alt={evt.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            onError={(e) => {
-                              // Hide image container on error
-                              e.currentTarget.parentElement?.classList.add('hidden');
-                            }}
-                          />
+                {activeEvents.length === 0 ? (
+                  <p className="text-sm text-gray-500 font-bold italic">No upcoming campus events scheduled at this time.</p>
+                ) : (
+                  activeEvents.map((evt, idx) => (
+                    <FadeIn key={evt._id} delay={idx * 0.05}>
+                      <div className="flex gap-4 p-5 bg-[#F8F9FC] border border-slate-100 rounded-3xl text-left items-center group">
+                        <div className="w-12 h-12 rounded-2xl bg-[#3D348B]/10 flex flex-col items-center justify-center text-[#3D348B] shrink-0 font-montserrat">
+                          <span className="text-[10px] font-black uppercase tracking-tighter">
+                            {new Date(evt.date).toLocaleDateString("en-US", { month: "short" })}
+                          </span>
+                          <span className="text-lg font-black leading-none -mt-0.5">
+                            {new Date(evt.date).getDate()}
+                          </span>
                         </div>
-                      )}
 
-                      <div className="space-y-1 flex-1">
-                        <h4 className="font-black text-[#3D348B] uppercase text-sm tracking-tight font-montserrat">
-                          {evt.title}
-                        </h4>
-                        <p className="text-xs text-gray-500 font-bold leading-relaxed line-clamp-2">
-                          {evt.description}
-                        </p>
+                        {evt.imageUrl && (
+                          <div className="relative w-20 h-14 rounded-xl overflow-hidden bg-slate-900 shrink-0 border border-slate-100/50">
+                            <img
+                              src={evt.imageUrl}
+                              alt={evt.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              onError={(e) => {
+                                // Hide image container on error
+                                e.currentTarget.parentElement?.classList.add('hidden');
+                              }}
+                            />
+                          </div>
+                        )}
+
+                        <div className="space-y-1 flex-1">
+                          <h4 className="font-black text-[#3D348B] uppercase text-sm tracking-tight font-montserrat">
+                            {evt.title}
+                          </h4>
+                          <p className="text-xs text-gray-500 font-bold leading-relaxed line-clamp-2">
+                            {evt.description}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </FadeIn>
-                ))}
+                    </FadeIn>
+                  ))
+                )}
               </div>
             </div>
 
@@ -230,9 +262,23 @@ export default function UpcomingEventsAndBlogs() {
                     Event Planner
                   </h3>
                 </div>
-                <span className="text-xs font-black uppercase tracking-widest text-[#7678ED]">
-                  {currentMonthName} {currentYear}
-                </span>
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => setCalendarDate(new Date(calendarYear, calendarMonth - 1, 1))}
+                    className="p-1 hover:bg-slate-100 rounded-md transition-all text-[#3D348B] cursor-pointer"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <span className="text-xs font-black uppercase tracking-widest text-[#7678ED] min-w-[100px] text-center">
+                    {currentMonthName} {calendarYear}
+                  </span>
+                  <button 
+                    onClick={() => setCalendarDate(new Date(calendarYear, calendarMonth + 1, 1))}
+                    className="p-1 hover:bg-slate-100 rounded-md transition-all text-[#3D348B] cursor-pointer"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
               </div>
 
               {/* Mon-Sun Header Grid */}
@@ -281,7 +327,7 @@ export default function UpcomingEventsAndBlogs() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#F7B801] inline-block" />
-                  <span>Jal Pakhwada</span>
+                  <span>Highlight Event</span>
                 </div>
               </div>
             </div>

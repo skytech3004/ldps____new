@@ -82,6 +82,12 @@ const modules = [
     icon: Trophy
   },
   {
+    title: "Sports & Selections",
+    description: "Manage player listings, game summaries, selectors statistics, and complex carousels.",
+    href: "/admin/sports",
+    icon: Trophy
+  },
+  {
     title: "More Pages",
     description: "Edit the content pages behind the More menu items and publish new page sections.",
     href: "/admin/pages",

@@ -21,6 +21,7 @@ const navItems = [
   { href: "/admin/alumni", label: "Alumni Registrations", icon: GraduationCap },
   { href: "/admin/facilities", label: "Advanced Facilities", icon: LayoutGrid },
   { href: "/admin/results", label: "Board Results", icon: Trophy },
+  { href: "/admin/sports", label: "Sports Selections", icon: Trophy },
   { href: "/admin/pages", label: "More Pages", icon: FileText },
   { href: "/admin/carousel", label: "Home Carousel", icon: Images },
   { href: "/admin/hero", label: "Hero Carousel", icon: Images },

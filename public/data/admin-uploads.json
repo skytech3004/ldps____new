@@ -1,6 +1,16 @@
 {
-  "updatedAt": "2026-07-10T07:36:24.068Z",
+  "updatedAt": "2026-07-10T11:06:25.051Z",
   "uploads": [
+    {
+      "id": "1783681585055",
+      "page": "gallery",
+      "section": "media-items",
+      "title": "WhatsApp Image 2026-04-30 at 10.avif",
+      "description": "",
+      "fileName": "2026-07-10T11-06-25-051Z-whatsapp-image-2026-04-30-at-10.avif",
+      "src": "/uploads/media-items/2026-07-10T11-06-25-051Z-whatsapp-image-2026-04-30-at-10.avif",
+      "uploadedAt": "2026-07-10T11:06:25.051Z"
+    },
     {
       "id": "1783668984071",
       "page": "pre-primary",

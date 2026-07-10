@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { schoolImages } from "@/data/lpsVidhyawadiDatabase";
 
@@ -53,12 +52,10 @@ export default function CategoryGrid() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
           {categories.map((cat, i) => (
             <Link key={i} href={cat.link || "#"} className="relative aspect-[4/3] group overflow-hidden block">
-              <Image 
+              <img 
                 src={cat.image} 
                 alt={cat.title} 
-                fill 
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover group-hover:scale-110 transition-transform duration-700" 
+                className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700 absolute inset-0" 
               />
               {/* Overlay */}
               <div className="absolute inset-0 bg-navy/60 group-hover:bg-navy/40 transition-colors duration-300 flex items-center justify-center p-4">

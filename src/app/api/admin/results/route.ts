@@ -60,6 +60,7 @@ export async function POST(request: Request) {
 
     const created = await BoardResultModel.create({
       year: body.year,
+      title: body.title || "",
       passPercentage: body.passPercentage || "100%",
       highestScore: body.highestScore || "0.0%",
       highestScoreScorer: body.highestScoreScorer || "",
@@ -90,6 +91,7 @@ export async function PUT(request: Request) {
       body.id,
       {
         year: body.year,
+        title: body.title,
         passPercentage: body.passPercentage,
         highestScore: body.highestScore,
         highestScoreScorer: body.highestScoreScorer,
