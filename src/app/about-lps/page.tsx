@@ -1,20 +1,38 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
-import { 
-  ArrowRight, Compass, Shield, Target, Award, Heart, Check, 
+import {
+  ArrowRight, Compass, Shield, Target, Award, Heart, Check,
   Sparkles, BookOpen, Home, Users, GraduationCap, CheckCircle2, ShieldCheck
 } from "lucide-react";
 
 export default function AboutLpsPage() {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [categories, setCategories] = useState<any[]>([]);
 
-  const carouselImages = [
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch("/api/admin/categories");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.items && data.items.length > 0) {
+            setCategories(data.items);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+      }
+    }
+    fetchCategories();
+  }, []);
+
+  const staticCarousel = [
     {
       src: "/lps-vidhyawadi/gallery-09.jpg",
       alt: "LPS Vidyawadi campus life and transport fleet",
@@ -34,6 +52,15 @@ export default function AboutLpsPage() {
       desc: "Cultivating wellness, team building, and physical fitness in sprawling outdoor spaces."
     }
   ];
+
+  const showcaseImages = categories.length > 0 
+    ? categories.map((cat) => ({
+        src: cat.image,
+        alt: cat.title,
+        title: cat.title,
+        desc: `Explore our state-of-the-art facilities, campus layout and ${cat.title.toLowerCase()} moments.`
+      }))
+    : staticCarousel;
 
   const highlights = [
     "CBSE Curriculum from LKG to Class XII",
@@ -63,7 +90,7 @@ export default function AboutLpsPage() {
     "Secure residential accommodation with perimeter control",
     "Caring hostel wardens and house mothers for daily mentorship",
     "Round-the-clock supervision and medical support",
-    "Healthy, hygienic, and wholesome vegetarian meals (Jain-compliant options)",
+    "Healthy, hygienic, and wholesome jain meals",
     "Dedicated study hours with individual academic guidance",
     "Comfortable, clean, and spacious living blocks"
   ];
@@ -94,9 +121,9 @@ export default function AboutLpsPage() {
   ];
 
   const coCurricular = [
-    "Sports & Athletics", "Yoga & Meditation", "NCC & Leadership Activities", 
-    "STEM Learning", "Science Exhibitions", "Robotics & Tech Exposure", 
-    "Debate & Public Speaking", "Performing Arts", "Music & Dance", 
+    "Sports & Athletics", "Yoga & Meditation", "NCC & Leadership Activities",
+    "STEM Learning", "Science Exhibitions", "Robotics & Tech Exposure",
+    "Debate & Public Speaking", "Performing Arts", "Music & Dance",
     "Creative Arts", "Cultural Celebrations", "Educational Tours"
   ];
 
@@ -108,7 +135,7 @@ export default function AboutLpsPage() {
       <section className="relative pt-36 pb-20 md:pt-48 md:pb-28 px-6 overflow-hidden bg-gradient-to-b from-primary/5 via-white to-transparent">
         {/* Background Grid Pattern */}
         <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#3D348B_1px,transparent_1px)] [background-size:20px_20px]" />
-        
+
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
           {/* Text Content */}
           <div className="lg:col-span-7 space-y-6">
@@ -116,7 +143,7 @@ export default function AboutLpsPage() {
               <Award size={14} className="text-accent" />
               <span>Best CBSE Girls' Boarding School in Rajasthan</span>
             </div>
-            
+
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-tight uppercase font-montserrat">
               Leeladevi Parasmal <br />
               <span className="text-accent relative inline-block">
@@ -129,35 +156,35 @@ export default function AboutLpsPage() {
             <h2 className="text-lg md:text-xl font-bold text-secondary uppercase tracking-wide">
               Empowering Girls with Quality Education, Strong Values & Future-Ready Skills
             </h2>
-            
+
             <div className="text-gray-600 text-sm md:text-base font-medium leading-relaxed space-y-4">
               <p>
-                Leeladevi Parasmal Sancheti English Medium Sr. Sec. School, a premier institution under 
-                Marudhar Mahila Shikshan Sangh (Vidyawadi), has been nurturing confident, compassionate, 
+                Leeladevi Parasmal Sancheti English Medium Sr. Sec. School, a premier institution under
+                Marudhar Mahila Shikshan Sangh (Vidyawadi), has been nurturing confident, compassionate,
                 and successful young women through quality education and value-based learning.
               </p>
               <p>
-                Located on a beautiful, secure, and eco-friendly campus in Rani, Pali, Rajasthan, our school 
-                provides an ideal environment where girls are encouraged to explore their talents, excel 
+                Located on a beautiful, secure, and eco-friendly campus in Rani, Pali, Rajasthan, our school
+                provides an ideal environment where girls are encouraged to explore their talents, excel
                 academically, develop leadership skills, and become responsible global citizens.
               </p>
               <p>
-                As one of the leading CBSE girls' boarding schools in Rajasthan, we combine academic excellence 
-                with character development, innovation, sports, life skills, and cultural values to prepare 
+                As one of the leading CBSE girls' boarding schools in Rajasthan, we combine academic excellence
+                with character development, innovation, sports, life skills, and cultural values to prepare
                 every student for success in higher education and beyond.
               </p>
             </div>
-            
+
             <div className="flex flex-wrap gap-4 pt-2">
-              <Link 
-                href="/apply-for-admission" 
+              <Link
+                href="/apply-for-admission"
                 className="bg-primary text-white font-extrabold px-6 py-3 rounded-xl hover:bg-secondary hover:shadow-lg hover:shadow-secondary/20 transition-all flex items-center gap-2 group text-sm uppercase tracking-wider"
               >
                 <span>Apply For Admission</span>
                 <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link 
-                href="/contact" 
+              <Link
+                href="/contact"
                 className="bg-white border-2 border-primary/10 text-primary font-extrabold px-6 py-3 rounded-xl hover:bg-primary/5 transition-all text-sm uppercase tracking-wider"
               >
                 Visit Campus
@@ -171,12 +198,12 @@ export default function AboutLpsPage() {
             <div className="absolute -left-8 top-1/3 w-16 h-16 rounded-full bg-accent opacity-85 shadow-[0_8px_24px_rgba(247,184,1,0.4)] animate-pulse" />
 
             <div className="relative w-full aspect-[4/3] max-w-md rounded-3xl overflow-hidden shadow-2xl border-8 border-white bg-white group hover:scale-[1.01] transition-transform duration-500">
-              <Image 
-                src="/lps-vidhyawadi/about-banner.jpg" 
-                alt="LPS Vidyawadi campus building" 
-                fill 
-                sizes="(max-width: 1024px) 100vw, 450px" 
-                className="object-cover" 
+              <Image
+                src="/lps-vidhyawadi/about-banner.jpg"
+                alt="LPS Vidyawadi campus building"
+                fill
+                sizes="(max-width: 1024px) 100vw, 450px"
+                className="object-cover"
                 priority
               />
               <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-300" />
@@ -188,7 +215,7 @@ export default function AboutLpsPage() {
       {/* Legacy and Foundation Section (Dark Navy Blue Gradient) */}
       <section className="relative py-20 px-6 bg-gradient-to-br from-primary to-[#251f59] text-white overflow-hidden shadow-inner">
         <div className="absolute right-0 bottom-0 w-96 h-96 bg-accent opacity-5 blur-[100px] rounded-full pointer-events-none" />
-        
+
         <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
           <div className="space-y-3">
             <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">67+ Years of Legacy</span>
@@ -199,11 +226,11 @@ export default function AboutLpsPage() {
           </div>
 
           <p className="text-white/80 text-base md:text-lg font-medium leading-relaxed max-w-3xl mx-auto pt-4">
-            About 67 years ago in 1956, a few visionary minds realized the critical importance of girls&apos; 
-            education in Rajasthan and took the courageous initiative to make Vidyawadi a reality. Managed by 
-            the eminent <strong className="text-accent font-bold">Marudhar Mahila Shikshan Sangh</strong>, our institution 
-            has steadily consolidated democratic management, robust administration, and exceptional infrastructural 
-            advancements. We dedicate every resource to ensuring our girls receive a healthy, values-driven environment 
+            About 67 years ago in 1956, a few visionary minds realized the critical importance of girls&apos;
+            education in Rajasthan and took the courageous initiative to make Vidyawadi a reality. Managed by
+            the eminent <strong className="text-accent font-bold">Marudhar Mahila Shikshan Sangh</strong>, our institution
+            has steadily consolidated democratic management, robust administration, and exceptional infrastructural
+            advancements. We dedicate every resource to ensuring our girls receive a healthy, values-driven environment
             to flourish.
           </p>
 
@@ -234,8 +261,8 @@ export default function AboutLpsPage() {
             </h2>
             <div className="h-1.5 w-20 bg-accent rounded-full" />
             <p className="text-gray-600 font-medium text-sm md:text-base leading-relaxed">
-              Choosing the right school shapes your child's future. At Leeladevi Parasmal Sancheti English Medium 
-              Sr. Sec. School, we offer a complete educational experience that supports academic achievement, 
+              Choosing the right school shapes your child's future. At Leeladevi Parasmal Sancheti English Medium
+              Sr. Sec. School, we offer a complete educational experience that supports academic achievement,
               emotional well-being, and holistic development.
             </p>
             <div className="bg-primary/5 rounded-3xl p-6 border border-primary/10 flex items-start gap-4">
@@ -296,7 +323,7 @@ export default function AboutLpsPage() {
 
           <div className="text-center pt-4">
             <p className="text-xs md:text-sm text-gray-500 font-bold max-w-2xl mx-auto leading-relaxed">
-              Our experienced teachers create engaging classrooms where students become active, confident learners 
+              Our experienced teachers create engaging classrooms where students become active, confident learners
               rather than passive recipients of knowledge.
             </p>
           </div>
@@ -313,8 +340,8 @@ export default function AboutLpsPage() {
             </h2>
             <div className="h-1.5 w-20 bg-accent rounded-full" />
             <p className="text-gray-600 font-medium text-sm md:text-base leading-relaxed">
-              Parents trust us because we provide a nurturing residential environment where students feel safe, 
-              happy, motivated, and fully cared for. Every child enjoys an atmosphere that feels truly like 
+              Parents trust us because we provide a nurturing residential environment where students feel safe,
+              happy, motivated, and fully cared for. Every child enjoys an atmosphere that feels truly like
               a second home.
             </p>
 
@@ -336,12 +363,12 @@ export default function AboutLpsPage() {
 
             {/* Main Picture Container */}
             <div className="relative w-full aspect-[4/3] max-w-md rounded-3xl overflow-hidden shadow-2xl border-8 border-white bg-white group hover:scale-[1.01] transition-transform duration-500">
-              <Image 
-                src="/lps-vidhyawadi/gallery-02.jpg" 
-                alt="LPS Vidyawadi hostel life and group study" 
-                fill 
-                sizes="(max-width: 1024px) 100vw, 450px" 
-                className="object-cover" 
+              <Image
+                src="/lps-vidhyawadi/about.jpeg"
+                alt="LPS Vidyawadi hostel life and group study"
+                fill
+                sizes="(max-width: 1024px) 100vw, 450px"
+                className="object-cover"
               />
             </div>
           </div>
@@ -368,8 +395,8 @@ export default function AboutLpsPage() {
                 </div>
                 <h3 className="text-xl font-black uppercase tracking-tight text-accent">Our Vision</h3>
                 <p className="text-white/80 font-medium text-sm leading-relaxed">
-                  To become one of India's most respected girls' educational institutions by nurturing confident, 
-                  ethical, innovative, and socially responsible young women who positively transform society through 
+                  To become one of India's most respected girls' educational institutions by nurturing confident,
+                  ethical, innovative, and socially responsible young women who positively transform society through
                   knowledge, leadership, and compassion.
                 </p>
               </div>
@@ -384,7 +411,7 @@ export default function AboutLpsPage() {
               <div className="space-y-2">
                 <h3 className="text-xl font-black uppercase tracking-tight text-accent">Our Mission</h3>
                 <p className="text-white/80 font-medium text-sm leading-relaxed">
-                  Our mission is to provide a healthy, inclusive, and inspiring learning environment where every girl 
+                  Our mission is to provide a healthy, inclusive, and inspiring learning environment where every girl
                   receives quality education, develops strong values, and gains the confidence to lead a meaningful life.
                 </p>
               </div>
@@ -429,7 +456,7 @@ export default function AboutLpsPage() {
           </h2>
           <div className="h-1.5 w-24 bg-accent rounded-full mx-auto" />
           <p className="text-gray-500 font-medium max-w-2xl mx-auto text-sm md:text-base">
-            At Leeladevi Parasmal Sancheti English Medium Sr. Sec. School, learning extends far beyond the classroom 
+            At Leeladevi Parasmal Sancheti English Medium Sr. Sec. School, learning extends far beyond the classroom
             to help students become independent, confident, and future-ready.
           </p>
         </div>
@@ -458,24 +485,24 @@ export default function AboutLpsPage() {
 
           {/* Desktop Showcase */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {carouselImages.map((slide, idx) => (
-              <div 
-                key={idx} 
+            {showcaseImages.map((slide, idx) => (
+              <div
+                key={idx}
                 className="bg-[#F8F9FC] border border-primary/5 rounded-3xl overflow-hidden shadow-md group hover:-translate-y-2 transition-all duration-300"
                 onMouseEnter={() => setActiveSlide(idx)}
               >
                 {/* Image Container */}
                 <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-                  <Image 
-                    src={slide.src} 
-                    alt={slide.alt} 
-                    fill 
-                    sizes="(max-width: 768px) 100vw, 380px" 
-                    className="object-cover group-hover:scale-105 transition-transform duration-500" 
+                  <Image
+                    src={slide.src}
+                    alt={slide.alt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 380px"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors" />
                 </div>
-                
+
                 {/* Description content */}
                 <div className="p-6 space-y-2">
                   <h4 className="text-lg font-black text-primary uppercase tracking-tight">
@@ -491,15 +518,14 @@ export default function AboutLpsPage() {
 
           {/* Pagination Dots */}
           <div className="flex items-center justify-center gap-2 pt-4">
-            {carouselImages.map((_, idx) => (
+            {showcaseImages.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setActiveSlide(idx)}
-                className={`w-3.5 h-3.5 rounded-full transition-all duration-300 ${
-                  activeSlide === idx 
-                    ? "bg-accent scale-110 shadow-[0_2px_8px_rgba(247,184,1,0.4)]" 
-                    : "bg-gray-200 hover:bg-gray-300"
-                }`}
+                className={`w-3.5 h-3.5 rounded-full transition-all duration-300 ${activeSlide === idx
+                  ? "bg-accent scale-110 shadow-[0_2px_8px_rgba(247,184,1,0.4)]"
+                  : "bg-gray-200 hover:bg-gray-300"
+                  }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
             ))}
@@ -512,22 +538,22 @@ export default function AboutLpsPage() {
         <div className="max-w-4xl mx-auto rounded-[2.5rem] bg-white border border-primary/10 p-8 md:p-12 text-center space-y-6 shadow-xl relative overflow-hidden">
           <div className="absolute -top-10 -left-10 w-24 h-24 bg-accent/5 rounded-full blur-xl" />
           <Heart className="text-accent mx-auto animate-bounce" size={40} />
-          
+
           <span className="text-accent font-black uppercase tracking-[0.3em] text-[10px] block">Admissions Open 2026-27</span>
-          
+
           <h3 className="text-2xl md:text-3.5xl font-black text-primary font-montserrat uppercase leading-tight">
             Building Tomorrow's Women Leaders
           </h3>
-          
+
           <p className="text-gray-600 font-medium text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
-            With academic excellence, modern infrastructure, experienced educators, strong moral values, and a secure 
-            residential campus, Leeladevi Parasmal Sancheti English Medium Sr. Sec. School continues to shape generations 
+            With academic excellence, modern infrastructure, experienced educators, strong moral values, and a secure
+            residential campus, Leeladevi Parasmal Sancheti English Medium Sr. Sec. School continues to shape generations
             of young women ready to succeed in an ever-changing world.
           </p>
-          
+
           <div className="pt-2">
-            <Link 
-              href="/apply-for-admission" 
+            <Link
+              href="/apply-for-admission"
               className="inline-flex items-center gap-2 bg-accent text-primary font-extrabold uppercase text-xs md:text-sm tracking-wider px-8 py-4 rounded-xl hover:bg-accent-hover hover:scale-[1.02] hover:shadow-lg transition-all"
             >
               <span>Begin Admission Query</span>
