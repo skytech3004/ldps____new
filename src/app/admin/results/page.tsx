@@ -3,11 +3,16 @@
 import React, { useEffect, useState } from "react";
 import { Plus, Trash2, Loader2, Trophy, Upload, X, Shield, Sparkles } from "lucide-react";
 
+interface ResultImage {
+  url: string;
+  title: string;
+}
+
 interface BoardResult {
   _id: string;
   year: string;
   title?: string;
-  images?: string[];
+  images?: (string | ResultImage)[];
 }
 
 export default function AdminResultsPage() {
@@ -23,7 +28,8 @@ export default function AdminResultsPage() {
   // Select Result Year inputs for editing
   const [editYear, setEditYear] = useState("");
   const [editTitle, setEditTitle] = useState("");
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<ResultImage[]>([]);
+  const [chartTitle, setChartTitle] = useState("");
   
   // File upload state
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -57,10 +63,20 @@ export default function AdminResultsPage() {
     setSelectedResult(result);
     setEditYear(result.year);
     setEditTitle(result.title || "");
-    setImages(result.images || []);
-    // Reset file preview
+    
+    // Normalize images to always be { url, title } objects
+    const normalized = (result.images || []).map((img: any) => {
+      if (typeof img === "string") {
+        return { url: img, title: "" };
+      }
+      return { url: img.url || "", title: img.title || "" };
+    });
+    setImages(normalized);
+
+    // Reset file preview & upload title
     setUploadFile(null);
     setUploadPreview(null);
+    setChartTitle("");
   };
 
   // Add a new Result Year
@@ -101,7 +117,7 @@ export default function AdminResultsPage() {
   };
 
   // Save changes to current Result Year
-  const handleSaveResultYear = async () => {
+  const handleSaveResultYear = async (overrideImages?: ResultImage[]) => {
     if (!selectedResult) return;
     if (!editYear.trim() || !editTitle.trim()) {
       alert("Please fill in both the Year and Title.");
@@ -117,7 +133,7 @@ export default function AdminResultsPage() {
           id: selectedResult._id,
           year: editYear.trim(),
           title: editTitle.trim(),
-          images: images,
+          images: overrideImages || images,
         }),
       });
 
@@ -189,7 +205,7 @@ export default function AdminResultsPage() {
       formData.append("file", uploadFile);
       formData.append("page", "result");
       formData.append("section", "results");
-      formData.append("title", `Result Year ${editYear}`);
+      formData.append("title", `Result Year ${editYear} - ${chartTitle}`);
 
       const res = await fetch("/api/admin/upload", {
         method: "POST",
@@ -199,7 +215,8 @@ export default function AdminResultsPage() {
       if (!res.ok) throw new Error("Upload failed.");
       const data = await res.json();
 
-      const updatedImages = [...images, data.upload.src];
+      const newImgObj = { url: data.upload.src, title: chartTitle.trim() };
+      const updatedImages = [...images, newImgObj];
       setImages(updatedImages);
 
       // Save changes to db immediately
@@ -223,6 +240,7 @@ export default function AdminResultsPage() {
 
       setUploadFile(null);
       setUploadPreview(null);
+      setChartTitle("");
     } catch (err) {
       console.error(err);
       alert("Failed to upload image.");
@@ -397,7 +415,7 @@ export default function AdminResultsPage() {
                     <p className="text-xs text-white/50 font-bold mt-1">Configuring year record: {selectedResult.year}</p>
                   </div>
                   <button 
-                    onClick={handleSaveResultYear}
+                    onClick={() => handleSaveResultYear()}
                     disabled={saving}
                     className="bg-accent hover:bg-accent/90 text-primary font-black uppercase text-xs tracking-wider px-6 py-3 rounded-xl flex items-center gap-2 transition-all shadow-premium-sm"
                   >
@@ -437,6 +455,15 @@ export default function AdminResultsPage() {
                   {/* File Selector */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-end">
                     <div className="space-y-3">
+                      <label className="text-[10px] font-bold text-white/50 uppercase block">Card Heading (e.g. CLASS XII BOARD RESULTS 2026)</label>
+                      <input 
+                        type="text" 
+                        value={chartTitle}
+                        onChange={(e) => setChartTitle(e.target.value)}
+                        placeholder="e.g. CLASS XII BOARD RESULTS 2026"
+                        className="w-full bg-[#081736] border border-white/10 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-accent text-white mb-3"
+                      />
+                      
                       <label className="text-[10px] font-bold text-white/50 uppercase block">Select Chart Graphic</label>
                       <div className="relative group">
                         <input 
@@ -482,18 +509,36 @@ export default function AdminResultsPage() {
                         No results posters attached yet. Upload a chart above.
                       </div>
                     ) : (
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {images.map((img, i) => (
-                          <div key={i} className="relative aspect-[4/3] rounded-xl overflow-hidden border border-white/10 bg-[#081736] group shadow-md">
-                            <img src={img} alt={`Result poster ${i + 1}`} className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <button 
-                                onClick={() => handleRemoveImage(i)}
-                                className="p-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors shadow-lg"
-                                title="Remove Image"
-                              >
-                                <Trash2 size={16} />
-                              </button>
+                          <div key={i} className="bg-[#081736]/40 border border-white/10 rounded-2xl p-4 flex flex-col gap-3 group relative">
+                            <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-black flex items-center justify-center">
+                              <img src={img.url} alt={`Result poster ${i + 1}`} className="max-w-full max-h-full object-contain" />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button 
+                                  onClick={() => handleRemoveImage(i)}
+                                  className="p-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors shadow-lg"
+                                  title="Remove Image"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-1">
+                              <label className="text-[9px] font-bold text-white/40 uppercase">Card Heading:</label>
+                              <input 
+                                type="text" 
+                                value={img.title} 
+                                onChange={(e) => {
+                                  const newTitle = e.target.value;
+                                  const updated = images.map((item, idx) => idx === i ? { ...item, title: newTitle } : item);
+                                  setImages(updated);
+                                }}
+                                onBlur={() => handleSaveResultYear()}
+                                placeholder="e.g. CLASS XII BOARD RESULTS"
+                                className="w-full bg-[#081736] border border-white/10 rounded-lg px-2.5 py-1.5 text-[11px] font-bold focus:outline-none focus:border-accent text-white"
+                              />
                             </div>
                           </div>
                         ))}

@@ -64,7 +64,7 @@ const BoardResultSchema = new Schema(
       default: [],
     },
     images: {
-      type: [String],
+      type: [Schema.Types.Mixed],
       default: [],
     },
   },

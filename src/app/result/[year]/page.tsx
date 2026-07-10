@@ -6,11 +6,16 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Trophy, Loader2 } from "lucide-react";
 
+interface ResultImage {
+  url: string;
+  title: string;
+}
+
 interface BoardResultData {
   _id: string;
   year: string;
   title?: string;
-  images?: string[];
+  images?: (string | ResultImage)[];
 }
 
 export default function ResultYearPage({ params }: { params: Promise<{ year: string }> }) {
@@ -89,58 +94,66 @@ export default function ResultYearPage({ params }: { params: Promise<{ year: str
       {/* Main Content Area */}
       <div className="pt-40 pb-24 px-6 max-w-7xl mx-auto space-y-12 text-center">
         
-        {/* Dynamic Centered Heading */}
-        <div className="space-y-4">
-          <h1 className="text-3xl md:text-4xl font-extrabold uppercase font-montserrat text-primary tracking-tight">
-            {data.title ? data.title.toUpperCase() : `BOARD RESULTS ${data.year}`}
-          </h1>
-          <div className="h-1 bg-accent mx-auto w-24 rounded-full" />
-        </div>
-
         {data.images && data.images.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto pt-6">
-            {data.images.map((imgUrl: string, i: number) => {
-              // Determine class labels matching screenshot patterns
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-7xl mx-auto pt-6">
+            {data.images.map((img: any, i: number) => {
+              // Extract URL and Title (handle backward compatibility cleanly)
+              const imgUrl = typeof img === "string" ? img : (img.url || "");
+              const cardTitle = typeof img === "string" ? "" : (img.title || "");
+
+              // Dynamic heading block for each individual card
+              const headingText = cardTitle 
+                ? cardTitle.toUpperCase() 
+                : (data.title ? data.title.toUpperCase() : `BOARD RESULTS ${data.year}`);
+
               let label = "BOARD RESULT";
-              if (data.title) {
-                const titleLower = data.title.toLowerCase();
+              if (headingText) {
+                const titleLower = headingText.toLowerCase();
                 if (titleLower.includes("xii") || titleLower.includes("class 12") || titleLower.includes("12th")) {
                   label = "XII RESULT";
                 } else if (titleLower.includes("x ") || titleLower.includes("class 10") || titleLower.includes("10th")) {
                   label = "X RESULT";
                 } else {
-                  label = data.title.toUpperCase();
+                  label = headingText;
                 }
               }
 
               return (
-                <div 
-                  key={i} 
-                  className="bg-[#0b1736] rounded-3xl p-5 shadow-2xl flex flex-col group transition-all duration-300 hover:scale-[1.01]"
-                >
-                  {/* Image Container with White Background for Results Charts */}
-                  <div className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden bg-white flex items-center justify-center p-3">
-                    <a href={imgUrl} target="_blank" rel="noopener noreferrer" className="w-full h-full flex items-center justify-center">
-                      <img 
-                        src={imgUrl} 
-                        alt={`${label} Page ${i + 1}`} 
-                        className="max-w-full max-h-full object-contain" 
-                      />
-                    </a>
+                <div key={i} className="flex flex-col">
+                  {/* Dynamic Heading Rendered Above This Specific Result Card */}
+                  <div className="space-y-3 mb-6 text-center shrink-0">
+                    <h2 className="text-xl md:text-2xl font-black uppercase font-montserrat text-primary tracking-tight line-clamp-2 min-h-[3rem] flex items-center justify-center">
+                      {headingText}
+                    </h2>
+                    <div className="h-1 bg-[#F7B801] mx-auto w-16 rounded-full" />
                   </div>
 
-                  {/* Caption & Download Footer */}
-                  <div className="pt-5 pb-2 text-left flex justify-between items-center px-2">
-                    <span className="text-white text-xl font-black uppercase tracking-wider font-montserrat">
-                      {label}
-                    </span>
-                    <a 
-                      href={imgUrl} 
-                      download 
-                      className="text-accent hover:text-white font-black text-xs uppercase tracking-wider transition-colors"
-                    >
-                      Download Image
-                    </a>
+                  {/* Dark blue card for the image */}
+                  <div className="bg-[#0b1736] rounded-3xl p-5 shadow-2xl flex flex-col group transition-all duration-300 hover:scale-[1.01] flex-1">
+                    {/* Image Container with White Background for Results Charts */}
+                    <div className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden bg-white flex items-center justify-center p-3">
+                      <a href={imgUrl} target="_blank" rel="noopener noreferrer" className="w-full h-full flex items-center justify-center">
+                        <img 
+                          src={imgUrl} 
+                          alt={`${label} Page ${i + 1}`} 
+                          className="max-w-full max-h-full object-contain" 
+                        />
+                      </a>
+                    </div>
+
+                    {/* Caption & Download Footer */}
+                    <div className="pt-5 pb-2 text-left flex justify-between items-center px-2">
+                      <span className="text-white text-base font-black uppercase tracking-wider font-montserrat">
+                        {label}
+                      </span>
+                      <a 
+                        href={imgUrl} 
+                        download 
+                        className="text-accent hover:text-white font-black text-xs uppercase tracking-wider transition-colors"
+                      >
+                        Download Image
+                      </a>
+                    </div>
                   </div>
                 </div>
               );
