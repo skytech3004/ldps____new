@@ -6,7 +6,7 @@ import {
   Plus, Pencil, Trash2, X, Save, Image, 
   Upload, ArrowUpRight, BookOpen, Calendar, User, Eye 
 } from "lucide-react";
-import FroalaEditor from "@/components/FroalaEditor";
+import TipTapEditor from "@/components/TipTapEditor";
 
 type BlogPost = {
   _id: string;
@@ -493,7 +493,7 @@ export default function AdminBlogPage() {
 
               <div>
                 <label className="text-[10px] font-black uppercase tracking-wider text-white/60 block mb-2">Blog Content *</label>
-                <FroalaEditor 
+                <TipTapEditor 
                   value={formContent} 
                   onChange={(val) => setFormContent(val)}
                   placeholder="Write your blog contents here..." 
