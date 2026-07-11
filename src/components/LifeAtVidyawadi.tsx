@@ -9,8 +9,8 @@ import Reveal from "@/components/ui/Reveal";
 
 export default function LifeAtVidyawadi() {
   const [moments, setMoments] = useState<any[]>([]);
-  const [activeFilter, setActiveFilter] = useState("Recent");
-  const [filters, setFilters] = useState<string[]>(["Recent", "Events", "Sports", "NCC", "NSS", "Hostel", "Infrastructure", "Laboratories"]);
+  const [activeFilter, setActiveFilter] = useState("Overview");
+  const [filters, setFilters] = useState<string[]>(["Overview", "Events", "Sports", "NCC", "NSS", "Hostel", "Infrastructure", "Laboratories"]);
 
   const defaultMoments = [
     { src: "/lps-vidhyawadi/gallery-01.jpg", title: "Residential Comforts", category: "Hostel" },
@@ -56,18 +56,18 @@ export default function LifeAtVidyawadi() {
             ...defaultMoments.map(dm => dm.category)
           ];
           const uniqueCats = Array.from(new Set(allCategories));
-          
-          const preferredOrder = ["Recent", "Events", "Sports", "NCC", "NSS", "Hostel"];
-          const orderedFilters = ["Recent"];
-          
+
+          const preferredOrder = ["Overview", "Events", "Sports", "NCC", "NSS", "Hostel"];
+          const orderedFilters = ["Overview"];
+
           preferredOrder.slice(1).forEach(cat => {
             if (uniqueCats.includes(cat)) {
               orderedFilters.push(cat);
             }
           });
-          
+
           uniqueCats.forEach(cat => {
-            if (!orderedFilters.includes(cat) && cat !== "Recent") {
+            if (!orderedFilters.includes(cat) && cat !== "Overview") {
               orderedFilters.push(cat);
             }
           });
@@ -84,8 +84,21 @@ export default function LifeAtVidyawadi() {
   // Combine dynamic uploads with fallbacks (ensure uploaded items appear first)
   const combinedMoments = [...moments, ...defaultMoments.filter(dm => !moments.some(m => m.src === dm.src))];
 
-  const filteredMoments = activeFilter === "Recent" 
-    ? combinedMoments.slice(0, 8) // Show first 8 of the combined list
+  // Helper to get only one image per category for the overview tab
+  const getUniqueCategoryMoments = (momentsList: any[]) => {
+    const seen = new Set();
+    const unique: any[] = [];
+    for (const item of momentsList) {
+      if (!seen.has(item.category)) {
+        seen.add(item.category);
+        unique.push(item);
+      }
+    }
+    return unique;
+  };
+
+  const filteredMoments = activeFilter === "Overview"
+    ? getUniqueCategoryMoments(combinedMoments).slice(0, 8) // Show up to 8 unique categories
     : combinedMoments.filter(item => item.category === activeFilter);
 
   const getCategoryLink = (category: string) => {
@@ -99,7 +112,7 @@ export default function LifeAtVidyawadi() {
   return (
     <section className="py-32 md:py-40 px-6 bg-[#F8F9FC]">
       <div className="max-w-7xl mx-auto space-y-16">
-        
+
         {/* Header Row: Flex row on large screens */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 text-left">
           <div className="space-y-3">
@@ -119,11 +132,10 @@ export default function LifeAtVidyawadi() {
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
-                className={`px-5 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-300 ${
-                  activeFilter === filter
+                className={`px-5 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-300 ${activeFilter === filter
                     ? "bg-[#3D348B] text-white shadow-filter-shadow"
                     : "bg-white text-[#3D348B] border border-slate-100 hover:bg-[#F1F2F6]"
-                }`}
+                  }`}
               >
                 {filter}
               </button>
@@ -132,8 +144,8 @@ export default function LifeAtVidyawadi() {
 
           {/* View All Button */}
           <div className="shrink-0">
-            <Link 
-              href="/gallery" 
+            <Link
+              href="/gallery"
               className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#3D348B] hover:text-[#7678ED] transition-colors group"
             >
               View All Moments
@@ -143,13 +155,13 @@ export default function LifeAtVidyawadi() {
         </div>
 
         {/* Gallery Grid - 4 Columns */}
-        <motion.div 
+        <motion.div
           layout
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
         >
           <AnimatePresence mode="popLayout">
             {filteredMoments.map((moment, idx) => (
-              <Link 
+              <Link
                 href={getCategoryLink(moment.category)}
                 key={moment.src}
                 className="block"
@@ -160,6 +172,7 @@ export default function LifeAtVidyawadi() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.4 }}
+                  style={{ boxShadow: "5px 5px 0 3px #F7B80A" }}
                   className="group relative aspect-[4/3] rounded-[2rem] overflow-hidden shadow-premium-sm hover:shadow-premium-lg border border-slate-100 bg-slate-900 cursor-pointer"
                 >
                   <Image

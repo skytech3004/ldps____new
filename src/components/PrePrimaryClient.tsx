@@ -305,12 +305,12 @@ export default function PrePrimaryClient() {
           </p>
         </div>
       </div>
-    </motion.div>
+    </motion.div >
   );
 
   return (
     <div className="w-full space-y-24 relative pb-20">
-      
+
       {/* Decorative Background Elements */}
       <div className="absolute top-0 -left-20 w-96 h-96 bg-[#7678ED]/5 rounded-full blur-3xl -z-20 animate-pulse" />
       <div className="absolute top-[20%] -right-20 w-96 h-96 bg-[#F7B801]/5 rounded-full blur-3xl -z-20" />
@@ -442,8 +442,8 @@ export default function PrePrimaryClient() {
             </div>
 
             {/* Bottom Info Bar & Mobile Swiper Controls */}
-            <div 
-              onClick={(e) => e.stopPropagation()} 
+            <div
+              onClick={(e) => e.stopPropagation()}
               className="w-full max-w-3xl text-center flex flex-col items-center gap-2 text-white px-4"
             >
               {/* Title display */}
