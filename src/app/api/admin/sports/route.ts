@@ -24,9 +24,9 @@ const defaultGames = [
 ];
 
 const defaultComplexImages = [
-  "/lps-vidhyawadi/gallery-06.jpg",
-  "/lps-vidhyawadi/gallery-09.jpg",
-  "/lps-vidhyawadi/gallery-11.jpg"
+  "/uploads/gallery/sports-img-1.jpg",
+  "/uploads/gallery/sports-img-2.jpg",
+  "/uploads/gallery/sports-img-3.jpg"
 ];
 
 export async function GET() {
@@ -54,10 +54,10 @@ export async function PUT(request: Request) {
   try {
     await connectToDatabase();
     const body = await request.json();
-    
+
     const updated = await SportsModel.findOneAndUpdate(
       { key: "main" },
-      { 
+      {
         complexImages: body.complexImages,
         players: body.players,
         games: body.games,
@@ -65,7 +65,7 @@ export async function PUT(request: Request) {
       },
       { new: true, runValidators: true, upsert: true }
     );
-    
+
     return NextResponse.json(updated);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to update sports details.";

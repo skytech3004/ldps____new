@@ -93,17 +93,17 @@ export default function ResultYearPage({ params }: { params: Promise<{ year: str
 
       {/* Main Content Area */}
       <div className="pt-40 pb-24 px-6 max-w-7xl mx-auto space-y-12 text-center">
-        
+
         {data.images && data.images.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-7xl mx-auto pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-12 max-w-7xl mx-auto pt-6">
             {data.images.map((img: any, i: number) => {
               // Extract URL and Title (handle backward compatibility cleanly)
               const imgUrl = typeof img === "string" ? img : (img.url || "");
               const cardTitle = typeof img === "string" ? "" : (img.title || "");
 
               // Dynamic heading block for each individual card
-              const headingText = cardTitle 
-                ? cardTitle.toUpperCase() 
+              const headingText = cardTitle
+                ? cardTitle.toUpperCase()
                 : (data.title ? data.title.toUpperCase() : `BOARD RESULTS ${data.year}`);
 
               let label = "BOARD RESULT";
@@ -133,10 +133,10 @@ export default function ResultYearPage({ params }: { params: Promise<{ year: str
                     {/* Image Container with White Background for Results Charts */}
                     <div className="relative aspect-[3/4] w-full rounded-2xl overflow-hidden bg-white flex items-center justify-center p-3">
                       <a href={imgUrl} target="_blank" rel="noopener noreferrer" className="w-full h-full flex items-center justify-center">
-                        <img 
-                          src={imgUrl} 
-                          alt={`${label} Page ${i + 1}`} 
-                          className="max-w-full max-h-full object-contain" 
+                        <img
+                          src={imgUrl}
+                          alt={`${label} Page ${i + 1}`}
+                          className="max-w-full max-h-full object-contain"
                         />
                       </a>
                     </div>
@@ -146,9 +146,9 @@ export default function ResultYearPage({ params }: { params: Promise<{ year: str
                       <span className="text-white text-base font-black uppercase tracking-wider font-montserrat">
                         {label}
                       </span>
-                      <a 
-                        href={imgUrl} 
-                        download 
+                      <a
+                        href={imgUrl}
+                        download
                         className="text-accent hover:text-white font-black text-xs uppercase tracking-wider transition-colors"
                       >
                         Download Image

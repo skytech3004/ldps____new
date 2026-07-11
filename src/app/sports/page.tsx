@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Trophy, Award, CheckCircle, Shield, ArrowRight, Activity, Users, Star, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Trophy, Award, CheckCircle, Shield, ArrowRight, Activity, Users, Star, Loader2, ChevronLeft, ChevronRight, ImageIcon, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Player {
@@ -34,12 +34,50 @@ interface SportsData {
 export default function SportsPage() {
   const [data, setData] = useState<SportsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [galleryItems, setGalleryItems] = useState<any[]>([]);
+  const [activePhoto, setActivePhoto] = useState<number | null>(null);
   
   // Sports Complex Carousel State
   const [activeComplexSlide, setActiveComplexSlide] = useState(0);
   
   // Players Carousel State
   const [activePlayerSlide, setActivePlayerSlide] = useState(0);
+
+  const handlePrev = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (activePhoto === null) return;
+    setActivePhoto((prev) => (prev === 0 ? galleryItems.length - 1 : (prev ?? 0) - 1));
+  };
+
+  const handleNext = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (activePhoto === null) return;
+    setActivePhoto((prev) => (prev === galleryItems.length - 1 ? 0 : (prev ?? 0) + 1));
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (activePhoto === null) return;
+      if (e.key === "ArrowLeft") handlePrev();
+      if (e.key === "ArrowRight") handleNext();
+      if (e.key === "Escape") setActivePhoto(null);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activePhoto, galleryItems]);
+
+  // Lock scroll
+  useEffect(() => {
+    if (activePhoto !== null) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [activePhoto]);
 
   useEffect(() => {
     const fetchSports = async () => {
@@ -51,11 +89,23 @@ export default function SportsPage() {
         }
       } catch (err) {
         console.error("Failed to load sports data:", err);
-      } finally {
-        setLoading(false);
       }
     };
-    fetchSports();
+    const fetchPhotos = async () => {
+      try {
+        const res = await fetch("/api/admin/media-items?type=photo");
+        if (res.ok) {
+          const data = await res.json();
+          const sportsPhotos = (data || []).filter((item: any) => item.category === "Sports");
+          setGalleryItems(sportsPhotos);
+        }
+      } catch (error) {
+        console.error("Failed to fetch sports photos:", error);
+      }
+    };
+    Promise.all([fetchSports(), fetchPhotos()]).finally(() => {
+      setLoading(false);
+    });
   }, []);
 
   const handlePrevComplexSlide = () => {
@@ -355,6 +405,137 @@ export default function SportsPage() {
           </div>
         </section>
       )}
+
+      {/* Sports Gallery Section */}
+      {galleryItems.length > 0 && (
+        <section className="py-20 px-6 bg-slate-50 border-t border-slate-100 text-center">
+          <div className="max-w-7xl mx-auto space-y-12">
+            
+            <div className="space-y-4">
+              <span className="text-accent font-black uppercase tracking-[0.4em] text-xs block">Action Captures</span>
+              <h2 className="text-2xl md:text-4xl font-black text-primary uppercase font-montserrat tracking-tight">
+                Sports Gallery
+              </h2>
+              <div className="h-1.5 w-24 bg-accent mx-auto rounded-full" />
+              <p className="text-gray-500 font-medium text-xs md:text-sm max-w-xl mx-auto pt-2">
+                Action-packed moments of our students training, competing, and winning.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
+              {galleryItems.map((item, idx) => (
+                <motion.div 
+                  key={item._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: (idx % 3) * 0.1 }}
+                  onClick={() => setActivePhoto(idx)}
+                  className="bg-white rounded-2xl border border-slate-100 shadow-[0_12px_30px_rgba(61,52,139,0.03)] overflow-hidden p-4 flex flex-col cursor-pointer transition-all duration-300 hover:shadow-[0_20px_45px_rgba(61,52,139,0.06)] hover:-translate-y-1.5 group"
+                >
+                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-50 border border-slate-100">
+                    <img 
+                      src={item.src} 
+                      alt={item.alt || item.title}
+                      loading="lazy"
+                      className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 scale-100 group-hover:scale-[1.03] transition-all duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-start p-3">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-black text-white uppercase bg-primary px-2.5 py-1 rounded-lg backdrop-blur-sm">
+                        <ImageIcon size={10} />
+                        View Full Screen
+                      </span>
+                    </div>
+                  </div>
+                  <h3 className="text-primary text-sm md:text-base font-extrabold line-clamp-1 text-left mt-4 group-hover:text-accent transition-colors leading-snug">
+                    {item.title}
+                  </h3>
+                </motion.div>
+              ))}
+            </div>
+
+          </div>
+        </section>
+      )}
+
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {activePhoto !== null && galleryItems[activePhoto] && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setActivePhoto(null)}
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex flex-col justify-between items-center py-6 px-4"
+          >
+            {/* Top Bar */}
+            <div className="w-full max-w-6xl flex justify-between items-center text-white px-2">
+              <span className="text-xs md:text-sm font-bold tracking-widest text-[#F7B801] uppercase">
+                Sports Action Portal
+              </span>
+              <button
+                onClick={() => setActivePhoto(null)}
+                className="p-2.5 bg-white/5 hover:bg-white/15 hover:scale-105 border border-white/10 rounded-full text-white/80 hover:text-white transition-all cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Media Area */}
+            <div className="flex-1 w-full flex items-center justify-center relative my-4 max-h-[75vh]">
+              <button
+                onClick={handlePrev}
+                className="absolute left-2 md:left-4 z-10 p-3 bg-white/5 hover:bg-white/15 border border-white/10 text-white/80 hover:text-white rounded-full transition-all cursor-pointer hidden sm:block"
+              >
+                <ChevronLeft size={24} />
+              </button>
+
+              <motion.div
+                key={activePhoto}
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="relative max-h-full max-w-full md:max-w-4xl flex flex-col items-center justify-center"
+              >
+                <img
+                  src={galleryItems[activePhoto].src}
+                  alt={galleryItems[activePhoto].title}
+                  className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl border border-white/5 shadow-2xl"
+                />
+              </motion.div>
+
+              <button
+                onClick={handleNext}
+                className="absolute right-2 md:right-4 z-10 p-3 bg-white/5 hover:bg-white/15 border border-white/10 text-white/80 hover:text-white rounded-full transition-all cursor-pointer hidden sm:block"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </div>
+
+            {/* Bottom Info Bar */}
+            <div 
+              onClick={(e) => e.stopPropagation()} 
+              className="w-full max-w-3xl text-center flex flex-col items-center gap-4 text-white px-4"
+            >
+              <div className="space-y-1">
+                <p className="text-sm md:text-lg font-black text-white tracking-wide max-w-2xl leading-snug">
+                  {galleryItems[activePhoto].title}
+                </p>
+                <p className="text-[11px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  Photo {activePhoto + 1} of {galleryItems.length}
+                </p>
+              </div>
+
+              {/* Mobile Controls */}
+              <div className="flex sm:hidden items-center gap-6 mt-1">
+                <button onClick={handlePrev} className="p-2.5 bg-white/5 rounded-full text-white"><ChevronLeft size={20} /></button>
+                <button onClick={handleNext} className="p-2.5 bg-white/5 rounded-full text-white"><ChevronRight size={20} /></button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Game Breakdown list */}
       <section className="py-24 px-6 max-w-7xl mx-auto space-y-12">

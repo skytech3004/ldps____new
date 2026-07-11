@@ -51,6 +51,8 @@ export default function Navbar() {
         { label: "Scholastic", href: "/scholastic" },
         { label: "Co-Scholastic", href: "/co-scholastic" },
         { label: "Sports", href: "/sports" },
+        { label: "NSS", href: "/academics/nss" },
+        { label: "NCC", href: "/academics/ncc" },
         {
           label: "Result",
           href: "#",
@@ -209,7 +211,7 @@ export default function Navbar() {
                   height={160}
                   className="
                     object-contain
-                    w-16 h-20 pt-6
+                    w-16 h-30 
                     sm:w-20 sm:h-24
                     md:w-24 md:h-32
                     lg:w-28 lg:h-36

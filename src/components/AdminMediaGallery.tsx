@@ -16,7 +16,10 @@ interface MediaItem {
 export default function AdminMediaGallery() {
   const [photoItems, setPhotoItems] = useState<MediaItem[]>([]);
   const [videoItems, setVideoItems] = useState<MediaItem[]>([]);
-  const [activeTab, setActiveTab] = useState<"photo" | "video">("photo");
+  const [nssItems, setNssItems] = useState<MediaItem[]>([]);
+  const [nccItems, setNccItems] = useState<MediaItem[]>([]);
+  const [activeTab, setActiveTab] = useState<"photo" | "video" | "nss-photo" | "ncc-photo">("photo");
+  const [adminFilter, setAdminFilter] = useState<string>("All");
   const [activePreview, setActivePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -29,6 +32,23 @@ export default function AdminMediaGallery() {
     src: "",
     category: "Others",
   });
+
+  const handleTabChange = (tab: typeof activeTab) => {
+    setActiveTab(tab);
+    setAdminFilter("All");
+    setShowAddForm(false);
+  };
+
+  let rawItems = photoItems;
+  if (activeTab === "video") rawItems = videoItems;
+  else if (activeTab === "nss-photo") rawItems = nssItems;
+  else if (activeTab === "ncc-photo") rawItems = nccItems;
+
+  const currentItems = adminFilter === "All"
+    ? rawItems
+    : rawItems.filter((item) => item.category === adminFilter);
+
+  const previewItem = currentItems.find((item) => item._id === activePreview);
 
   const fetchFilters = async () => {
     try {
@@ -94,6 +114,8 @@ export default function AdminMediaGallery() {
       setLoading(true);
       const photosRes = await fetch("/api/admin/media-items?type=photo");
       const videosRes = await fetch("/api/admin/media-items?type=video");
+      const nssRes = await fetch("/api/admin/media-items?type=nss-photo");
+      const nccRes = await fetch("/api/admin/media-items?type=ncc-photo");
 
       if (photosRes.ok) {
         const photos = await photosRes.json();
@@ -103,6 +125,16 @@ export default function AdminMediaGallery() {
       if (videosRes.ok) {
         const videos = await videosRes.json();
         setVideoItems(videos);
+      }
+
+      if (nssRes.ok) {
+        const nss = await nssRes.json();
+        setNssItems(nss);
+      }
+
+      if (nccRes.ok) {
+        const ncc = await nccRes.json();
+        setNccItems(ncc);
       }
     } catch (error) {
       console.error("Failed to fetch media items:", error);
@@ -121,8 +153,8 @@ export default function AdminMediaGallery() {
   const handlePrevPreview = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (activePreview === null) return;
-    const currentItems = activeTab === "photo" ? photoItems : videoItems;
     const currentIdx = currentItems.findIndex((item) => item._id === activePreview);
+    if (currentIdx === -1) return;
     const newIdx = currentIdx === 0 ? currentItems.length - 1 : currentIdx - 1;
     const nextId = currentItems[newIdx]._id;
     if (nextId) setActivePreview(nextId);
@@ -131,8 +163,8 @@ export default function AdminMediaGallery() {
   const handleNextPreview = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (activePreview === null) return;
-    const currentItems = activeTab === "photo" ? photoItems : videoItems;
     const currentIdx = currentItems.findIndex((item) => item._id === activePreview);
+    if (currentIdx === -1) return;
     const newIdx = currentIdx === currentItems.length - 1 ? 0 : currentIdx + 1;
     const nextId = currentItems[newIdx]._id;
     if (nextId) setActivePreview(nextId);
@@ -149,7 +181,7 @@ export default function AdminMediaGallery() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activePreview, activeTab, photoItems, videoItems]);
+  }, [activePreview, currentItems]);
 
   // Lock scroll when preview is open
   useEffect(() => {
@@ -227,8 +259,12 @@ export default function AdminMediaGallery() {
 
       if (activeTab === "photo") {
         setPhotoItems([...photoItems, savedItem]);
-      } else {
+      } else if (activeTab === "video") {
         setVideoItems([...videoItems, savedItem]);
+      } else if (activeTab === "nss-photo") {
+        setNssItems([...nssItems, savedItem]);
+      } else if (activeTab === "ncc-photo") {
+        setNccItems([...nccItems, savedItem]);
       }
 
       setFormData({ title: "", src: "", category: "Others" });
@@ -256,8 +292,12 @@ export default function AdminMediaGallery() {
 
       if (activeTab === "photo") {
         setPhotoItems(photoItems.filter((item) => item._id !== id));
-      } else {
+      } else if (activeTab === "video") {
         setVideoItems(videoItems.filter((item) => item._id !== id));
+      } else if (activeTab === "nss-photo") {
+        setNssItems(nssItems.filter((item) => item._id !== id));
+      } else if (activeTab === "ncc-photo") {
+        setNccItems(nccItems.filter((item) => item._id !== id));
       }
 
       if (activePreview === id) setActivePreview(null);
@@ -269,19 +309,15 @@ export default function AdminMediaGallery() {
     }
   };
 
-  const currentItems = activeTab === "photo" ? photoItems : videoItems;
-  const previewItem = currentItems.find((item) => item._id === activePreview);
+
 
   return (
     <div className="w-full max-w-7xl mx-auto font-montserrat text-white">
       {/* Tab Navigation */}
-      <div className="flex gap-4 mb-8 border-b border-slate-200">
+      <div className="flex gap-4 mb-8 border-b border-slate-200 flex-wrap">
         <button
-          onClick={() => {
-            setActiveTab("photo");
-            setShowAddForm(false);
-          }}
-          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 ${
+          onClick={() => handleTabChange("photo")}
+          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === "photo"
               ? "text-white border-b-2 border-accent font-bold"
               : "text-white/60 hover:text-white"
@@ -291,11 +327,8 @@ export default function AdminMediaGallery() {
           Photos ({photoItems.length})
         </button>
         <button
-          onClick={() => {
-            setActiveTab("video");
-            setShowAddForm(false);
-          }}
-          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 ${
+          onClick={() => handleTabChange("video")}
+          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${
             activeTab === "video"
               ? "text-white border-b-2 border-accent font-bold"
               : "text-white/60 hover:text-white"
@@ -304,27 +337,59 @@ export default function AdminMediaGallery() {
           <Film size={20} />
           Videos ({videoItems.length})
         </button>
+        <button
+          onClick={() => handleTabChange("nss-photo")}
+          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            activeTab === "nss-photo"
+              ? "text-white border-b-2 border-accent font-bold"
+              : "text-white/60 hover:text-white"
+          }`}
+        >
+          <ImageIcon size={20} />
+          NSS Photos ({nssItems.length})
+        </button>
+        <button
+          onClick={() => handleTabChange("ncc-photo")}
+          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            activeTab === "ncc-photo"
+              ? "text-white border-b-2 border-accent font-bold"
+              : "text-white/60 hover:text-white"
+          }`}
+        >
+          <ImageIcon size={20} />
+          NCC Photos ({nccItems.length})
+        </button>
       </div>
 
       {/* Header Area */}
       <div className="mb-8 flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white bg-[#3D348B] border border-white/10 px-4 py-2 rounded-lg inline-block">
-            {activeTab === "photo" ? "Manage General Photos" : "Manage General Videos"}
+            {activeTab === "photo" 
+              ? "Manage General Photos" 
+              : activeTab === "video"
+              ? "Manage General Videos"
+              : activeTab === "nss-photo"
+              ? "Manage NSS Photos"
+              : "Manage NCC Photos"}
           </h2>
           <p className="text-white/60 text-xs mt-2">
             {activeTab === "photo" 
               ? "Upload and manage photos for the general school image gallery." 
-              : "Upload and manage videos for the general school video gallery."}
+              : activeTab === "video"
+              ? "Upload and manage videos for the general school video gallery."
+              : activeTab === "nss-photo"
+              ? "Upload and manage photos for the NSS academic gallery."
+              : "Upload and manage photos for the NCC academic gallery."}
           </p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-2 px-4 py-2 text-white bg-yellow-500 hover:bg-yellow-600 transition-colors rounded-lg disabled:opacity-50 font-bold text-sm uppercase shrink-0"
+          className="flex items-center gap-2 px-4 py-2 text-white bg-yellow-500 hover:bg-yellow-600 transition-colors rounded-lg disabled:opacity-50 font-bold text-sm uppercase tracking-wider shrink-0 cursor-pointer"
           disabled={loading}
         >
           <Plus size={20} />
-          Add {activeTab === "photo" ? "Photo" : "Video"}
+          Add {activeTab === "video" ? "Video" : "Photo"}
         </button>
       </div>
 
@@ -337,6 +402,24 @@ export default function AdminMediaGallery() {
 
       {!loading && (
         <>
+          {/* Category Filter Bar */}
+          <div className="flex flex-wrap gap-2 mb-8 bg-[#0f234f]/40 p-4 rounded-2xl border border-white/5 items-center">
+            <span className="text-white/40 text-xs font-bold mr-2 uppercase tracking-wider">Filter Category:</span>
+            {["All", ...categories].map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setAdminFilter(filter)}
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+                  adminFilter === filter
+                    ? "bg-[#F7B801] text-[#3D348B]"
+                    : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
           {/* Add Form */}
           {showAddForm && (
             <div className="bg-[#0f234f]/80 p-6 rounded-2xl mb-8 border border-white/10">
@@ -401,7 +484,7 @@ export default function AdminMediaGallery() {
                   {inputMode === "url" ? (
                     <input
                       type="text"
-                      placeholder={activeTab === "photo" ? "Image URL" : "YouTube Embed URL"}
+                      placeholder={activeTab === "video" ? "YouTube Embed URL" : "Image URL"}
                       value={formData.src}
                       onChange={(e) => setFormData({ ...formData, src: e.target.value })}
                       className="w-full px-4 py-2 border bg-[#081736] text-white border-white/10 rounded-lg focus:outline-none focus:border-accent"
@@ -410,13 +493,13 @@ export default function AdminMediaGallery() {
                     <label className="relative w-full h-[40px] px-4 py-2 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-accent transition-colors flex items-center justify-center bg-[#081736]">
                       <input
                         type="file"
-                        accept={activeTab === "photo" ? "image/*" : "video/*"}
+                        accept={activeTab === "video" ? "video/*" : "image/*"}
                         onChange={handleFileUpload}
                         disabled={uploading}
                         className="hidden"
                       />
                       <span className="text-white/60 font-semibold truncate text-xs">
-                        {uploading ? "Uploading..." : formData.src ? `✓ ${activeTab === "photo" ? "Image" : "Video"} Uploaded` : `Click to Upload ${activeTab === "photo" ? "Image" : "Video"}`}
+                        {uploading ? "Uploading..." : formData.src ? `✓ ${activeTab === "video" ? "Video" : "Image"} Uploaded` : `Click to Upload ${activeTab === "video" ? "Video" : "Image"}`}
                       </span>
                     </label>
                   )}

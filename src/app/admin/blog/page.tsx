@@ -6,6 +6,7 @@ import {
   Plus, Pencil, Trash2, X, Save, Image, 
   Upload, ArrowUpRight, BookOpen, Calendar, User, Eye 
 } from "lucide-react";
+import FroalaEditor from "@/components/FroalaEditor";
 
 type BlogPost = {
   _id: string;
@@ -491,14 +492,11 @@ export default function AdminBlogPage() {
               </div>
 
               <div>
-                <label className="text-[10px] font-black uppercase tracking-wider text-white/60 block mb-2">Blog Content * (Plain text or HTML supported)</label>
-                <textarea 
-                  rows={12} 
-                  required
+                <label className="text-[10px] font-black uppercase tracking-wider text-white/60 block mb-2">Blog Content *</label>
+                <FroalaEditor 
                   value={formContent} 
-                  onChange={(e) => setFormContent(e.target.value)}
-                  placeholder="Write your blog contents here. Use double newlines to start a new paragraph." 
-                  className="w-full border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-bold bg-[#081a3a] focus:outline-none focus:border-[#F7B801] resize-y"
+                  onChange={(val) => setFormContent(val)}
+                  placeholder="Write your blog contents here..." 
                 />
               </div>
 

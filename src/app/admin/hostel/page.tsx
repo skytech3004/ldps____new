@@ -78,6 +78,7 @@ export default function AdminHostelPage() {
   const [photoSrc, setPhotoSrc] = useState("");
   const [photoCategory, setPhotoCategory] = useState("Rooms");
   const [hostelCategories, setHostelCategories] = useState<string[]>(["Rooms", "Mess", "Campus"]);
+  const [hostelFilter, setHostelFilter] = useState<string>("All");
 
   async function fetchData() {
     try {
@@ -332,7 +333,10 @@ export default function AdminHostelPage() {
         {(["facilities", "fees", "rules", "gallery"] as const).map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => {
+              setActiveTab(tab);
+              setHostelFilter("All");
+            }}
             className={`px-6 py-4 font-black uppercase text-xs tracking-widest border-b-2 transition-all ${
               activeTab === tab ? "border-[#F7B801] text-[#F7B801]" : "border-transparent text-white/60 hover:text-white"
             }`}
@@ -443,8 +447,30 @@ export default function AdminHostelPage() {
           )}
 
           {activeTab === "gallery" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {hostelPhotos.map((photo) => (
+            <div className="space-y-6">
+              {/* Category Filter Bar */}
+              <div className="flex flex-wrap gap-2 mb-2 bg-[#0b1738]/60 p-4 rounded-2xl border border-white/5 items-center">
+                <span className="text-white/40 text-xs font-bold mr-2 uppercase tracking-wider">Filter Category:</span>
+                {["All", ...hostelCategories].map((filter) => (
+                  <button
+                    key={filter}
+                    type="button"
+                    onClick={() => setHostelFilter(filter)}
+                    className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+                      hostelFilter === filter
+                        ? "bg-[#F7B801] text-[#3D348B]"
+                        : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
+                    }`}
+                  >
+                    {filter}
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {hostelPhotos
+                  .filter((p) => hostelFilter === "All" || p.category === hostelFilter)
+                  .map((photo) => (
                 <div key={photo._id} className="bg-[#0b1738] border border-white/10 rounded-2xl overflow-hidden flex flex-col justify-between">
                   <div className="relative aspect-[16/10] bg-slate-950">
                     <img src={photo.src} alt={photo.title} className="w-full h-full object-cover" />
@@ -467,9 +493,10 @@ export default function AdminHostelPage() {
                   </div>
                 </div>
               ))}
-              {hostelPhotos.length === 0 && (
-                <div className="col-span-full text-center py-12 text-white/50 font-bold text-xs uppercase tracking-widest">No gallery photos added yet.</div>
+              {hostelPhotos.filter((p) => hostelFilter === "All" || p.category === hostelFilter).length === 0 && (
+                <div className="col-span-full text-center py-12 text-white/50 font-bold text-xs uppercase tracking-widest">No gallery photos found for this filter.</div>
               )}
+              </div>
             </div>
           )}
         </div>
