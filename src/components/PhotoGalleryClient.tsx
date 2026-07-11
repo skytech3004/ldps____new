@@ -115,7 +115,7 @@ export default function PhotoGalleryClient() {
             onClick={() => setActiveFilter(filter)}
             className={`px-5 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-300 ${
               activeFilter === filter
-                ? "bg-[#3D348B] text-white shadow-premium-sm"
+                ? "bg-[#3D348B] text-white shadow-filter-shadow"
                 : "bg-white text-[#3D348B] border border-slate-100 hover:bg-[#F1F2F6]"
             }`}
           >
