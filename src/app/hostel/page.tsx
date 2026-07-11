@@ -374,9 +374,7 @@ export default function HostelPage() {
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.4 }}
                   onClick={() => setActivePhoto(idx)}
-                  className={`group relative rounded-[2.2rem] overflow-hidden shadow-premium-md border-4 border-white bg-slate-50 transition-all duration-500 hover:-translate-y-2 hover:shadow-premium-lg cursor-pointer ${
-                    idx % 4 === 0 ? "lg:aspect-[3/4] lg:row-span-2" : "aspect-square sm:aspect-[4/3] lg:aspect-square"
-                  }`}
+                  className="group relative rounded-[2.2rem] overflow-hidden shadow-premium-md border-4 border-white bg-slate-50 transition-all duration-500 hover:-translate-y-2 hover:shadow-premium-lg cursor-pointer aspect-square sm:aspect-[4/3]"
                 >
                   <img 
                     src={item.src} 
