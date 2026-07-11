@@ -10,7 +10,7 @@ import Reveal from "@/components/ui/Reveal";
 export default function LifeAtVidyawadi() {
   const [moments, setMoments] = useState<any[]>([]);
   const [activeFilter, setActiveFilter] = useState("Recent");
-  const [filters, setFilters] = useState<string[]>(["Recent", "Events", "Fun & Food Fest", "Hostel", "Infrastructure", "Laboratories"]);
+  const [filters, setFilters] = useState<string[]>(["Recent", "Events", "Sports", "NCC", "NSS", "Hostel", "Infrastructure", "Laboratories"]);
 
   const defaultMoments = [
     { src: "/lps-vidhyawadi/gallery-01.jpg", title: "Residential Comforts", category: "Hostel" },
@@ -25,35 +25,60 @@ export default function LifeAtVidyawadi() {
     { src: "/lps-vidhyawadi/gallery-10.jpg", title: "Vibrant Stalls & Fun", category: "Fun & Food Fest" },
     { src: "/lps-vidhyawadi/gallery-11.jpg", title: "Interactive Smart Class", category: "Infrastructure" },
     { src: "/lps-vidhyawadi/gallery-12.jpg", title: "Creative Fine Arts Studio", category: "Laboratories" },
+    // Custom fallbacks for new categories
+    { src: "/uploads/gallery/sports-img-1.jpg", title: "Athletics Practice", category: "Sports" },
+    { src: "/uploads/gallery/ncc-img-1.jpg", title: "Cadet Parade Guard", category: "NCC" },
+    { src: "/uploads/gallery/nss-img-1.jpg", title: "Community Service Drive", category: "NSS" }
   ];
 
   React.useEffect(() => {
-    const fetchPhotos = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch("/api/admin/media-items?type=photo");
+        const res = await fetch("/api/admin/media-items"); // Fetch all types
         if (res.ok) {
           const data = await res.json();
-          setMoments(data || []);
+          const processed = (data || []).map((item: any) => {
+            let category = item.category || "Events";
+            if (item.type === "sports-photo") category = "Sports";
+            else if (item.type === "ncc-photo") category = "NCC";
+            else if (item.type === "nss-photo") category = "NSS";
+            else if (item.type === "hostel-photo") category = "Hostel";
+            return {
+              ...item,
+              category
+            };
+          });
+          setMoments(processed);
+
+          // Build filter list dynamically from categories present in the data and defaults
+          const allCategories = [
+            ...processed.map((item: any) => item.category),
+            ...defaultMoments.map(dm => dm.category)
+          ];
+          const uniqueCats = Array.from(new Set(allCategories));
+          
+          const preferredOrder = ["Recent", "Events", "Sports", "NCC", "NSS", "Hostel"];
+          const orderedFilters = ["Recent"];
+          
+          preferredOrder.slice(1).forEach(cat => {
+            if (uniqueCats.includes(cat)) {
+              orderedFilters.push(cat);
+            }
+          });
+          
+          uniqueCats.forEach(cat => {
+            if (!orderedFilters.includes(cat) && cat !== "Recent") {
+              orderedFilters.push(cat);
+            }
+          });
+
+          setFilters(orderedFilters);
         }
       } catch (error) {
         console.error("Failed to fetch gallery moments:", error);
       }
     };
-    const fetchFilters = async () => {
-      try {
-        const res = await fetch("/api/admin/filters?type=gallery");
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.length > 0) {
-            setFilters(["Recent", ...data.map((f: any) => f.name)]);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch gallery filters:", error);
-      }
-    };
-    fetchPhotos();
-    fetchFilters();
+    fetchData();
   }, []);
 
   // Combine dynamic uploads with fallbacks (ensure uploaded items appear first)
@@ -62,6 +87,14 @@ export default function LifeAtVidyawadi() {
   const filteredMoments = activeFilter === "Recent" 
     ? combinedMoments.slice(0, 8) // Show first 8 of the combined list
     : combinedMoments.filter(item => item.category === activeFilter);
+
+  const getCategoryLink = (category: string) => {
+    if (category === "Sports") return "/sports";
+    if (category === "NCC") return "/academics/ncc";
+    if (category === "NSS") return "/academics/nss";
+    if (category === "Hostel") return "/hostel";
+    return `/gallery?category=${category}`;
+  };
 
   return (
     <section className="py-32 md:py-40 px-6 bg-[#F8F9FC]">
@@ -117,7 +150,7 @@ export default function LifeAtVidyawadi() {
           <AnimatePresence mode="popLayout">
             {filteredMoments.map((moment, idx) => (
               <Link 
-                href={`/gallery?category=${moment.category}`}
+                href={getCategoryLink(moment.category)}
                 key={moment.src}
                 className="block"
               >
