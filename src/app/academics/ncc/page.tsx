@@ -137,7 +137,7 @@ export default function NCCPage() {
           <div className="absolute -bottom-10 -left-10 w-42 h-42 bg-[#F7B801]/10 rounded-full blur-3xl" />
           <div className="relative aspect-[4/3] rounded-[2.5rem] overflow-hidden border-[12px] border-white shadow-2xl">
             <Image
-              src="/uploads/gallery/ncc-img-1.jpg"
+              src="/uploads/gallery/ncc-img-2.jpg"
               alt="NCC Cadet Training & Drills"
               fill
               sizes="(max-width: 768px) 100vw, 40vw"
@@ -151,7 +151,7 @@ export default function NCCPage() {
       {/* NCC Gallery Section */}
       <section className="py-20 px-6 bg-white border-t border-slate-100 text-center">
         <div className="max-w-7xl mx-auto space-y-12">
-          
+
           <div className="space-y-4">
             <span className="text-[#3D348B] font-black uppercase tracking-[0.4em] text-xs block">Cadet Chronicle</span>
             <h2 className="text-3xl md:text-5xl font-black text-[#3D348B] uppercase font-montserrat tracking-tight">
@@ -175,23 +175,23 @@ export default function NCCPage() {
               <p className="text-sm text-slate-500 mt-1">Photos of NCC activities will appear here once uploaded in the Admin portal.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
+            <div className="columns-1 sm:columns-2 lg:columns-3 gap-8 [column-fill:_balance] pt-4">
               {galleryItems.map((item, idx) => (
-                <motion.div 
+                <motion.div
                   key={item._id}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: (idx % 3) * 0.1 }}
                   onClick={() => setActivePhoto(idx)}
-                  className="bg-white rounded-2xl border border-slate-100 shadow-[0_12px_30px_rgba(61,52,139,0.03)] overflow-hidden p-4 flex flex-col cursor-pointer transition-all duration-300 hover:shadow-[0_20px_45px_rgba(61,52,139,0.06)] hover:-translate-y-1.5 group"
+                  className="break-inside-avoid mb-8 bg-white rounded-2xl border border-slate-100 shadow-[0_12px_30px_rgba(61,52,139,0.03)] overflow-hidden p-4 flex flex-col cursor-pointer transition-all duration-300 hover:shadow-[0_20px_45px_rgba(61,52,139,0.06)] hover:-translate-y-1.5 group w-full"
                 >
-                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-50 border border-slate-100">
-                    <img 
-                      src={item.src} 
+                  <div className="relative rounded-xl overflow-hidden bg-slate-50 border border-slate-100">
+                    <img
+                      src={item.src}
                       alt={item.alt || item.title}
                       loading="lazy"
-                      className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 scale-100 group-hover:scale-[1.03] transition-all duration-500"
+                      className="w-full h-auto object-cover filter grayscale group-hover:grayscale-0 scale-100 group-hover:scale-[1.03] transition-all duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-start p-3">
                       <span className="inline-flex items-center gap-1 text-[10px] font-black text-white uppercase bg-[#3D348B]/95 px-2.5 py-1 rounded-lg backdrop-blur-sm">
@@ -267,8 +267,8 @@ export default function NCCPage() {
             </div>
 
             {/* Bottom Info Bar */}
-            <div 
-              onClick={(e) => e.stopPropagation()} 
+            <div
+              onClick={(e) => e.stopPropagation()}
               className="w-full max-w-3xl text-center flex flex-col items-center gap-4 text-white px-4"
             >
               <div className="space-y-1">
