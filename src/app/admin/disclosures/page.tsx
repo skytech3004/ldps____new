@@ -847,7 +847,7 @@ export default function AdminDisclosuresPage() {
               {isCustomCategory && (
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-wider text-primary/60 ml-2">
-                    Custom Category/Tab Name (lowercase, singular, e.g., 'audits') *
+                    Custom Category/Tab Name (lowercase, singular, e.g., &apos;audits&apos;) *
                   </label>
                   <input
                     value={customCategoryName}
