@@ -18,6 +18,8 @@ export default function AdminMediaGallery() {
   const [videoItems, setVideoItems] = useState<MediaItem[]>([]);
   const [nssItems, setNssItems] = useState<MediaItem[]>([]);
   const [nccItems, setNccItems] = useState<MediaItem[]>([]);
+  const [nccFeatured, setNccFeatured] = useState<MediaItem | null>(null);
+  const [nssFeatured, setNssFeatured] = useState<MediaItem | null>(null);
   const [activeTab, setActiveTab] = useState<"photo" | "video" | "nss-photo" | "ncc-photo">("photo");
   const [adminFilter, setAdminFilter] = useState<string>("All");
   const [activePreview, setActivePreview] = useState<string | null>(null);
@@ -116,6 +118,8 @@ export default function AdminMediaGallery() {
       const videosRes = await fetch("/api/admin/media-items?type=video");
       const nssRes = await fetch("/api/admin/media-items?type=nss-photo");
       const nccRes = await fetch("/api/admin/media-items?type=ncc-photo");
+      const nccFeaturedRes = await fetch("/api/admin/media-items?type=ncc-featured");
+      const nssFeaturedRes = await fetch("/api/admin/media-items?type=nss-featured");
 
       if (photosRes.ok) {
         const photos = await photosRes.json();
@@ -135,6 +139,24 @@ export default function AdminMediaGallery() {
       if (nccRes.ok) {
         const ncc = await nccRes.json();
         setNccItems(ncc);
+      }
+
+      if (nccFeaturedRes.ok) {
+        const items = await nccFeaturedRes.json();
+        if (items && items.length > 0) {
+          setNccFeatured(items[0]);
+        } else {
+          setNccFeatured(null);
+        }
+      }
+
+      if (nssFeaturedRes.ok) {
+        const items = await nssFeaturedRes.json();
+        if (items && items.length > 0) {
+          setNssFeatured(items[0]);
+        } else {
+          setNssFeatured(null);
+        }
       }
     } catch (error) {
       console.error("Failed to fetch media items:", error);
@@ -231,6 +253,82 @@ export default function AdminMediaGallery() {
       console.error("Upload failed:", error);
       alert("File upload failed. Please try again.");
       setUploading(false);
+    }
+  };
+
+  const handleFeaturedUpload = async (e: React.ChangeEvent<HTMLInputElement>, isNcc: boolean) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const dataToUpload = new FormData();
+      dataToUpload.append("file", file);
+      dataToUpload.append("section", "media-items");
+      dataToUpload.append("page", isNcc ? "ncc" : "nss");
+      dataToUpload.append("title", `${isNcc ? "NCC" : "NSS"} Featured Banner`);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: dataToUpload,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+      
+      const payload = {
+        title: `${isNcc ? "NCC" : "NSS"} Featured Banner`,
+        src: data.upload.src,
+        alt: `${isNcc ? "NCC" : "NSS"} Featured Banner Image`,
+        type: isNcc ? "ncc-featured" : "nss-featured",
+      };
+
+      const existingId = isNcc ? nccFeatured?._id : nssFeatured?._id;
+      
+      const saveRes = await fetch("/api/admin/media-items", {
+        method: existingId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(existingId ? { _id: existingId, ...payload } : payload),
+      });
+
+      if (!saveRes.ok) throw new Error("Failed to save media item");
+      const savedItem = await saveRes.json();
+
+      if (isNcc) {
+        setNccFeatured(savedItem);
+      } else {
+        setNssFeatured(savedItem);
+      }
+      alert("Featured image updated successfully!");
+    } catch (error) {
+      console.error("Featured image update failed:", error);
+      alert("Failed to update featured image.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeleteFeatured = async (isNcc: boolean) => {
+    const item = isNcc ? nccFeatured : nssFeatured;
+    if (!item?._id) return;
+    const confirmed = window.confirm("Are you sure you want to reset the featured image to its default banner?");
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/admin/media-items?id=${item._id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Delete failed");
+      
+      if (isNcc) {
+        setNccFeatured(null);
+      } else {
+        setNssFeatured(null);
+      }
+      alert("Featured image reset to default.");
+    } catch (error) {
+      console.error("Failed to delete featured image:", error);
+      alert("Failed to reset featured image.");
     }
   };
 
@@ -392,6 +490,66 @@ export default function AdminMediaGallery() {
           Add {activeTab === "video" ? "Video" : "Photo"}
         </button>
       </div>
+
+      {/* Featured Banner Image Manager for NSS / NCC */}
+      {(activeTab === "nss-photo" || activeTab === "ncc-photo") && !loading && (
+        <div className="bg-[#111c38]/40 border border-white/5 p-6 rounded-2xl mb-8 flex flex-col md:flex-row gap-6 items-center text-left">
+          <div className="flex-1 space-y-2">
+            <span className="px-2 py-0.5 bg-[#F7B801]/10 border border-[#F7B801]/25 text-[#F7B801] rounded text-[8px] font-mono font-bold uppercase tracking-wider">
+              Featured Banner Section
+            </span>
+            <h3 className="text-lg font-black uppercase text-white font-montserrat tracking-tight">
+              {activeTab === "ncc-photo" ? "NCC" : "NSS"} Main Page Banner Photo
+            </h3>
+            <p className="text-xs text-white/50 leading-relaxed font-semibold max-w-xl">
+              This photo is displayed in the main introduction banner on the public {activeTab === "ncc-photo" ? "NCC" : "NSS"} page. Upload a horizontal high-resolution image to customize it.
+            </p>
+          </div>
+          <div className="w-full md:w-auto flex flex-col sm:flex-row gap-4 items-center shrink-0">
+            {/* Preview current featured image */}
+            <div className="w-36 h-24 rounded-xl overflow-hidden bg-slate-800 border border-white/10 relative shrink-0">
+              <img
+                src={
+                  activeTab === "ncc-photo"
+                    ? nccFeatured?.src || "/uploads/gallery/ncc-img-2.jpg"
+                    : nssFeatured?.src || "/uploads/gallery/nss-img-5.jpg"
+                }
+                alt="Featured Banner Preview"
+                className="w-full h-full object-cover"
+              />
+              <span className="absolute bottom-1 right-1 bg-black/65 px-1.5 py-0.5 rounded text-[8px] font-mono text-white/70">
+                {activeTab === "ncc-photo"
+                  ? nccFeatured ? "Custom" : "Default"
+                  : nssFeatured ? "Custom" : "Default"}
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-2 w-full sm:w-auto">
+              <div className="relative bg-[#F7B801] hover:bg-[#E5AA00] text-[#3D348B] font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2">
+                <Upload size={14} />
+                <span>{uploading ? "Updating..." : "Change Banner"}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFeaturedUpload(e, activeTab === "ncc-photo")}
+                  disabled={uploading}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                />
+              </div>
+              {(activeTab === "ncc-photo" ? nccFeatured : nssFeatured) && (
+                <button
+                  onClick={() => handleDeleteFeatured(activeTab === "ncc-photo")}
+                  disabled={uploading}
+                  className="bg-red-500/15 hover:bg-red-500/25 border border-red-500/20 text-red-400 font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-xl transition-all cursor-pointer w-full text-center flex items-center justify-center gap-1.5"
+                >
+                  <Trash2 size={12} />
+                  Reset to Default
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Loading State */}
       {loading && (

@@ -65,6 +65,7 @@ export default function HostelPage() {
   const [hostelPhotos, setHostelPhotos] = useState<HostelPhoto[]>([]);
   const [activeFilter, setActiveFilter] = useState("All");
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
+  const [prospectusUrl, setProspectusUrl] = useState<string | null>(null);
 
   const [filters, setFilters] = useState<string[]>(["All", "Rooms", "Mess", "Campus"]);
 
@@ -116,7 +117,21 @@ export default function HostelPage() {
       }
     }
 
-    Promise.all([fetchHostelData(), fetchHostelPhotos(), fetchHostelFilters()]);
+    async function checkProspectus() {
+      try {
+        const res = await fetch("/api/admin/prospectus");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.exists) {
+            setProspectusUrl(data.url);
+          }
+        }
+      } catch (err) {
+        console.error("Error checking prospectus", err);
+      }
+    }
+
+    Promise.all([fetchHostelData(), fetchHostelPhotos(), fetchHostelFilters(), checkProspectus()]);
   }, []);
 
   const filteredPhotos = activeFilter === "All"
@@ -226,10 +241,24 @@ export default function HostelPage() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="flex flex-wrap gap-4 pt-4"
             >
-              <button className="px-8 py-4 bg-accent hover:bg-accent-hover text-[#3D348B] font-black uppercase tracking-widest rounded-2xl shadow-premium-lg flex items-center gap-3 transition-all duration-300 hover:-translate-y-0.5">
-                <Download size={18} />
-                Download Prospectus
-              </button>
+              {prospectusUrl ? (
+                <a 
+                  href={prospectusUrl}
+                  download="LPS_Vidyawadi_Prospectus.pdf"
+                  className="px-8 py-4 bg-accent hover:bg-accent-hover text-[#3D348B] font-black uppercase tracking-widest rounded-2xl shadow-premium-lg flex items-center gap-3 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer"
+                >
+                  <Download size={18} />
+                  Download Prospectus
+                </a>
+              ) : (
+                <button 
+                  onClick={() => alert("The digital prospectus is currently being updated by the administration. Please contact our reception desk for inquiries.")}
+                  className="px-8 py-4 bg-accent hover:bg-accent-hover text-[#3D348B] font-black uppercase tracking-widest rounded-2xl shadow-premium-lg flex items-center gap-3 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer"
+                >
+                  <Download size={18} />
+                  Download Prospectus
+                </button>
+              )}
               <Link 
                 href="/apply-for-admission" 
                 className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-black uppercase tracking-widest rounded-2xl border border-white/20 flex items-center gap-3 transition-all duration-300 hover:border-white/40"

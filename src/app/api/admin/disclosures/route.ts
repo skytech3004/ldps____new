@@ -26,14 +26,17 @@ export async function POST(request: Request) {
     await connectToDatabase();
     const body = await request.json();
 
-    if (!body.title || !body.pdfUrl) {
-      return NextResponse.json({ error: "Missing required fields (title, pdfUrl)." }, { status: 400 });
+    if (!body.title || !body.category) {
+      return NextResponse.json({ error: "Missing required fields (title, category)." }, { status: 400 });
     }
 
     const created = await DisclosureDocumentModel.create({
       title: body.title,
-      pdfUrl: body.pdfUrl,
-      category: body.category || "documents",
+      pdfUrl: body.pdfUrl || "",
+      category: body.category,
+      value: body.value || "",
+      details: body.details || "",
+      count: typeof body.count === "number" ? body.count : undefined,
     });
 
     return NextResponse.json(created, { status: 201 });
@@ -52,16 +55,19 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Disclosure ID is required." }, { status: 400 });
     }
 
-    if (!body.title || !body.pdfUrl) {
-      return NextResponse.json({ error: "Missing required fields (title, pdfUrl)." }, { status: 400 });
+    if (!body.title || !body.category) {
+      return NextResponse.json({ error: "Missing required fields (title, category)." }, { status: 400 });
     }
 
     const updated = await DisclosureDocumentModel.findByIdAndUpdate(
       body.id,
       {
         title: body.title,
-        pdfUrl: body.pdfUrl,
-        category: body.category || "documents",
+        pdfUrl: body.pdfUrl || "",
+        category: body.category,
+        value: body.value || "",
+        details: body.details || "",
+        count: typeof body.count === "number" ? body.count : undefined,
       },
       { new: true, runValidators: true }
     );

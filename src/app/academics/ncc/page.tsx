@@ -21,6 +21,7 @@ export default function NCCPage() {
   const [galleryItems, setGalleryItems] = useState<MediaItem[]>([]);
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [featuredImage, setFeaturedImage] = useState("/uploads/gallery/ncc-img-2.jpg");
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -32,11 +33,26 @@ export default function NCCPage() {
         }
       } catch (error) {
         console.error("Failed to fetch NCC photos:", error);
-      } finally {
-        setLoading(false);
       }
     };
-    fetchPhotos();
+
+    const fetchFeatured = async () => {
+      try {
+        const res = await fetch("/api/admin/media-items?type=ncc-featured");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setFeaturedImage(data[0].src);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch NCC featured image:", error);
+      }
+    };
+
+    Promise.all([fetchPhotos(), fetchFeatured()]).finally(() => {
+      setLoading(false);
+    });
   }, []);
 
   const handlePrev = (e?: React.MouseEvent) => {
@@ -137,7 +153,7 @@ export default function NCCPage() {
           <div className="absolute -bottom-10 -left-10 w-42 h-42 bg-[#F7B801]/10 rounded-full blur-3xl" />
           <div className="relative aspect-[4/3] rounded-[2.5rem] overflow-hidden border-[12px] border-white shadow-2xl">
             <Image
-              src="/uploads/gallery/ncc-img-2.jpg"
+              src={featuredImage}
               alt="NCC Cadet Training & Drills"
               fill
               sizes="(max-width: 768px) 100vw, 40vw"

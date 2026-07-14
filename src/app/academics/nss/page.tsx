@@ -21,6 +21,7 @@ export default function NSSPage() {
   const [galleryItems, setGalleryItems] = useState<MediaItem[]>([]);
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [featuredImage, setFeaturedImage] = useState("/uploads/gallery/nss-img-5.jpg");
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -32,11 +33,26 @@ export default function NSSPage() {
         }
       } catch (error) {
         console.error("Failed to fetch NSS photos:", error);
-      } finally {
-        setLoading(false);
       }
     };
-    fetchPhotos();
+
+    const fetchFeatured = async () => {
+      try {
+        const res = await fetch("/api/admin/media-items?type=nss-featured");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setFeaturedImage(data[0].src);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch NSS featured image:", error);
+      }
+    };
+
+    Promise.all([fetchPhotos(), fetchFeatured()]).finally(() => {
+      setLoading(false);
+    });
   }, []);
 
   const handlePrev = (e?: React.MouseEvent) => {
@@ -137,7 +153,7 @@ export default function NSSPage() {
           <div className="absolute -bottom-10 -left-10 w-42 h-42 bg-[#F7B801]/10 rounded-full blur-3xl" />
           <div className="relative aspect-[4/3] rounded-[2.5rem] overflow-hidden border-[12px] border-white shadow-2xl">
             <Image
-              src="/uploads/gallery/nss-img-5.jpg"
+              src={featuredImage}
               alt="NSS Social Service Activities"
               fill
               sizes="(max-width: 768px) 100vw, 40vw"
@@ -191,7 +207,7 @@ export default function NSSPage() {
                       src={item.src}
                       alt={item.alt || item.title}
                       loading="lazy"
-                      className="w-full h-auto object-cover filter grayscale group-hover:grayscale-0 scale-100 group-hover:scale-[1.03] transition-all duration-500"
+                      className="w-full h-auto object-cover filter  group-hover:grayscale-0 scale-100 group-hover:scale-[1.03] transition-all duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-start p-3">
                       <span className="inline-flex items-center gap-1 text-[10px] font-black text-white uppercase bg-[#3D348B]/95 px-2.5 py-1 rounded-lg backdrop-blur-sm">

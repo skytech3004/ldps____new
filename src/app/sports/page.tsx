@@ -438,7 +438,7 @@ export default function SportsPage() {
                       src={item.src} 
                       alt={item.alt || item.title}
                       loading="lazy"
-                      className="w-full h-auto object-cover filter grayscale group-hover:grayscale-0 scale-100 group-hover:scale-[1.03] transition-all duration-500"
+                      className="w-full h-auto object-cover filter  group-hover:grayscale-0 scale-100 group-hover:scale-[1.03] transition-all duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-start p-3">
                       <span className="inline-flex items-center gap-1 text-[10px] font-black text-white uppercase bg-primary px-2.5 py-1 rounded-lg backdrop-blur-sm">

@@ -33,6 +33,7 @@ import { curriculumPage, getSection } from "@/data/lpsVidhyawadiDatabase";
 export default function ScholasticPage() {
   const [facilities, setFacilities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [prospectusUrl, setProspectusUrl] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchFacilities() {
@@ -48,7 +49,22 @@ export default function ScholasticPage() {
         setLoading(false);
       }
     }
-    fetchFacilities();
+
+    async function checkProspectus() {
+      try {
+        const res = await fetch("/api/admin/prospectus");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.exists) {
+            setProspectusUrl(data.url);
+          }
+        }
+      } catch (err) {
+        console.error("Error checking prospectus", err);
+      }
+    }
+
+    Promise.all([fetchFacilities(), checkProspectus()]);
   }, []);
 
   const primaryCurriculum = getSection(curriculumPage, "The Curriculum");
@@ -434,12 +450,22 @@ export default function ScholasticPage() {
               </div>
 
               <div className="pt-6">
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center gap-2 text-accent font-black uppercase tracking-widest text-sm hover:translate-x-2 transition-transform"
-                >
-                  Download Detailed Prospectus <ArrowRight size={18} />
-                </Link>
+                {prospectusUrl ? (
+                  <a
+                    href={prospectusUrl}
+                    download="LPS_Vidyawadi_Prospectus.pdf"
+                    className="inline-flex items-center gap-2 text-accent font-black uppercase tracking-widest text-sm hover:translate-x-2 transition-transform cursor-pointer"
+                  >
+                    Download Detailed Prospectus <ArrowRight size={18} />
+                  </a>
+                ) : (
+                  <Link
+                    href="/contact"
+                    className="inline-flex items-center gap-2 text-accent font-black uppercase tracking-widest text-sm hover:translate-x-2 transition-transform"
+                  >
+                    Download Detailed Prospectus <ArrowRight size={18} />
+                  </Link>
+                )}
               </div>
             </div>
           </div>

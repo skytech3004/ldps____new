@@ -49,6 +49,18 @@ export default function AdminDownloadsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<DownloadForm>(initialForm);
 
+  // Prospectus states
+  const [prospectusInfo, setProspectusInfo] = useState<{
+    exists: boolean;
+    url?: string;
+    filename?: string;
+    size?: string;
+    updatedAt?: string;
+  } | null>(null);
+  const [prospectusUploading, setProspectusUploading] = useState(false);
+  const [prospectusError, setProspectusError] = useState("");
+  const [prospectusSuccess, setProspectusSuccess] = useState("");
+
   async function fetchItems() {
     try {
       setLoading(true);
@@ -67,8 +79,21 @@ export default function AdminDownloadsPage() {
     }
   }
 
+  async function fetchProspectusInfo() {
+    try {
+      const response = await fetch("/api/admin/prospectus");
+      if (response.ok) {
+        const data = await response.json();
+        setProspectusInfo(data);
+      }
+    } catch (e) {
+      console.error("Failed to fetch prospectus info", e);
+    }
+  }
+
   useEffect(() => {
     fetchItems();
+    fetchProspectusInfo();
   }, []);
 
   function openCreateModal() {
@@ -143,6 +168,80 @@ export default function AdminDownloadsPage() {
     }
   }
 
+  async function handleProspectusUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
+      setProspectusError("Please upload a PDF file only.");
+      return;
+    }
+
+    setProspectusUploading(true);
+    setProspectusError("");
+    setProspectusSuccess("");
+
+    try {
+      const body = new FormData();
+      body.set("file", file);
+
+      const response = await fetch("/api/admin/prospectus", {
+        method: "POST",
+        body,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error ?? "Prospectus upload failed.");
+      }
+
+      setProspectusInfo({
+        exists: true,
+        url: result.url,
+        filename: result.filename,
+        size: result.size,
+        updatedAt: result.updatedAt,
+      });
+      setProspectusSuccess("Prospectus PDF uploaded and activated successfully!");
+    } catch (uploadError) {
+      const message = uploadError instanceof Error ? uploadError.message : "Upload failed.";
+      setProspectusError(message);
+    } finally {
+      setProspectusUploading(false);
+    }
+  }
+
+  async function handleProspectusRemove() {
+    const confirmed = window.confirm(
+      "Are you sure you want to remove the school prospectus? This will delete the prospectus file from the server."
+    );
+    if (!confirmed) return;
+
+    setProspectusUploading(true);
+    setProspectusError("");
+    setProspectusSuccess("");
+
+    try {
+      const response = await fetch("/api/admin/prospectus", {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error ?? "Failed to delete prospectus.");
+      }
+
+      setProspectusInfo({ exists: false });
+      setProspectusSuccess("Prospectus PDF removed successfully.");
+    } catch (deleteError) {
+      const message = deleteError instanceof Error ? deleteError.message : "Failed to delete prospectus.";
+      setProspectusError(message);
+    } finally {
+      setProspectusUploading(false);
+    }
+  }
+
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     try {
@@ -207,7 +306,116 @@ export default function AdminDownloadsPage() {
   }
 
   return (
-    <>
+    <div className="space-y-8">
+      {/* Prospectus Manager Section */}
+      <section className="bg-white rounded-2xl border border-teal/10 shadow-sm overflow-hidden text-gray-800 p-6 md:p-8 space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-teal/5 pb-5">
+          <div className="text-left">
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#7678ED]">Official Publications</span>
+            <h2 className="text-2xl font-black text-primary mt-1 uppercase font-montserrat flex items-center gap-2">
+              <Upload className="text-[#7678ED]" size={20} />
+              School Prospectus Manager
+            </h2>
+            <p className="text-xs text-gray-500 font-semibold mt-1">
+              Upload, update, or remove the official school prospectus. This updates the prospectus download link across the whole site.
+            </p>
+          </div>
+        </div>
+
+        {prospectusError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-xs font-semibold leading-relaxed flex gap-2 text-left">
+            <AlertTriangle className="shrink-0" size={14} />
+            <span>{prospectusError}</span>
+          </div>
+        )}
+
+        {prospectusSuccess && (
+          <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-4 rounded-xl text-xs font-semibold leading-relaxed flex gap-2 text-left">
+            <CheckCircle2 className="shrink-0" size={14} />
+            <span>{prospectusSuccess}</span>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+          {/* Status Display */}
+          <div className="border border-gray-100 rounded-2xl p-6 bg-gray-50/50 flex flex-col gap-4 text-left">
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-bold text-gray-500 uppercase">Prospectus Status</span>
+              {prospectusInfo?.exists ? (
+                <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-wider">
+                  Active
+                </span>
+              ) : (
+                <span className="px-2.5 py-1 bg-gray-200 text-gray-500 rounded-full text-[10px] font-black uppercase tracking-wider">
+                  Not Uploaded
+                </span>
+              )}
+            </div>
+
+            {prospectusInfo?.exists ? (
+              <div className="space-y-3">
+                <div className="flex gap-3 items-center">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <FileText size={20} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-primary truncate" title={prospectusInfo.filename}>{prospectusInfo.filename}</p>
+                    <p className="text-[10px] text-gray-400 font-medium">Size: {prospectusInfo.size}</p>
+                  </div>
+                </div>
+                {prospectusInfo.updatedAt && (
+                  <div className="text-[10px] text-gray-400 font-medium">
+                    Last updated: {new Date(prospectusInfo.updatedAt).toLocaleString("en-IN")}
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2.5 pt-2">
+                  <a
+                    href={prospectusInfo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 bg-primary text-white font-extrabold text-[10px] uppercase tracking-wider px-4 py-2.5 rounded-lg shadow-sm hover:bg-secondary transition-all"
+                  >
+                    <ExternalLink size={12} />
+                    View Live
+                  </a>
+                  <button
+                    onClick={handleProspectusRemove}
+                    disabled={prospectusUploading}
+                    className="inline-flex items-center gap-1.5 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 font-extrabold text-[10px] uppercase tracking-wider px-4 py-2.5 rounded-lg transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <Trash2 size={12} />
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="py-4 text-center">
+                <p className="text-sm font-bold text-gray-400">No official prospectus file uploaded.</p>
+                <p className="text-xs text-gray-400 mt-1">Users will see a message prompting them to contact registry.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Upload Drag/Select Panel */}
+          <div className="border-2 border-dashed border-gray-200 hover:border-primary/40 rounded-2xl p-6 flex flex-col items-center justify-center transition-all bg-white relative h-40">
+            <Upload className="text-gray-400 mb-3" size={28} />
+            <p className="text-xs font-bold text-gray-600 text-center">
+              {prospectusUploading ? "Uploading PDF..." : "Upload or Drop PDF File"}
+            </p>
+            <p className="text-[10px] text-gray-400 text-center mt-1">Accepts prospectus.pdf up to 10MB</p>
+            
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={handleProspectusUpload}
+              disabled={prospectusUploading}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Existing Downloads List */}
       <section className="bg-white rounded-2xl border border-teal/10 shadow-sm overflow-hidden text-gray-800">
         <div className="p-6 md:p-8 border-b border-teal/10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -453,6 +661,6 @@ export default function AdminDownloadsPage() {
           </div>
         </div>
       ) : null}
-    </>
+    </div>
   );
 }

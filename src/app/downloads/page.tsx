@@ -43,27 +43,81 @@ export default function DownloadsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchDownloads() {
+    async function loadData() {
       try {
-        const response = await fetch("/api/admin/downloads");
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.length > 0) {
-            setDownloads(data);
-          } else {
-            setDownloads(fallbackForms);
+        setLoading(true);
+        // Fetch prospectus info
+        let dynamicProspectus = null;
+        try {
+          const propRes = await fetch("/api/admin/prospectus");
+          if (propRes.ok) {
+            const propData = await propRes.json();
+            if (propData.exists) {
+              dynamicProspectus = propData;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to load prospectus info", e);
+        }
+
+        // Fetch regular downloads
+        let finalDownloads = [...fallbackForms];
+        try {
+          const res = await fetch("/api/admin/downloads");
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.length > 0) {
+              finalDownloads = data;
+            }
+          }
+        } catch (err) {
+          console.error("Failed to fetch downloads:", err);
+        }
+
+        // Merge prospectus if it exists
+        if (dynamicProspectus) {
+          let updated = false;
+          finalDownloads = finalDownloads.map((item) => {
+            const title = String(item.title || "").toLowerCase();
+            if (title.includes("prospectus") || title.includes("brochure")) {
+              updated = true;
+              return {
+                ...item,
+                pdfUrl: dynamicProspectus.url,
+                fileSize: dynamicProspectus.size,
+                filename: dynamicProspectus.filename,
+              };
+            }
+            return item;
+          });
+
+          if (!updated) {
+            // Prepend a new card for the prospectus
+            finalDownloads.unshift({
+              title: "School E-Prospectus & Brochure",
+              description: "Official school prospectus detailing standard guidelines, infrastructure details, streams offered, and values.",
+              filename: dynamicProspectus.filename,
+              fileSize: dynamicProspectus.size,
+              pdfUrl: dynamicProspectus.url,
+            });
           }
         } else {
-          setDownloads(fallbackForms);
+          // If no prospectus is uploaded, remove the prospectus card from the list
+          finalDownloads = finalDownloads.filter((item) => {
+            const title = String(item.title || "").toLowerCase();
+            return !(title.includes("prospectus") || title.includes("brochure"));
+          });
         }
+
+        setDownloads(finalDownloads);
       } catch (err) {
-        console.error("Failed to fetch downloads:", err);
-        setDownloads(fallbackForms);
+        console.error("Error loading downloads page data:", err);
       } finally {
         setLoading(false);
       }
     }
-    fetchDownloads();
+
+    loadData();
   }, []);
 
   return (

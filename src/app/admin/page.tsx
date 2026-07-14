@@ -4,7 +4,7 @@ import Link from "next/link";
 import { 
   Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle, ClipboardList, 
   LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar, Download, Award, 
-  GraduationCap, Trophy, Home, Briefcase, Sparkles, Terminal, Activity 
+  GraduationCap, Trophy, Home, Briefcase, Sparkles, Terminal, Activity, Users 
 } from "lucide-react";
 
 const modules = [
@@ -56,6 +56,13 @@ const modules = [
     description: "Manage the public leadership page with names, designations, and portrait images.",
     href: "/admin/leadership",
     icon: ShieldCheck
+  },
+  {
+    title: "Managing Committee",
+    description: "Manage the Academic Excellence Team names and designations loaded from teacher.txt.",
+    href: "/admin/managing-committee",
+    icon: Users,
+    badge: "Local Roster"
   },
   {
     title: "Investiture Cabinet",

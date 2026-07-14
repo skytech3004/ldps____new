@@ -96,7 +96,7 @@ export default function Navbar() {
         { label: "Video Gallery", href: "/video-gallery" },
       ],
     },
-    { name: "CBSC Mandatory Disclosur", href: "/cbsc-mandatory-disclosure" },
+    { name: "CBSE Mandatory Disclosur", href: "/cbse-mandatory-disclosure" },
     {
       name: "More",
       href: "/",
