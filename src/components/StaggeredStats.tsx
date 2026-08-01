@@ -64,12 +64,16 @@ export default function StaggeredStats() {
       num: "8+",
       title: "HOSTEL",
       desc: "Safe, comfortable, and modern residential halls for students."
+    }, {
+      num: "1100+",
+      title: "STUDENTS",
+      desc: "A vibrant community of learners from diverse backgrounds."
     },
     {
       num: "21+",
       title: "BUSES",
       desc: "Reliable peripheral transport network connecting various regions."
-    }
+    },
   ];
 
   return (
@@ -108,49 +112,61 @@ export default function StaggeredStats() {
         </div>
 
         {/* Desktop Layout (3 Staggered Columns matching reference 3rd image) */}
-        <div className="hidden lg:grid grid-cols-3 gap-8 lg:gap-12 items-start relative min-h-[660px]">
-          {/* Column 1 (Left - Shifted Down) */}
-          <div className="flex flex-col gap-8 lg:mt-24">
-            <StatCard
-              num={stats[0].num}
-              title={stats[0].title}
-              desc={stats[0].desc}
-              delay={0.1}
-            />
-            <StatCard
-              num={stats[3].num}
-              title={stats[3].title}
-              desc={stats[3].desc}
-              delay={0.4}
-            />
-          </div>
+       <div className="hidden lg:grid grid-cols-3 gap-8 lg:gap-12 items-start relative min-h-[660px]">
 
-          {/* Column 2 (Middle - Centered/Shifted) */}
-          <div className="flex flex-col gap-8 lg:mt-12">
-            <StatCard
-              num={stats[1].num}
-              title={stats[1].title}
-              desc={stats[1].desc}
-              delay={0.2}
-            />
-          </div>
+  {/* Column 1 */}
+  <div className="flex flex-col gap-8 lg:mt-24">
+    <StatCard
+      num={stats[0].num}
+      title={stats[0].title}
+      desc={stats[0].desc}
+      delay={0.1}
+    />
 
-          {/* Column 3 (Right - Shifted Down) */}
-          <div className="flex flex-col gap-8 lg:mt-24">
-            <StatCard
-              num={stats[2].num}
-              title={stats[2].title}
-              desc={stats[2].desc}
-              delay={0.3}
-            />
-            <StatCard
-              num={stats[4].num}
-              title={stats[4].title}
-              desc={stats[4].desc}
-              delay={0.5}
-            />
-          </div>
-        </div>
+    <StatCard
+      num={stats[3].num}
+      title={stats[3].title}
+      desc={stats[3].desc}
+      delay={0.4}
+    />
+  </div>
+
+  {/* Column 2 */}
+  <div className="flex flex-col gap-8 lg:mt-12">
+    <StatCard
+      num={stats[1].num}
+      title={stats[1].title}
+      desc={stats[1].desc}
+      delay={0.2}
+    />
+
+    {/* THIS WAS MISSING */}
+    <StatCard
+      num={stats[4].num}
+      title={stats[4].title}
+      desc={stats[4].desc}
+      delay={0.5}
+    />
+  </div>
+
+  {/* Column 3 */}
+  <div className="flex flex-col gap-8 lg:mt-24">
+    <StatCard
+      num={stats[2].num}
+      title={stats[2].title}
+      desc={stats[2].desc}
+      delay={0.3}
+    />
+
+    <StatCard
+      num={stats[5].num}
+      title={stats[5].title}
+      desc={stats[5].desc}
+      delay={0.6}
+    />
+  </div>
+
+</div>
 
         {/* Mobile & Tablet Layout (Standard Responsive Grid) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:hidden">

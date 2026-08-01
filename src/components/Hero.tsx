@@ -1,29 +1,37 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Star, ChevronLeft, ChevronRight } from "lucide-react";
-import { heroSlides } from "@/data/lpsVidhyawadiDatabase";
+import { Star, ChevronLeft, ChevronRight } from "lucide-react";
+
+interface HeroSlide {
+  image: string;
+  title: string;
+  description: string;
+}
 
 const socialSidebar = [
   { 
     name: "Facebook", 
+    href: "https://www.facebook.com/profile.php?id=61583590541462",
     bg: "bg-[#3b5998]", 
     icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg> 
   },
   { 
-    name: "X (Twitter)", 
-    bg: "bg-black", 
-    icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg> 
+    name: "LinkedIn",
+    href: "https://www.linkedin.com/company/111560973/admin/page-posts/published/",
+    bg: "bg-[#0a66c2]",
+    icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg>
   },
   { 
-    name: "Youtube", 
+    name: "Youtube",
+    href: "https://www.youtube.com/@Vidyawadi-MMSS",
     bg: "bg-[#e52d27]", 
     icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg> 
   },
   { 
-    name: "Instagram", 
+    name: "Instagram",
+    href: "https://www.instagram.com/vidyawadiofficial",
     bg: "bg-[#262626]", 
     icon: <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> 
   }
@@ -31,7 +39,7 @@ const socialSidebar = [
  
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [slides, setSlides] = useState<any[]>([]);
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [loading, setLoading] = useState(true);
   const [transitionStyle, setTransitionStyle] = useState("fade");
  
@@ -41,7 +49,7 @@ export default function Hero() {
         const res = await fetch("/api/admin/carousel?key=hero");
         if (res.ok) {
           const data = await res.json();
-          if (data.slides) {
+          if (Array.isArray(data.slides)) {
             setSlides(data.slides);
           }
           if (data.transition) {
@@ -144,10 +152,10 @@ export default function Hero() {
             Admissions Open 2026-27
           </span>
           <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight leading-tight mb-2">
-            {slides[currentSlide].title || "Empowering Girls through Quality CBSE Education"}
+            {slides[currentSlide].title}
           </h2>
           <p className="text-xs md:text-sm text-white/80 font-medium leading-relaxed">
-            {slides[currentSlide].description || "Explore our sprawling lush 65-acre residential campus at Khimel, Rajasthan."}
+            {slides[currentSlide].description}
           </p>
         </div>
 
@@ -180,7 +188,9 @@ export default function Hero() {
           {socialSidebar.map((social) => (
             <a 
               key={social.name}
-              href="#"
+              href={social.href}
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label={social.name}
               className={`${social.bg} w-12 h-12 flex items-center justify-center cursor-pointer transition-all hover:-translate-x-2 shadow-lg`}
             >

@@ -5,42 +5,42 @@ import { PrePrimaryItemModel } from "@/models/PrePrimaryItem";
 const defaultPrePrimaryShowcaseItems = [
   {
     section: "Pre School",
-    title: "Bead Maze Learning",
-    description: "Developing fine motor skills and spatial reasoning through tactile wooden bead maze puzzles.",
-    src: "https://images.unsplash.com/photo-1603354363425-60bfee595b8d?auto=format&fit=crop&w=600&q=80",
-    alt: "tactile bead maze toy block learning",
+    title: "Pre School Activity Room",
+    description: "Young learners build confidence through playful classroom activities and guided interaction.",
+    src: "/uploads/pre-primary/2026-07-26T08-32-58-387Z-img-20250825-wa0128.jpg",
+    alt: "pre school classroom activity",
     sortOrder: 1
   },
   {
     section: "Pre School",
-    title: "Cup Stacking Tower",
-    description: "Collaborative building exercises to teach kids coordination, scale, balance, and patience.",
-    src: "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=600&q=80",
-    alt: "cup stacking and balance coordination",
+    title: "Creative Learning Session",
+    description: "Collaborative activities help children practice balance, coordination, and observation.",
+    src: "/uploads/pre-primary/2026-07-26T08-43-51-854Z-img-20250915-wa0226.jpg",
+    alt: "pre school creative learning session",
     sortOrder: 2
   },
   {
     section: "Pre School",
-    title: "Preschool Classroom Seating",
-    description: "Creating comfortable learning spaces where kids look ahead, listen, and participate together.",
-    src: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=600&q=80",
-    alt: "children sitting at school tables looking ahead",
+    title: "Classroom Participation",
+    description: "Comfortable learning spaces help children listen, participate, and learn together.",
+    src: "/uploads/pre-primary/2026-07-26T08-48-06-149Z-img20240504133917.jpg",
+    alt: "pre school classroom participation",
     sortOrder: 3
   },
   {
     section: "Pre School",
-    title: "Sensory Wall Activity Board",
-    description: "Hands-on wall activities featuring gears, shapes, and textures to foster cognitive development.",
-    src: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=600&q=80",
-    alt: "toddler touching wall activity toys",
+    title: "Hands-On Exploration",
+    description: "Activity-based learning strengthens curiosity, motor skills, and early problem solving.",
+    src: "/uploads/pre-primary/2026-07-29T08-23-17-656Z-img-20240921-wa0018.jpg",
+    alt: "pre school hands on exploration",
     sortOrder: 4
   },
   {
     section: "Pre School",
-    title: "Vibrant Creative Playroom",
-    description: "Vibrant playroom loaded with educational blocks, dolls, and puzzles for active social play.",
-    src: "https://images.unsplash.com/photo-1566378246598-5b11a0fe3a23?auto=format&fit=crop&w=600&q=80",
-    alt: "preschool colorful creative toys setup",
+    title: "Joyful Pre School Moments",
+    description: "Playful group moments support early social skills and a happy classroom environment.",
+    src: "/uploads/pre-primary/2026-07-29T08-24-21-258Z-img-20250915-wa0075.jpg",
+    alt: "joyful pre school learning moment",
     sortOrder: 5
   },
   {

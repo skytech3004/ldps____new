@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Users, BookOpen, Calendar, ArrowRight, ShieldCheck, Heart, Award, X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
+import { Users, BookOpen, ShieldCheck, Heart, X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface MediaItem {
@@ -17,11 +17,24 @@ interface MediaItem {
   category?: string;
 }
 
+const fallbackGalleryItems: MediaItem[] = Array.from({ length: 7 }, (_, index) => {
+  const photoNumber = index + 1;
+  return {
+    _id: `nss-fallback-${photoNumber}`,
+    title: `NSS Activity Photo ${photoNumber}`,
+    src: `/uploads/gallery/nss-img-${photoNumber}.jpg`,
+    alt: `NSS activity photo ${photoNumber}`,
+    type: "nss-photo",
+  };
+});
+
+const fallbackFeaturedImage = "/uploads/gallery/nss-img-5.jpg";
+
 export default function NSSPage() {
   const [galleryItems, setGalleryItems] = useState<MediaItem[]>([]);
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const [featuredImage, setFeaturedImage] = useState("/uploads/gallery/nss-img-5.jpg");
+  const [featuredImage, setFeaturedImage] = useState(fallbackFeaturedImage);
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -29,10 +42,13 @@ export default function NSSPage() {
         const res = await fetch("/api/admin/media-items?type=nss-photo");
         if (res.ok) {
           const data = await res.json();
-          setGalleryItems(data || []);
+          setGalleryItems(Array.isArray(data) && data.length > 0 ? data : fallbackGalleryItems);
+        } else {
+          setGalleryItems(fallbackGalleryItems);
         }
       } catch (error) {
         console.error("Failed to fetch NSS photos:", error);
+        setGalleryItems(fallbackGalleryItems);
       }
     };
 
@@ -55,17 +71,17 @@ export default function NSSPage() {
     });
   }, []);
 
-  const handlePrev = (e?: React.MouseEvent) => {
+  const handlePrev = React.useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (activePhoto === null) return;
     setActivePhoto((prev) => (prev === 0 ? galleryItems.length - 1 : (prev ?? 0) - 1));
-  };
+  }, [activePhoto, galleryItems]);
 
-  const handleNext = (e?: React.MouseEvent) => {
+  const handleNext = React.useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (activePhoto === null) return;
     setActivePhoto((prev) => (prev === galleryItems.length - 1 ? 0 : (prev ?? 0) + 1));
-  };
+  }, [activePhoto, galleryItems]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -77,7 +93,7 @@ export default function NSSPage() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activePhoto, galleryItems]);
+  }, [activePhoto, galleryItems, handlePrev, handleNext]);
 
   // Lock scroll
   useEffect(() => {
@@ -110,7 +126,7 @@ export default function NSSPage() {
             National Service Scheme <span className="text-[#F7B801]">(NSS)</span>
           </h1>
           <p className="text-white/70 font-medium text-xs md:text-base max-w-2xl leading-relaxed">
-            Developing personality and character of students through voluntary community service. "Not Me But You".
+            Developing personality and character of students through voluntary community service. &quot;Not Me But You&quot;.
           </p>
         </div>
       </section>
@@ -127,7 +143,7 @@ export default function NSSPage() {
           </div>
 
           <p className="text-gray-600 font-medium text-sm md:text-base leading-relaxed">
-            The National Service Scheme (NSS) at Leeladevi Parasmal Sancheti English Medium School is a flagship student program designed to cultivate civic responsibility, social empathy, and democratic values. Guided by the motto <strong>"Not Me But You"</strong>, our volunteers participate in various community engagement activities including health camps, environment drives, educational workshops, and sanitation campaigns.
+            The National Service Scheme (NSS) at Leeladevi Parasmal Sancheti English Medium School is a flagship student program designed to cultivate civic responsibility, social empathy, and democratic values. Guided by the motto <strong>&quot;Not Me But You&quot;</strong>, our volunteers participate in various community engagement activities including health camps, environment drives, educational workshops, and sanitation campaigns.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -158,6 +174,7 @@ export default function NSSPage() {
               fill
               sizes="(max-width: 768px) 100vw, 40vw"
               className="object-cover"
+              onError={() => setFeaturedImage(fallbackFeaturedImage)}
               priority
             />
           </div>
@@ -208,6 +225,9 @@ export default function NSSPage() {
                       alt={item.alt || item.title}
                       loading="lazy"
                       className="w-full h-auto object-cover filter  group-hover:grayscale-0 scale-100 group-hover:scale-[1.03] transition-all duration-500"
+                      onError={(e) => {
+                        e.currentTarget.src = fallbackGalleryItems[idx % fallbackGalleryItems.length].src;
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-start p-3">
                       <span className="inline-flex items-center gap-1 text-[10px] font-black text-white uppercase bg-[#3D348B]/95 px-2.5 py-1 rounded-lg backdrop-blur-sm">
@@ -271,6 +291,9 @@ export default function NSSPage() {
                   src={galleryItems[activePhoto].src}
                   alt={galleryItems[activePhoto].title}
                   className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl border border-white/5 shadow-2xl"
+                  onError={(e) => {
+                    e.currentTarget.src = fallbackGalleryItems[activePhoto % fallbackGalleryItems.length].src;
+                  }}
                 />
               </motion.div>
 

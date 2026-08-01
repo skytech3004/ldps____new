@@ -9,38 +9,38 @@ const prePrimaryShowcaseItems = [
   // SECTION 1: Pre School (5 items)
   {
     section: "Pre School",
-    title: "Bead Maze Learning",
-    description: "Developing fine motor skills and spatial reasoning through tactile wooden bead maze puzzles.",
-    src: "https://images.unsplash.com/photo-1603354363425-60bfee595b8d?auto=format&fit=crop&w=600&q=80",
-    alt: "tactile bead maze toy block learning",
+    title: "Pre School Activity Room",
+    description: "Young learners build confidence through playful classroom activities and guided interaction.",
+    src: "/uploads/pre-primary/2026-07-26T08-32-58-387Z-img-20250825-wa0128.jpg",
+    alt: "pre school classroom activity",
   },
   {
     section: "Pre School",
-    title: "Cup Stacking Tower",
-    description: "Collaborative building exercises to teach kids coordination, scale, balance, and patience.",
-    src: "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=600&q=80",
-    alt: "cup stacking and balance coordination",
+    title: "Creative Learning Session",
+    description: "Collaborative activities help children practice balance, coordination, and observation.",
+    src: "/uploads/pre-primary/2026-07-26T08-43-51-854Z-img-20250915-wa0226.jpg",
+    alt: "pre school creative learning session",
   },
   {
     section: "Pre School",
-    title: "Preschool Classroom Seating",
-    description: "Creating comfortable learning spaces where kids look ahead, listen, and participate together.",
-    src: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=600&q=80",
-    alt: "children sitting at school tables looking ahead",
+    title: "Classroom Participation",
+    description: "Comfortable learning spaces help children listen, participate, and learn together.",
+    src: "/uploads/pre-primary/2026-07-26T08-48-06-149Z-img20240504133917.jpg",
+    alt: "pre school classroom participation",
   },
   {
     section: "Pre School",
-    title: "Sensory Wall Activity Board",
-    description: "Hands-on wall activities featuring gears, shapes, and textures to foster cognitive development.",
-    src: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=600&q=80",
-    alt: "toddler touching wall activity toys",
+    title: "Hands-On Exploration",
+    description: "Activity-based learning strengthens curiosity, motor skills, and early problem solving.",
+    src: "/uploads/pre-primary/2026-07-29T08-23-17-656Z-img-20240921-wa0018.jpg",
+    alt: "pre school hands on exploration",
   },
   {
     section: "Pre School",
-    title: "Vibrant Creative Playroom",
-    description: "Vibrant playroom loaded with educational blocks, dolls, and puzzles for active social play.",
-    src: "https://images.unsplash.com/photo-1566378246598-5b11a0fe3a23?auto=format&fit=crop&w=600&q=80",
-    alt: "preschool colorful creative toys setup",
+    title: "Joyful Pre School Moments",
+    description: "Playful group moments support early social skills and a happy classroom environment.",
+    src: "/uploads/pre-primary/2026-07-29T08-24-21-258Z-img-20250915-wa0075.jpg",
+    alt: "joyful pre school learning moment",
   },
 
   // SECTION 2: Academics (5 items)
@@ -190,7 +190,6 @@ const prePrimaryShowcaseItems = [
 export default function PrePrimaryClient() {
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
   const [showcaseItems, setShowcaseItems] = useState(prePrimaryShowcaseItems);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchShowcase() {
@@ -204,8 +203,6 @@ export default function PrePrimaryClient() {
         }
       } catch (err) {
         console.error("Failed to fetch pre-primary items from DB:", err);
-      } finally {
-        setLoading(false);
       }
     }
     fetchShowcase();
@@ -257,14 +254,14 @@ export default function PrePrimaryClient() {
   };
 
   const renderSectionHeader = (title: string) => (
-    <div className="flex flex-col items-center mb-16 space-y-2">
+    <div className="flex flex-col items-center mb-16  space-y-2">
       <span className="text-xs font-black uppercase tracking-[0.3em] text-[#7678ED]">Learning Modules</span>
       <h2 className="text-3xl md:text-5xl font-black text-[#3D348B] uppercase font-montserrat tracking-tight">{title}</h2>
       <div className="w-16 h-1 bg-accent rounded-full mt-2" />
     </div>
   );
 
-  const renderImageCard = (item: { title: string; description: string; src: string; alt: string; originalIndex: number }) => (
+  const renderImageCard = (item: { section: string; title: string; description: string; src: string; alt: string; originalIndex: number }) => (
     <motion.div
       key={item.originalIndex}
       initial={{ opacity: 0, y: 30 }}
@@ -276,7 +273,7 @@ export default function PrePrimaryClient() {
     >
       <div className="bg-white p-4 rounded-[2rem] border border-slate-100 flex flex-col h-full hover:shadow-premium-lg transition-all duration-500 hover:-translate-y-1.5 shadow-premium-sm">
         {/* Polaroid Style Image Frame */}
-        <div className="relative w-full aspect-[4/3] rounded-[1.5rem] overflow-hidden bg-slate-100 shadow-sm">
+        <div className={`relative w-full ${item.section === "Pre School" ? "aspect-[16/9]" : "aspect-[4/3]"} rounded-[1.5rem] overflow-hidden bg-slate-100 shadow-sm`}>
           <img
             src={item.src}
             alt={item.alt}
@@ -320,7 +317,7 @@ export default function PrePrimaryClient() {
       <section className="w-full py-16 md:py-24 border-b border-slate-100">
         {renderSectionHeader("Pre School Showcase")}
         {/* Grid of 5 horizontal cards in a row */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-6 md:gap-8">
           {getSectionItems("Pre School").map((item) => renderImageCard(item))}
         </div>
       </section>

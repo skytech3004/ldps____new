@@ -209,7 +209,7 @@ export default function Navbar() {
                   alt="Vidyawadi Logo"
                   width={128}
                   height={160}
-                  className="
+                  className=" lg:mt-8
                     object-contain
                     w-16 h-30 
                     sm:w-20 sm:h-24

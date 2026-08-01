@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Users, BookOpen, Calendar, ArrowRight, ShieldCheck, Target, Award, X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
+import { Users, ShieldCheck, Target, Award, X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface MediaItem {
@@ -17,11 +17,24 @@ interface MediaItem {
   category?: string;
 }
 
+const fallbackGalleryItems: MediaItem[] = Array.from({ length: 5 }, (_, index) => {
+  const photoNumber = index + 1;
+  return {
+    _id: `ncc-fallback-${photoNumber}`,
+    title: `NCC Activity Photo ${photoNumber}`,
+    src: `/uploads/gallery/ncc-img-${photoNumber}.jpg`,
+    alt: `NCC activity photo ${photoNumber}`,
+    type: "ncc-photo",
+  };
+});
+
+const fallbackFeaturedImage = "/uploads/gallery/ncc-img-2.jpg";
+
 export default function NCCPage() {
   const [galleryItems, setGalleryItems] = useState<MediaItem[]>([]);
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const [featuredImage, setFeaturedImage] = useState("/uploads/gallery/ncc-img-2.jpg");
+  const [featuredImage, setFeaturedImage] = useState(fallbackFeaturedImage);
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -29,10 +42,13 @@ export default function NCCPage() {
         const res = await fetch("/api/admin/media-items?type=ncc-photo");
         if (res.ok) {
           const data = await res.json();
-          setGalleryItems(data || []);
+          setGalleryItems(Array.isArray(data) && data.length > 0 ? data : fallbackGalleryItems);
+        } else {
+          setGalleryItems(fallbackGalleryItems);
         }
       } catch (error) {
         console.error("Failed to fetch NCC photos:", error);
+        setGalleryItems(fallbackGalleryItems);
       }
     };
 
@@ -55,17 +71,17 @@ export default function NCCPage() {
     });
   }, []);
 
-  const handlePrev = (e?: React.MouseEvent) => {
+  const handlePrev = React.useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (activePhoto === null) return;
     setActivePhoto((prev) => (prev === 0 ? galleryItems.length - 1 : (prev ?? 0) - 1));
-  };
+  }, [activePhoto, galleryItems]);
 
-  const handleNext = (e?: React.MouseEvent) => {
+  const handleNext = React.useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (activePhoto === null) return;
     setActivePhoto((prev) => (prev === galleryItems.length - 1 ? 0 : (prev ?? 0) + 1));
-  };
+  }, [activePhoto, galleryItems]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -77,7 +93,7 @@ export default function NCCPage() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activePhoto, galleryItems]);
+  }, [activePhoto, galleryItems, handlePrev, handleNext]);
 
   // Lock scroll
   useEffect(() => {
@@ -110,7 +126,7 @@ export default function NCCPage() {
             National Cadet Corps <span className="text-[#F7B801]">(NCC)</span>
           </h1>
           <p className="text-white/70 font-medium text-xs md:text-base max-w-2xl leading-relaxed">
-            Nurturing discipline, leadership, and patriotism to groom the leaders of tomorrow. "Unity and Discipline".
+            Nurturing discipline, leadership, and patriotism to groom the leaders of tomorrow. &quot;Unity and Discipline&quot;.
           </p>
         </div>
       </section>
@@ -127,7 +143,7 @@ export default function NCCPage() {
           </div>
 
           <p className="text-gray-600 font-medium text-sm md:text-base leading-relaxed">
-            The National Cadet Corps (NCC) is a premier youth organisation that aims to develop character, comradeship, discipline, secular outlook, the spirit of adventure, and ideals of selfless service among young citizens. Under the motto <strong>"Unity and Discipline"</strong>, our NCC cadets engage in drill training, weapon training, map reading, obstacle courses, leadership camps, and adventure expeditions, preparing them for careers in defence and civil services.
+            The National Cadet Corps (NCC) is a premier youth organisation that aims to develop character, comradeship, discipline, secular outlook, the spirit of adventure, and ideals of selfless service among young citizens. Under the motto <strong>&quot;Unity and Discipline&quot;</strong>, our NCC cadets engage in drill training, weapon training, map reading, obstacle courses, leadership camps, and adventure expeditions, preparing them for careers in defence and civil services.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -158,6 +174,7 @@ export default function NCCPage() {
               fill
               sizes="(max-width: 768px) 100vw, 40vw"
               className="object-cover"
+              onError={() => setFeaturedImage(fallbackFeaturedImage)}
               priority
             />
           </div>
@@ -208,6 +225,9 @@ export default function NCCPage() {
                       alt={item.alt || item.title}
                       loading="lazy"
                       className="w-full h-auto object-cover filter  group-hover:grayscale-0 scale-100 group-hover:scale-[1.03] transition-all duration-500"
+                      onError={(e) => {
+                        e.currentTarget.src = fallbackGalleryItems[idx % fallbackGalleryItems.length].src;
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-start p-3">
                       <span className="inline-flex items-center gap-1 text-[10px] font-black text-white uppercase bg-[#3D348B]/95 px-2.5 py-1 rounded-lg backdrop-blur-sm">
@@ -271,6 +291,9 @@ export default function NCCPage() {
                   src={galleryItems[activePhoto].src}
                   alt={galleryItems[activePhoto].title}
                   className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl border border-white/5 shadow-2xl"
+                  onError={(e) => {
+                    e.currentTarget.src = fallbackGalleryItems[activePhoto % fallbackGalleryItems.length].src;
+                  }}
                 />
               </motion.div>
 
