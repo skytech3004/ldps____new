@@ -1,0 +1,25 @@
+
+> marudhar-mahila-ldps@0.1.0 dev
+> next dev --port 3001
+
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://192.168.0.189:3001
+- Environments: .env.local, .env
+✓ Ready in 5.2s
+- Experiments (use with caution):
+  · proxyClientMaxBodySize: "200mb"
+
+○ Compiling /pre-primary ...
+ GET / 200 in 33.7s (next.js: 32.6s, application-code: 1152ms)
+ GET /api/admin/results?list=years 404 in 1248ms (next.js: 441ms, application-code: 807ms)
+ GET /api/admin/brand?key=logo 404 in 1424ms (next.js: 526ms, application-code: 898ms)
+ GET /api/admin/carousel?key=hero 404 in 1731ms (next.js: 615ms, application-code: 1116ms)
+ GET /api/admin/notices 404 in 1877ms (next.js: 688ms, application-code: 1189ms)
+ GET /api/blogs 404 in 1912ms (next.js: 972ms, application-code: 941ms)
+ GET /api/admin/carousel 404 in 2.0s (next.js: 896ms, application-code: 1117ms)
+ GET /api/admin/events 404 in 413ms (next.js: 52ms, application-code: 361ms)
+ GET /api/admin/media-items 404 in 431ms (next.js: 93ms, application-code: 338ms)
+ GET /api/admin/media-items?type=highlight 404 in 433ms (next.js: 197ms, application-code: 236ms)
+ GET /api/admin/brand?key=logo 404 in 455ms (next.js: 241ms, application-code: 215ms)
+✓ Finished filesystem cache database compaction in 67s
