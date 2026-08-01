@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_NAME="${APP_NAME:-lps-local}"
+APP_NAME="${APP_NAME:-lps-vidyawadi}"
 PORT="${PORT:-3003}"
 HOST="${HOST:-0.0.0.0}"
 

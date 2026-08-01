@@ -87,7 +87,8 @@ export default function RootLayout({
               "email": "lpsvidhyawadi@gmail.com",
               "sameAs": [
                 "https://www.facebook.com/profile.php?id=61583590541462",
-                "https://www.instagram.com/vidyawadiofficial"
+                "https://www.instagram.com/vidyawadiofficial",
+                "https://www.youtube.com/@MMSSVIDYAWADIOFFICIAL"
               ]
             })
           }}
