@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Calendar as CalendarIcon, ArrowRight, BookOpen, Clock, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar as CalendarIcon, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Reveal from "@/components/ui/Reveal";
 import FadeIn from "@/components/ui/FadeIn";
 
@@ -35,10 +34,19 @@ type GalleryAlbum = {
   createdAt?: string;
 };
 
+type EventPhotoItem = {
+  _id: string;
+  title: string;
+  src: string;
+  alt?: string;
+  category?: string;
+  createdAt?: string;
+};
+
 export default function UpcomingEventsAndBlogs() {
   const [blogs, setBlogs] = useState<BlogItem[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
-  const [eventAlbums, setEventAlbums] = useState<GalleryAlbum[]>([]);
+  const [eventPhotos, setEventPhotos] = useState<EventPhotoItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Dynamic Calendar Date State
@@ -56,11 +64,12 @@ export default function UpcomingEventsAndBlogs() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [blogsRes, eventsRes] = await Promise.all([
+        const [blogsRes, eventsRes, eventPhotosRes, galleriesRes] = await Promise.all([
           fetch("/api/blogs"),
-          fetch("/api/admin/events")
+          fetch("/api/admin/events"),
+          fetch("/api/admin/media-items?type=event-photo"),
+          fetch("/api/admin/galleries"),
         ]);
-        const galleriesRes = await fetch("/api/admin/galleries");
 
         if (blogsRes.ok) {
           const blogsData = await blogsRes.json();
@@ -72,12 +81,31 @@ export default function UpcomingEventsAndBlogs() {
           setEvents(eventsData);
         }
 
-        if (galleriesRes.ok) {
-          const galleriesData = await galleriesRes.json();
-          const eventOnlyAlbums = Array.isArray(galleriesData)
-            ? galleriesData.filter((album: GalleryAlbum) => album.category === "Events")
-            : [];
-          setEventAlbums(eventOnlyAlbums);
+        if (eventPhotosRes.ok) {
+          const eventPhotosData = await eventPhotosRes.json();
+          const normalizedEventPhotos = Array.isArray(eventPhotosData) ? eventPhotosData : [];
+
+          if (normalizedEventPhotos.length > 0) {
+            setEventPhotos(normalizedEventPhotos);
+          } else if (galleriesRes.ok) {
+            const galleriesData = await galleriesRes.json();
+            const fallbackEventPhotos = Array.isArray(galleriesData)
+              ? galleriesData
+                  .filter((album: GalleryAlbum) => album.category === "Events")
+                  .flatMap((album: GalleryAlbum) =>
+                    (album.photos?.length ? album.photos : album.cover ? [album.cover] : []).map((photo, index) => ({
+                      _id: `${album._id}-${index}`,
+                      title: album.title,
+                      src: photo,
+                      alt: album.description || album.title,
+                      category: album.category,
+                      createdAt: album.createdAt,
+                    }))
+                  )
+              : [];
+
+            setEventPhotos(fallbackEventPhotos);
+          }
         }
       } catch (err) {
         console.error("Failed to fetch events and blogs:", err);
@@ -157,33 +185,33 @@ export default function UpcomingEventsAndBlogs() {
           Event Gallery
         </h3>
 
-        {eventAlbums.length === 0 ? (
+        {eventPhotos.length === 0 ? (
           <p className="text-sm text-gray-500 font-bold italic">
-            Event albums will appear here after they are published in Admin &gt; Galleries.
+            Event photos will appear here after they are published in Admin &gt; Media Gallery.
           </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-            {eventAlbums.slice(0, 6).map((album) => (
-              <div key={album._id} className="group rounded-3xl border border-slate-100 bg-[#F8F9FC] overflow-hidden hover:shadow-premium-md transition-all">
+            {eventPhotos.slice(0, 6).map((photo) => (
+              <div key={photo._id} className="group rounded-3xl border border-slate-100 bg-[#F8F9FC] overflow-hidden hover:shadow-premium-md transition-all">
                 <div className="relative aspect-[4/3] bg-slate-200 overflow-hidden">
                   <img
-                    src={album.cover || album.photos?.[0] || "/uploads/hostel/hostel.jpg"}
-                    alt={album.title}
+                    src={photo.src || "/uploads/hostel/hostel.jpg"}
+                    alt={photo.alt || photo.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4">
                     <span className="inline-block px-3 py-1 bg-[#F7B801] text-[#3D348B] text-[9px] font-black uppercase tracking-widest rounded-full mb-2">
-                      {album.category || "Events"}
+                      {photo.category || "Events"}
                     </span>
                     <h4 className="text-white font-black uppercase text-sm tracking-tight leading-snug">
-                      {album.title}
+                      {photo.title}
                     </h4>
                   </div>
                 </div>
                 <div className="p-4">
                   <p className="text-xs text-gray-500 font-bold line-clamp-2">
-                    {album.description || "Recent campus event moments from the gallery manager."}
+                    {photo.alt || "Recent campus event moments from the media gallery."}
                   </p>
                 </div>
               </div>

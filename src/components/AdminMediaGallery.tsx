@@ -9,18 +9,19 @@ interface MediaItem {
   title: string;
   src: string;
   alt: string;
-  type: "photo" | "video" | "hostel-photo";
+  type: "photo" | "video" | "event-photo" | "hostel-photo";
   category?: string;
 }
 
 export default function AdminMediaGallery() {
   const [photoItems, setPhotoItems] = useState<MediaItem[]>([]);
+  const [eventItems, setEventItems] = useState<MediaItem[]>([]);
   const [videoItems, setVideoItems] = useState<MediaItem[]>([]);
   const [nssItems, setNssItems] = useState<MediaItem[]>([]);
   const [nccItems, setNccItems] = useState<MediaItem[]>([]);
   const [nccFeatured, setNccFeatured] = useState<MediaItem | null>(null);
   const [nssFeatured, setNssFeatured] = useState<MediaItem | null>(null);
-  const [activeTab, setActiveTab] = useState<"photo" | "video" | "nss-photo" | "ncc-photo">("photo");
+  const [activeTab, setActiveTab] = useState<"photo" | "event-photo" | "video" | "nss-photo" | "ncc-photo">("photo");
   const [adminFilter, setAdminFilter] = useState<string>("All");
   const [activePreview, setActivePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,7 +43,8 @@ export default function AdminMediaGallery() {
   };
 
   let rawItems = photoItems;
-  if (activeTab === "video") rawItems = videoItems;
+  if (activeTab === "event-photo") rawItems = eventItems;
+  else if (activeTab === "video") rawItems = videoItems;
   else if (activeTab === "nss-photo") rawItems = nssItems;
   else if (activeTab === "ncc-photo") rawItems = nccItems;
 
@@ -51,20 +53,6 @@ export default function AdminMediaGallery() {
     : rawItems.filter((item) => item.category === adminFilter);
 
   const previewItem = currentItems.find((item) => item._id === activePreview);
-
-  const fetchFilters = async () => {
-    try {
-      const res = await fetch("/api/admin/filters?type=gallery");
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.length > 0) {
-          setCategories(data.map((f: any) => f.name));
-        }
-      }
-    } catch (e) {
-      console.error("Failed to load gallery filters:", e);
-    }
-  };
 
   const handleCreateNewCategory = async () => {
     const newCat = window.prompt("Enter new gallery category name:");
@@ -110,65 +98,85 @@ export default function AdminMediaGallery() {
     return url.includes("youtube.com") || url.includes("youtu.be");
   };
 
-  // Load media items from database
-  const fetchMediaItems = async () => {
-    try {
-      setLoading(true);
-      const photosRes = await fetch("/api/admin/media-items?type=photo");
-      const videosRes = await fetch("/api/admin/media-items?type=video");
-      const nssRes = await fetch("/api/admin/media-items?type=nss-photo");
-      const nccRes = await fetch("/api/admin/media-items?type=ncc-photo");
-      const nccFeaturedRes = await fetch("/api/admin/media-items?type=ncc-featured");
-      const nssFeaturedRes = await fetch("/api/admin/media-items?type=nss-featured");
-
-      if (photosRes.ok) {
-        const photos = await photosRes.json();
-        setPhotoItems(photos);
-      }
-
-      if (videosRes.ok) {
-        const videos = await videosRes.json();
-        setVideoItems(videos);
-      }
-
-      if (nssRes.ok) {
-        const nss = await nssRes.json();
-        setNssItems(nss);
-      }
-
-      if (nccRes.ok) {
-        const ncc = await nccRes.json();
-        setNccItems(ncc);
-      }
-
-      if (nccFeaturedRes.ok) {
-        const items = await nccFeaturedRes.json();
-        if (items && items.length > 0) {
-          setNccFeatured(items[0]);
-        } else {
-          setNccFeatured(null);
-        }
-      }
-
-      if (nssFeaturedRes.ok) {
-        const items = await nssFeaturedRes.json();
-        if (items && items.length > 0) {
-          setNssFeatured(items[0]);
-        } else {
-          setNssFeatured(null);
-        }
-      }
-    } catch (error) {
-      console.error("Failed to fetch media items:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Load on mount
   useEffect(() => {
-    fetchMediaItems();
-    fetchFilters();
+    let cancelled = false;
+
+    async function loadMediaItems() {
+      try {
+        const [
+          photosRes,
+          eventsRes,
+          videosRes,
+          nssRes,
+          nccRes,
+          nccFeaturedRes,
+          nssFeaturedRes,
+          filtersRes,
+        ] = await Promise.all([
+          fetch("/api/admin/media-items?type=photo"),
+          fetch("/api/admin/media-items?type=event-photo"),
+          fetch("/api/admin/media-items?type=video"),
+          fetch("/api/admin/media-items?type=nss-photo"),
+          fetch("/api/admin/media-items?type=ncc-photo"),
+          fetch("/api/admin/media-items?type=ncc-featured"),
+          fetch("/api/admin/media-items?type=nss-featured"),
+          fetch("/api/admin/filters?type=gallery"),
+        ]);
+
+        if (cancelled) return;
+
+        if (photosRes.ok) {
+          const photos = await photosRes.json();
+          setPhotoItems(photos);
+        }
+
+        if (eventsRes.ok) {
+          const events = await eventsRes.json();
+          setEventItems(events);
+        }
+
+        if (videosRes.ok) {
+          const videos = await videosRes.json();
+          setVideoItems(videos);
+        }
+
+        if (nssRes.ok) {
+          const nss = await nssRes.json();
+          setNssItems(nss);
+        }
+
+        if (nccRes.ok) {
+          const ncc = await nccRes.json();
+          setNccItems(ncc);
+        }
+
+        if (nccFeaturedRes.ok) {
+          const items = await nccFeaturedRes.json();
+          setNccFeatured(items && items.length > 0 ? items[0] : null);
+        }
+
+        if (nssFeaturedRes.ok) {
+          const items = await nssFeaturedRes.json();
+          setNssFeatured(items && items.length > 0 ? items[0] : null);
+        }
+
+        if (filtersRes.ok) {
+          const data = await filtersRes.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setCategories(data.map((filter: { name: string }) => filter.name));
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch media items:", error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void loadMediaItems();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Navigate preview
@@ -357,6 +365,8 @@ export default function AdminMediaGallery() {
 
       if (activeTab === "photo") {
         setPhotoItems([...photoItems, savedItem]);
+      } else if (activeTab === "event-photo") {
+        setEventItems([...eventItems, savedItem]);
       } else if (activeTab === "video") {
         setVideoItems([...videoItems, savedItem]);
       } else if (activeTab === "nss-photo") {
@@ -390,6 +400,8 @@ export default function AdminMediaGallery() {
 
       if (activeTab === "photo") {
         setPhotoItems(photoItems.filter((item) => item._id !== id));
+      } else if (activeTab === "event-photo") {
+        setEventItems(eventItems.filter((item) => item._id !== id));
       } else if (activeTab === "video") {
         setVideoItems(videoItems.filter((item) => item._id !== id));
       } else if (activeTab === "nss-photo") {
@@ -423,6 +435,17 @@ export default function AdminMediaGallery() {
         >
           <ImageIcon size={20} />
           Photos ({photoItems.length})
+        </button>
+        <button
+          onClick={() => handleTabChange("event-photo")}
+          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            activeTab === "event-photo"
+              ? "text-white border-b-2 border-accent font-bold"
+              : "text-white/60 hover:text-white"
+          }`}
+        >
+          <ImageIcon size={20} />
+          Event Photos ({eventItems.length})
         </button>
         <button
           onClick={() => handleTabChange("video")}
@@ -465,6 +488,8 @@ export default function AdminMediaGallery() {
           <h2 className="text-2xl font-bold text-white bg-[#3D348B] border border-white/10 px-4 py-2 rounded-lg inline-block">
             {activeTab === "photo" 
               ? "Manage General Photos" 
+              : activeTab === "event-photo"
+              ? "Manage Event Photos"
               : activeTab === "video"
               ? "Manage General Videos"
               : activeTab === "nss-photo"
@@ -474,6 +499,8 @@ export default function AdminMediaGallery() {
           <p className="text-white/60 text-xs mt-2">
             {activeTab === "photo" 
               ? "Upload and manage photos for the general school image gallery." 
+              : activeTab === "event-photo"
+              ? "Upload and manage photos for the event gallery feed."
               : activeTab === "video"
               ? "Upload and manage videos for the general school video gallery."
               : activeTab === "nss-photo"
