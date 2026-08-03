@@ -345,11 +345,16 @@ export default function AdminMediaGallery() {
 
     setSaving(true);
     try {
+      const itemType =
+        activeTab === "event-photo" || (activeTab === "photo" && formData.category === "Events")
+          ? "event-photo"
+          : activeTab;
+
       const newItem = {
         title: formData.title,
         src: formData.src,
         alt: formData.title,
-        type: activeTab,
+        type: itemType,
         category: formData.category,
       };
 
@@ -363,15 +368,15 @@ export default function AdminMediaGallery() {
 
       const savedItem = await res.json();
 
-      if (activeTab === "photo") {
+      if (itemType === "photo") {
         setPhotoItems([...photoItems, savedItem]);
-      } else if (activeTab === "event-photo") {
+      } else if (itemType === "event-photo") {
         setEventItems([...eventItems, savedItem]);
-      } else if (activeTab === "video") {
+      } else if (itemType === "video") {
         setVideoItems([...videoItems, savedItem]);
-      } else if (activeTab === "nss-photo") {
+      } else if (itemType === "nss-photo") {
         setNssItems([...nssItems, savedItem]);
-      } else if (activeTab === "ncc-photo") {
+      } else if (itemType === "ncc-photo") {
         setNccItems([...nccItems, savedItem]);
       }
 

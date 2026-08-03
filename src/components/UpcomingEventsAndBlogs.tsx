@@ -40,6 +40,7 @@ type EventPhotoItem = {
   src: string;
   alt?: string;
   category?: string;
+  type?: string;
   createdAt?: string;
 };
 
@@ -64,10 +65,11 @@ export default function UpcomingEventsAndBlogs() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [blogsRes, eventsRes, eventPhotosRes, galleriesRes] = await Promise.all([
+        const [blogsRes, eventsRes, eventPhotosRes, legacyPhotosRes, galleriesRes] = await Promise.all([
           fetch("/api/blogs"),
           fetch("/api/admin/events"),
           fetch("/api/admin/media-items?type=event-photo"),
+          fetch("/api/admin/media-items?type=photo"),
           fetch("/api/admin/galleries"),
         ]);
 
@@ -85,8 +87,37 @@ export default function UpcomingEventsAndBlogs() {
           const eventPhotosData = await eventPhotosRes.json();
           const normalizedEventPhotos = Array.isArray(eventPhotosData) ? eventPhotosData : [];
 
-          if (normalizedEventPhotos.length > 0) {
-            setEventPhotos(normalizedEventPhotos);
+          if (legacyPhotosRes.ok) {
+            const legacyPhotosData = await legacyPhotosRes.json();
+            const legacyEventPhotos = Array.isArray(legacyPhotosData)
+              ? legacyPhotosData.filter((item: EventPhotoItem) => item.category === "Events")
+              : [];
+
+            const mergedEventPhotos = [...normalizedEventPhotos, ...legacyEventPhotos].filter((item, index, array) => {
+              return index === array.findIndex((other) => other._id === item._id);
+            });
+
+            if (mergedEventPhotos.length > 0) {
+              setEventPhotos(mergedEventPhotos);
+            } else if (galleriesRes.ok) {
+              const galleriesData = await galleriesRes.json();
+              const fallbackEventPhotos = Array.isArray(galleriesData)
+                ? galleriesData
+                    .filter((album: GalleryAlbum) => album.category === "Events")
+                    .flatMap((album: GalleryAlbum) =>
+                      (album.photos?.length ? album.photos : album.cover ? [album.cover] : []).map((photo, index) => ({
+                        _id: `${album._id}-${index}`,
+                        title: album.title,
+                        src: photo,
+                        alt: album.description || album.title,
+                        category: album.category,
+                        createdAt: album.createdAt,
+                      }))
+                    )
+                : [];
+
+              setEventPhotos(fallbackEventPhotos);
+            }
           } else if (galleriesRes.ok) {
             const galleriesData = await galleriesRes.json();
             const fallbackEventPhotos = Array.isArray(galleriesData)
