@@ -25,9 +25,20 @@ type EventItem = {
   imageUrl?: string;
 };
 
+type GalleryAlbum = {
+  _id: string;
+  title: string;
+  category?: string;
+  description?: string;
+  cover?: string;
+  photos?: string[];
+  createdAt?: string;
+};
+
 export default function UpcomingEventsAndBlogs() {
   const [blogs, setBlogs] = useState<BlogItem[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
+  const [eventAlbums, setEventAlbums] = useState<GalleryAlbum[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Dynamic Calendar Date State
@@ -49,6 +60,7 @@ export default function UpcomingEventsAndBlogs() {
           fetch("/api/blogs"),
           fetch("/api/admin/events")
         ]);
+        const galleriesRes = await fetch("/api/admin/galleries");
 
         if (blogsRes.ok) {
           const blogsData = await blogsRes.json();
@@ -58,6 +70,14 @@ export default function UpcomingEventsAndBlogs() {
         if (eventsRes.ok) {
           const eventsData = await eventsRes.json();
           setEvents(eventsData);
+        }
+
+        if (galleriesRes.ok) {
+          const galleriesData = await galleriesRes.json();
+          const eventOnlyAlbums = Array.isArray(galleriesData)
+            ? galleriesData.filter((album: GalleryAlbum) => album.category === "Events")
+            : [];
+          setEventAlbums(eventOnlyAlbums);
         }
       } catch (err) {
         console.error("Failed to fetch events and blogs:", err);
@@ -130,7 +150,47 @@ export default function UpcomingEventsAndBlogs() {
               Journal & Upcoming Events
             </h2>
           </Reveal>
-        </div>
+      </div>
+
+      <div className="mt-10 space-y-6">
+        <h3 className="text-sm font-black uppercase tracking-wider text-[#3D348B] border-b border-slate-100 pb-3">
+          Event Gallery
+        </h3>
+
+        {eventAlbums.length === 0 ? (
+          <p className="text-sm text-gray-500 font-bold italic">
+            Event albums will appear here after they are published in Admin &gt; Galleries.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+            {eventAlbums.slice(0, 6).map((album) => (
+              <div key={album._id} className="group rounded-3xl border border-slate-100 bg-[#F8F9FC] overflow-hidden hover:shadow-premium-md transition-all">
+                <div className="relative aspect-[4/3] bg-slate-200 overflow-hidden">
+                  <img
+                    src={album.cover || album.photos?.[0] || "/uploads/hostel/hostel.jpg"}
+                    alt={album.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <span className="inline-block px-3 py-1 bg-[#F7B801] text-[#3D348B] text-[9px] font-black uppercase tracking-widest rounded-full mb-2">
+                      {album.category || "Events"}
+                    </span>
+                    <h4 className="text-white font-black uppercase text-sm tracking-tight leading-snug">
+                      {album.title}
+                    </h4>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <p className="text-xs text-gray-500 font-bold line-clamp-2">
+                    {album.description || "Recent campus event moments from the gallery manager."}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
         {/* Split Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
