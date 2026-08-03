@@ -12,56 +12,97 @@ interface MediaItem {
   alt: string;
   type: "photo" | "video" | "hostel-photo";
   category?: string;
+  createdAt?: string;
 }
+
+interface GalleryAlbum {
+  _id: string;
+  title: string;
+  category: string;
+  description?: string;
+  photos: string[];
+  cover?: string;
+  featured?: boolean;
+  createdAt?: string;
+}
+
+type GalleryDisplayItem = {
+  _id: string;
+  title: string;
+  src: string;
+  alt: string;
+  category?: string;
+  createdAt?: string;
+};
 
 export default function PhotoGalleryClient() {
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category") || "All";
 
-  const [galleryItems, setGalleryItems] = useState<MediaItem[]>([]);
+  const [galleryItems, setGalleryItems] = useState<GalleryDisplayItem[]>([]);
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState(initialCategory);
   const [filters, setFilters] = useState<string[]>(["All", "Events", "Fun & Food Fest", "Hostel", "Infrastructure", "Laboratories"]);
 
   useEffect(() => {
-    const fetchPhotos = async () => {
+    const fetchGalleryData = async () => {
       try {
-        const res = await fetch("/api/admin/media-items?type=photo");
-        if (res.ok) {
-          const data = await res.json();
-          setGalleryItems(data);
-        }
+        const [photoRes, galleryRes, filterRes] = await Promise.all([
+          fetch("/api/admin/media-items?type=photo"),
+          fetch("/api/admin/galleries"),
+          fetch("/api/admin/filters?type=gallery"),
+        ]);
+
+        const photoItems: MediaItem[] = photoRes.ok ? await photoRes.json() : [];
+        const galleryAlbums: GalleryAlbum[] = galleryRes.ok ? await galleryRes.json() : [];
+        const galleryFilters = filterRes.ok ? await filterRes.json() : [];
+
+        const flattenedAlbums: GalleryDisplayItem[] = galleryAlbums.flatMap((album) =>
+          (album.photos?.length ? album.photos : [album.cover].filter(Boolean)).map((photo, index) => ({
+            _id: `${album._id}-${index}`,
+            title: album.title,
+            src: photo,
+            alt: album.description || album.title,
+            category: album.category,
+            createdAt: album.createdAt,
+          }))
+        );
+
+        const generalPhotos: GalleryDisplayItem[] = photoItems.map((item) => ({
+          _id: item._id,
+          title: item.title,
+          src: item.src,
+          alt: item.alt || item.title,
+          category: item.category,
+          createdAt: item.createdAt,
+        }));
+
+        const combinedItems = [...flattenedAlbums, ...generalPhotos].sort((left, right) => {
+          const leftTime = left.createdAt ? new Date(left.createdAt).getTime() : 0;
+          const rightTime = right.createdAt ? new Date(right.createdAt).getTime() : 0;
+          return rightTime - leftTime;
+        });
+
+        setGalleryItems(combinedItems);
+
+        const dynamicFilters = new Set<string>(["All", "Events", "Fun & Food Fest", "Hostel", "Infrastructure", "Laboratories"]);
+        galleryFilters.forEach((filter: { name?: string }) => {
+          if (filter?.name) dynamicFilters.add(filter.name);
+        });
+        combinedItems.forEach((item) => {
+          if (item.category) dynamicFilters.add(item.category);
+        });
+        setFilters(Array.from(dynamicFilters));
       } catch (error) {
-        console.error("Failed to fetch photos:", error);
+        console.error("Failed to fetch gallery data:", error);
       } finally {
         setLoading(false);
       }
     };
-    const fetchFilters = async () => {
-      try {
-        const res = await fetch("/api/admin/filters?type=gallery");
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.length > 0) {
-            setFilters(["All", ...data.map((f: any) => f.name)]);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch gallery filters:", error);
-      }
-    };
-    fetchPhotos();
-    fetchFilters();
-  }, []);
 
-  // Update active filter if searchParams category changes
-  useEffect(() => {
-    const categoryParam = searchParams.get("category");
-    if (categoryParam) {
-      setActiveFilter(categoryParam);
-    }
-  }, [searchParams]);
+    fetchGalleryData();
+  }, []);
 
   const filteredItems = activeFilter === "All"
     ? galleryItems
