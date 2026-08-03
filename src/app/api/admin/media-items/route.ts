@@ -2,6 +2,19 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { MediaItemModel } from "@/models/MediaItem";
 
+function normalizeMediaItem(body: Record<string, unknown>) {
+  const category = String(body.category ?? "").trim();
+  const type = String(body.type ?? "").trim();
+  const isEventCategory = category === "Events";
+  const normalizedType = isEventCategory && type === "photo" ? "event-photo" : type;
+
+  return {
+    ...body,
+    type: isEventCategory ? "event-photo" : normalizedType,
+    category: isEventCategory ? "Events" : category || "Others",
+  };
+}
+
 export async function GET(request: Request) {
   try {
     await connectToDatabase();
@@ -33,7 +46,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const item = await MediaItemModel.create(body);
+    const item = await MediaItemModel.create(normalizeMediaItem(body));
     return NextResponse.json(item);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to create media item.";
@@ -54,7 +67,7 @@ export async function PUT(request: Request) {
       );
     }
 
-    const updated = await MediaItemModel.findByIdAndUpdate(_id, updateData, { new: true });
+    const updated = await MediaItemModel.findByIdAndUpdate(_id, normalizeMediaItem(updateData), { new: true });
     return NextResponse.json(updated);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to update media item.";
