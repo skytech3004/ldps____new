@@ -10,7 +10,7 @@ interface MediaItem {
   title: string;
   src: string;
   alt: string;
-  type: "photo" | "video" | "hostel-photo";
+  type: "photo" | "video" | "event-photo" | "hostel-photo";
   category?: string;
   createdAt?: string;
 }
@@ -48,13 +48,15 @@ export default function PhotoGalleryClient() {
   useEffect(() => {
     const fetchGalleryData = async () => {
       try {
-        const [photoRes, galleryRes, filterRes] = await Promise.all([
+        const [photoRes, eventPhotoRes, galleryRes, filterRes] = await Promise.all([
           fetch("/api/admin/media-items?type=photo"),
+          fetch("/api/admin/media-items?type=event-photo"),
           fetch("/api/admin/galleries"),
           fetch("/api/admin/filters?type=gallery"),
         ]);
 
         const photoItems: MediaItem[] = photoRes.ok ? await photoRes.json() : [];
+        const eventPhotoItems: MediaItem[] = eventPhotoRes.ok ? await eventPhotoRes.json() : [];
         const galleryAlbums: GalleryAlbum[] = galleryRes.ok ? await galleryRes.json() : [];
         const galleryFilters = filterRes.ok ? await filterRes.json() : [];
 
@@ -78,7 +80,27 @@ export default function PhotoGalleryClient() {
           createdAt: item.createdAt,
         }));
 
-        const combinedItems = [...flattenedAlbums, ...generalPhotos].sort((left, right) => {
+        const eventPhotos: GalleryDisplayItem[] = eventPhotoItems.map((item) => ({
+          _id: item._id,
+          title: item.title,
+          src: item.src,
+          alt: item.alt || item.title,
+          category: "Events",
+          createdAt: item.createdAt,
+        }));
+
+        const legacyEventPhotos: GalleryDisplayItem[] = photoItems
+          .filter((item) => item.category === "Events")
+          .map((item) => ({
+            _id: item._id,
+            title: item.title,
+            src: item.src,
+            alt: item.alt || item.title,
+            category: "Events",
+            createdAt: item.createdAt,
+          }));
+
+        const combinedItems = [...flattenedAlbums, ...generalPhotos, ...eventPhotos, ...legacyEventPhotos].sort((left, right) => {
           const leftTime = left.createdAt ? new Date(left.createdAt).getTime() : 0;
           const rightTime = right.createdAt ? new Date(right.createdAt).getTime() : 0;
           return rightTime - leftTime;

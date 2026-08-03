@@ -5,8 +5,8 @@ import { MediaItemModel } from "@/models/MediaItem";
 function normalizeMediaItem(body: Record<string, unknown>) {
   const category = String(body.category ?? "").trim();
   const type = String(body.type ?? "").trim();
-  const isEventCategory = category === "Events";
-  const normalizedType = isEventCategory && type === "photo" ? "event-photo" : type;
+  const isEventCategory = category === "Events" || type === "event-photo";
+  const normalizedType = isEventCategory ? "event-photo" : type;
 
   return {
     ...body,

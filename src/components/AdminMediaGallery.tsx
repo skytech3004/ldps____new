@@ -40,6 +40,10 @@ export default function AdminMediaGallery() {
     setActiveTab(tab);
     setAdminFilter("All");
     setShowAddForm(false);
+    setFormData((prev) => ({
+      ...prev,
+      category: tab === "event-photo" ? "Events" : prev.category,
+    }));
   };
 
   let rawItems = photoItems;
@@ -345,17 +349,16 @@ export default function AdminMediaGallery() {
 
     setSaving(true);
     try {
-      const itemType =
-        activeTab === "event-photo" || (activeTab === "photo" && formData.category === "Events")
-          ? "event-photo"
-          : activeTab;
+      const isEventUpload = activeTab === "event-photo" || (activeTab === "photo" && formData.category === "Events");
+      const itemType = isEventUpload ? "event-photo" : activeTab;
+      const itemCategory = isEventUpload ? "Events" : formData.category;
 
       const newItem = {
         title: formData.title,
         src: formData.src,
         alt: formData.title,
         type: itemType,
-        category: formData.category,
+        category: itemCategory,
       };
 
       const res = await fetch("/api/admin/media-items", {
