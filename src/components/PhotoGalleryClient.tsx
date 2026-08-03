@@ -59,7 +59,7 @@ export default function PhotoGalleryClient() {
         const galleryFilters = filterRes.ok ? await filterRes.json() : [];
 
         const flattenedAlbums: GalleryDisplayItem[] = galleryAlbums.flatMap((album) =>
-          (album.photos?.length ? album.photos : [album.cover].filter(Boolean)).map((photo, index) => ({
+          (album.photos?.length ? album.photos : album.cover ? [album.cover] : []).map((photo, index) => ({
             _id: `${album._id}-${index}`,
             title: album.title,
             src: photo,
@@ -108,7 +108,23 @@ export default function PhotoGalleryClient() {
     ? galleryItems
     : galleryItems.filter(item => item.category === activeFilter);
 
-  // Navigate lightbox photos
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (activePhoto === null) return;
+      if (e.key === "ArrowLeft") {
+        setActivePhoto((prev) => (prev === 0 ? filteredItems.length - 1 : (prev ?? 0) - 1));
+      }
+      if (e.key === "ArrowRight") {
+        setActivePhoto((prev) => (prev === filteredItems.length - 1 ? 0 : (prev ?? 0) + 1));
+      }
+      if (e.key === "Escape") setActivePhoto(null);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activePhoto, filteredItems.length]);
+
   const handlePrev = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (activePhoto === null) return;
@@ -120,19 +136,6 @@ export default function PhotoGalleryClient() {
     if (activePhoto === null) return;
     setActivePhoto((prev) => (prev === filteredItems.length - 1 ? 0 : (prev ?? 0) + 1));
   };
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (activePhoto === null) return;
-      if (e.key === "ArrowLeft") handlePrev();
-      if (e.key === "ArrowRight") handleNext();
-      if (e.key === "Escape") setActivePhoto(null);
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activePhoto, filteredItems]);
 
   // Lock scroll when lightbox is open
   useEffect(() => {
