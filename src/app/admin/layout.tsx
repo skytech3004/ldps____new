@@ -19,6 +19,7 @@ const navItems = [
   { href: "/admin/leadership", label: "Leadership Team", icon: ShieldCheck },
   { href: "/admin/managing-committee", label: "Managing Committee", icon: Users },
   { href: "/admin/investiture", label: "Investiture Cabinet", icon: Award },
+  { href: "/admin/investiture-ceremony", label: "Investiture Ceremony", icon: Award },
   { href: "/admin/alumni", label: "Alumni Registrations", icon: GraduationCap },
   { href: "/admin/facilities", label: "Advanced Facilities", icon: LayoutGrid },
   { href: "/admin/results", label: "Board Results", icon: Trophy },

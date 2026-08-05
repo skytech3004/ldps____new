@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { X, ChevronLeft, ChevronRight, ImageIcon, Award, Calendar, CheckSquare, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import {
+  defaultInvestitureCeremonyPhotos,
+  type InvestitureCeremonyGalleryRecord,
+} from "@/data/investitureCeremony";
 
 interface CabinetMember {
   _id: string;
@@ -15,24 +19,25 @@ interface CabinetMember {
   sortOrder: number;
 }
 
-// Constructing the 18 images from lpsvidhyawadi website
-const galleryImages = Array.from({ length: 18 }, (_, index) => {
-  const fileIndex = String(index + 1).padStart(2, "0");
-  return {
-    src: `https://www.lpsvidhyawadi.com/Images/InvestitureCeremony/InvestitureCeremony${fileIndex}.JPG`,
-    alt: `Investiture Ceremony Moment ${fileIndex}`,
-    title: `Ceremony Moment ${fileIndex}`,
-  };
-});
+interface GalleryPhoto {
+  src: string;
+  alt: string;
+  title: string;
+}
 
 export default function InvestitureCeremonyPage() {
   const [cabinet, setCabinet] = useState<CabinetMember[]>([]);
+  const [gallery, setGallery] = useState<GalleryPhoto[]>(defaultInvestitureCeremonyPhotos);
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingCabinet, setLoadingCabinet] = useState(true);
+  const [loadingGallery, setLoadingGallery] = useState(true);
+
+  const galleryCount = useMemo(() => gallery.length, [gallery]);
 
   useEffect(() => {
     async function fetchCabinet() {
       try {
+        setLoadingCabinet(true);
         const res = await fetch("/api/admin/cabinet");
         if (res.ok) {
           const data = await res.json();
@@ -41,23 +46,56 @@ export default function InvestitureCeremonyPage() {
       } catch (err) {
         console.error("Failed to fetch cabinet members:", err);
       } finally {
-        setLoading(false);
+        setLoadingCabinet(false);
       }
     }
     fetchCabinet();
   }, []);
 
-  const handlePrev = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    if (activePhoto === null) return;
-    setActivePhoto((prev) => (prev === 0 ? galleryImages.length - 1 : (prev ?? 0) - 1));
-  };
+  useEffect(() => {
+    async function fetchGallery() {
+      try {
+        setLoadingGallery(true);
+        const res = await fetch("/api/admin/galleries", { cache: "no-store" });
+        if (!res.ok) return;
 
-  const handleNext = (e?: React.MouseEvent) => {
+        const data = (await res.json()) as InvestitureCeremonyGalleryRecord[];
+        const ceremony = data.find((item) => item.page === "investiture-ceremony")
+          ?? data.find((item) => item.title?.toLowerCase().includes("investiture ceremony"))
+          ?? null;
+
+        if (ceremony && ceremony.photos.length > 0) {
+          setGallery(
+            ceremony.photos.map((src, index) => ({
+              src,
+              alt: `${ceremony.title || "Investiture Ceremony"} photo ${index + 1}`,
+              title: `Photo ${index + 1}`,
+            }))
+          );
+        } else {
+          setGallery(defaultInvestitureCeremonyPhotos);
+        }
+      } catch (err) {
+        console.error("Failed to fetch ceremony gallery:", err);
+        setGallery(defaultInvestitureCeremonyPhotos);
+      } finally {
+        setLoadingGallery(false);
+      }
+    }
+    fetchGallery();
+  }, []);
+
+  const handlePrev = useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (activePhoto === null) return;
-    setActivePhoto((prev) => (prev === galleryImages.length - 1 ? 0 : (prev ?? 0) + 1));
-  };
+    setActivePhoto((prev) => (prev === 0 ? gallery.length - 1 : (prev ?? 0) - 1));
+  }, [activePhoto, gallery.length]);
+
+  const handleNext = useCallback((e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (activePhoto === null) return;
+    setActivePhoto((prev) => (prev === gallery.length - 1 ? 0 : (prev ?? 0) + 1));
+  }, [activePhoto, gallery.length]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -68,7 +106,7 @@ export default function InvestitureCeremonyPage() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activePhoto]);
+  }, [activePhoto, handleNext, handlePrev]);
 
   useEffect(() => {
     if (activePhoto !== null) {
@@ -136,10 +174,12 @@ export default function InvestitureCeremonyPage() {
             </div>
 
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-md border border-slate-100 bg-[#3D348B] flex items-center justify-center">
-              <img
+              <Image
                 src="https://www.lpsvidhyawadi.com/Images/aboutBanner.jpg"
                 alt="Investiture Ceremony Banner"
-                className="w-full h-full object-cover opacity-80"
+                fill
+                className="object-cover opacity-80"
+                sizes="(max-width: 768px) 100vw, 33vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent flex items-end p-4">
                 <p className="text-white text-xs font-black uppercase tracking-widest drop-shadow-md">
@@ -158,7 +198,7 @@ export default function InvestitureCeremonyPage() {
               </h3>
             </div>
 
-            {loading ? (
+            {loadingCabinet ? (
               <div className="flex flex-col items-center justify-center py-12 gap-4">
                 <div className="w-10 h-10 border-4 border-[#3D348B] border-t-transparent rounded-full animate-spin" />
                 <p className="text-[#3D348B] text-sm font-bold animate-pulse">Loading cabinet portfolios...</p>
@@ -219,28 +259,35 @@ export default function InvestitureCeremonyPage() {
               </h3>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-              {galleryImages.map((image, idx) => (
-                <motion.div
-                  key={idx}
-                  onClick={() => setActivePhoto(idx)}
-                  whileHover={{ scale: 1.03 }}
-                  className="relative aspect-square rounded-xl overflow-hidden bg-slate-100 border border-slate-200/50 cursor-pointer shadow-sm group"
-                >
-                  <img
+            {loadingGallery ? (
+              <div className="bg-white rounded-2xl p-12 text-center border border-slate-100 shadow-sm">
+                <p className="text-slate-500">Loading ceremony gallery...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                {gallery.map((image, idx) => (
+                  <motion.div
+                    key={`${image.src}-${idx}`}
+                    onClick={() => setActivePhoto(idx)}
+                    whileHover={{ scale: 1.03 }}
+                    className="relative aspect-square rounded-xl overflow-hidden bg-slate-100 border border-slate-200/50 cursor-pointer shadow-sm group"
+                  >
+                  <Image
                     src={image.src}
                     alt={image.alt}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 16vw"
                   />
-                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <span className="text-[10px] font-black text-white uppercase tracking-wider bg-[#3D348B]/80 px-2 py-1 rounded">
-                      Zoom
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <span className="text-[10px] font-black text-white uppercase tracking-wider bg-[#3D348B]/80 px-2 py-1 rounded">
+                        Zoom
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </main>
@@ -282,10 +329,12 @@ export default function InvestitureCeremonyPage() {
 
               {/* Main Image View */}
               <div className="relative flex-1 aspect-[4/3] max-h-[70vh] flex items-center justify-center overflow-hidden rounded-xl">
-                <img
-                  src={galleryImages[activePhoto].src}
-                  alt={galleryImages[activePhoto].alt}
-                  className="max-w-full max-h-full object-contain rounded-lg"
+                <Image
+                  src={gallery[activePhoto].src}
+                  alt={gallery[activePhoto].alt}
+                  fill
+                  className="object-contain rounded-lg"
+                  sizes="100vw"
                 />
               </div>
 
@@ -302,10 +351,10 @@ export default function InvestitureCeremonyPage() {
             {/* Bottom Bar Details */}
             <div className="w-full max-w-3xl text-center px-4">
               <h4 className="text-white font-extrabold text-base md:text-lg">
-                {galleryImages[activePhoto].title}
+                {gallery[activePhoto].title}
               </h4>
               <p className="text-white/60 text-xs md:text-sm mt-1">
-                Image {activePhoto + 1} of {galleryImages.length}
+                Image {activePhoto + 1} of {galleryCount}
               </p>
             </div>
           </motion.div>
