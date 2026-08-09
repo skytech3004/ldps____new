@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { gisMenuItems } from "@/data/gisMenu";
 import { schoolDatabase, schoolImages, type SchoolPage } from "@/data/lpsVidhyawadiDatabase";
 import Image from "next/image";
+import RichHtmlContent, { isHtmlContent } from "@/components/RichHtmlContent";
 
 type DBPageContent = {
   title: string;
@@ -147,14 +148,22 @@ export default function GisStaticPage({ slug }: { slug: string }) {
                         <span className="w-2 h-2 rounded-full bg-accent" />
                         {section.title}
                       </h3>
-                      <ul className="space-y-3">
-                        {section.content.map((line, lIdx) => (
-                          <li key={lIdx} className="text-gray-600 font-medium text-sm leading-relaxed flex gap-3">
-                            <span className="text-accent mt-1.5 shrink-0">•</span>
-                            <span>{line}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      {section.content.length === 1 && isHtmlContent(section.content[0]) ? (
+                        <RichHtmlContent html={section.content[0]} className="text-gray-600 font-medium text-sm" />
+                      ) : (
+                        <ul className="space-y-3">
+                          {section.content.map((line, lIdx) => (
+                            <li key={lIdx} className="text-gray-600 font-medium text-sm leading-relaxed flex gap-3">
+                              <span className="text-accent mt-1.5 shrink-0">•</span>
+                              {isHtmlContent(line) ? (
+                                <RichHtmlContent html={line} className="flex-1" />
+                              ) : (
+                                <span>{line}</span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </article>
                   ))}
                 </div>

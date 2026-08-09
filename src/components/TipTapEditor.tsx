@@ -113,7 +113,7 @@ const MenuBar = ({
         );
       })}
 
-      {enableImages ? (
+      {enableImages !== false ? (
         <>
           <div className="w-[1px] h-6 bg-white/10 self-center mx-1" />
           <button
@@ -156,7 +156,7 @@ export default function TipTapEditor({
   value,
   onChange,
   placeholder,
-  enableImages = false,
+  enableImages = true,
   uploadPage = "home",
   uploadSection = "gallery",
 }: TipTapEditorProps) {
@@ -166,15 +166,11 @@ export default function TipTapEditor({
   const editor = useEditor({
     extensions: [
       StarterKit,
-      ...(enableImages
-        ? [
-            Image.configure({
-              HTMLAttributes: {
-                class: "rounded-xl shadow-lg max-w-full h-auto mx-auto",
-              },
-            }),
-          ]
-        : []),
+      Image.configure({
+        HTMLAttributes: {
+          class: "rounded-xl shadow-lg max-w-full h-auto mx-auto",
+        },
+      }),
     ],
     content: value,
     editorProps: {
@@ -215,7 +211,7 @@ export default function TipTapEditor({
   }
 
   async function handleImageUpload() {
-    if (!editor || !enableImages) return;
+    if (!editor) return;
 
     const useFileUpload = window.confirm("Click OK to upload an image file, or Cancel to paste an image URL.");
     if (useFileUpload) {
@@ -257,7 +253,7 @@ export default function TipTapEditor({
         uploadingImage={uploadingImage}
       />
       <EditorContent editor={editor} className="flex-1 w-full" />
-      {enableImages ? (
+      {enableImages !== false ? (
         <input
           ref={fileInputRef}
           type="file"

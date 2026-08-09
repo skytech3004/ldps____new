@@ -18,11 +18,13 @@ const AboutPageSchema = new Schema(
       trim: true,
     },
     pageTitle: { type: String, default: "", trim: true },
+    pageSubtitle: { type: String, default: "", trim: true },
     bannerImage: { type: String, default: "", trim: true },
     portraitImage: { type: String, default: "", trim: true },
     personName: { type: String, default: "", trim: true },
     personDesignation: { type: String, default: "", trim: true },
     content: { type: String, default: "" },
+    inspirationContent: { type: String, default: "" },
     members: { type: [ManagementMemberSchema], default: [] },
   },
   {

@@ -19,6 +19,7 @@ import {
   Star,
   ArrowRight
 } from "lucide-react";
+import TipTapEditor from "@/components/TipTapEditor";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Slide {
@@ -635,16 +636,17 @@ export default function AdminHeroPage() {
 
                     <div className="space-y-1.5">
                       <label className="text-[9px] font-bold text-white/50 uppercase">Description</label>
-                      <textarea
+                      <TipTapEditor
                         value={slides[currentSlide].description || ""}
-                        onChange={(e) => {
+                        onChange={(value) => {
                           const nextSlides = [...slides];
-                          nextSlides[currentSlide].description = e.target.value;
+                          nextSlides[currentSlide].description = value;
                           setSlides(nextSlides);
+                          saveSlides(nextSlides);
                         }}
-                        onBlur={() => saveSlides(slides)}
-                        rows={2}
-                        className="w-full bg-[#081736] border border-white/10 rounded-lg px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-accent resize-none"
+                        placeholder="Slide description..."
+                        uploadPage="hero"
+                        uploadSection="hero"
                       />
                     </div>
                   </div>

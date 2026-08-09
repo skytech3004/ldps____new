@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, FileText, BadgeInfo } from "lucide-react";
+import RichHtmlContent from "@/components/RichHtmlContent";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PrintButton from "@/components/PrintButton";
@@ -104,8 +105,8 @@ export default async function NoticeDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  // Segment paragraphs from body text
-  const paragraphs = notice.body.split("\n").filter(Boolean);
+  // Segment paragraphs from body text (plain text fallback handled in RichHtmlContent)
+  const bodyContent = notice.body;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8F9FC] via-white to-[#7678ED]/5 flex flex-col">
@@ -187,12 +188,8 @@ export default async function NoticeDetailPage({ params }: PageProps) {
             </section>
 
             {/* Document Body text paragraphs */}
-            <section className="mt-8 text-sm md:text-base text-slate-600 font-medium leading-relaxed space-y-5 px-1 text-justify">
-              {paragraphs.map((p: string, idx: number) => (
-                <p key={idx} className="indent-0 md:indent-8">
-                  {p}
-                </p>
-              ))}
+            <section className="mt-8 text-sm md:text-base text-slate-600 font-medium leading-relaxed px-1 text-justify">
+              <RichHtmlContent html={bodyContent} />
             </section>
 
             {/* Official Signature block */}

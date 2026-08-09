@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Pencil, Plus, Trash2, X, FileText, Save, Upload, CheckCircle2, AlertTriangle, ExternalLink } from "lucide-react";
+import TipTapEditor from "@/components/TipTapEditor";
 
 type DownloadItem = {
   _id: string;
@@ -552,12 +553,12 @@ export default function AdminDownloadsPage() {
                 <label className="text-xs font-black uppercase tracking-wider text-primary/60 ml-2">
                   Description
                 </label>
-                <textarea
+                <TipTapEditor
                   value={form.description}
-                  onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))}
+                  onChange={(value) => setForm((prev) => ({ ...prev, description: value }))}
                   placeholder="Prescribed form for submitting student leave requests..."
-                  rows={3}
-                  className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-primary font-bold focus:border-accent focus:outline-none transition-all resize-none"
+                  uploadPage="downloads"
+                  uploadSection="documents"
                 />
               </div>
 

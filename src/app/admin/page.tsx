@@ -4,7 +4,7 @@ import Link from "next/link";
 import { 
   Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle, ClipboardList, 
   LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar, Download, Award, 
-  GraduationCap, Trophy, Home, Briefcase, Sparkles, Terminal, Activity, Users 
+  GraduationCap, Trophy, Home, Briefcase, Sparkles, Terminal, Activity, Users, MessageSquare, Phone 
 } from "lucide-react";
 
 const modules = [
@@ -39,6 +39,13 @@ const modules = [
     badge: "Applications"
   },
   {
+    title: "Important Contacts",
+    description: "Manage department contacts shown on the Contact page — add, edit, hide, or delete entries.",
+    href: "/admin/contact",
+    icon: Phone,
+    badge: "CRUD"
+  },
+  {
     title: "Notice Board",
     description: "Manage news, announcements, circulars, and admission alerts shown on the home page.",
     href: "/admin/notices",
@@ -53,9 +60,16 @@ const modules = [
   },
   {
     title: "About Pages",
-    description: "Edit management committee, president's message, CEO message, and office bearers table.",
+    description: "Edit About Trust and Management Committee intro, office bearers table, and inspiration section.",
     href: "/admin/about-pages",
     icon: FileText,
+    badge: "CMS"
+  },
+  {
+    title: "About Messages",
+    description: "Edit President, CEO, Secretary, and Principal messages from the About navbar with portrait upload and rich text.",
+    href: "/admin/about-messages",
+    icon: MessageSquare,
     badge: "CMS"
   },
   {

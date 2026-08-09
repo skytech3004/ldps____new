@@ -6,18 +6,18 @@ import Footer from "@/components/Footer";
 import MessageDeskLayout from "@/components/about/MessageDeskLayout";
 import { aboutPageDefaults } from "@/data/aboutPages";
 
-export default function CeoMessagePage() {
-  const defaults = aboutPageDefaults["ceo-message"];
+export default function SecretaryMessagePage() {
+  const defaults = aboutPageDefaults["secretary-message"];
   const [pageData, setPageData] = useState(defaults);
 
   useEffect(() => {
     async function fetchPage() {
       try {
-        const response = await fetch("/api/admin/about-pages?slug=ceo-message", { cache: "no-store" });
+        const response = await fetch("/api/admin/about-pages?slug=secretary-message", { cache: "no-store" });
         if (response.ok) {
           const data = await response.json();
           setPageData({
-            slug: "ceo-message",
+            slug: "secretary-message",
             pageTitle: data.pageTitle || defaults.pageTitle,
             pageSubtitle: data.pageSubtitle || defaults.pageSubtitle,
             bannerImage: data.bannerImage || defaults.bannerImage,
@@ -30,7 +30,7 @@ export default function CeoMessagePage() {
           });
         }
       } catch (error) {
-        console.error("Failed to load CEO message page:", error);
+        console.error("Failed to load secretary message page:", error);
       }
     }
 
@@ -41,7 +41,7 @@ export default function CeoMessagePage() {
     <>
       <Navbar />
       <MessageDeskLayout
-        breadcrumbLabel="CEO's Message"
+        breadcrumbLabel="Secretary's Message"
         pageTitle={pageData.pageTitle}
         subtitle={pageData.pageSubtitle}
         portraitImage={pageData.portraitImage}

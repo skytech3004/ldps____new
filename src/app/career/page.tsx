@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import RichHtmlContent from "@/components/RichHtmlContent";
 import Reveal from "@/components/ui/Reveal";
 import FadeIn from "@/components/ui/FadeIn";
 import { 
@@ -274,9 +275,9 @@ export default function CareerPage() {
                       <h3 className="text-xl md:text-2xl font-black text-[#3D348B] uppercase tracking-tight font-montserrat">
                         {job.title}
                       </h3>
-                      <p className="text-xs md:text-sm text-gray-500 font-semibold leading-relaxed max-w-2xl">
-                        {job.description}
-                      </p>
+                      <div className="text-xs md:text-sm text-gray-500 font-semibold leading-relaxed max-w-2xl">
+                        <RichHtmlContent html={job.description} />
+                      </div>
                       {job.qualification && (
                         <p className="text-xs text-gray-400 font-bold">
                           <span className="text-[#3D348B] font-black uppercase tracking-wider text-[10px]">Required Qualification:</span> {job.qualification}

@@ -6,6 +6,7 @@ import {
   Plus, Pencil, Trash2, X, Save, Image, 
   Upload, ArrowUpRight, ImageIcon, Eye 
 } from "lucide-react";
+import TipTapEditor from "@/components/TipTapEditor";
 
 type PrePrimaryItem = {
   _id: string;
@@ -286,12 +287,12 @@ export default function AdminPrePrimaryPage() {
 
               <div>
                 <label className="text-[10px] font-black uppercase tracking-wider text-white/60 block mb-2">Card Description</label>
-                <textarea 
-                  rows={3} 
-                  value={formDescription} 
-                  onChange={(e) => setFormDescription(e.target.value)}
-                  placeholder="Details shown under title on card hover/expansion..." 
-                  className="w-full border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-bold bg-[#081a3a] focus:outline-none focus:border-[#F7B801] resize-none"
+                <TipTapEditor
+                  value={formDescription}
+                  onChange={setFormDescription}
+                  placeholder="Details shown under title on card hover/expansion..."
+                  uploadPage="pre-primary"
+                  uploadSection="pre-primary"
                 />
               </div>
 

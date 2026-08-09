@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Pencil, Plus, Trash2, X, Upload } from "lucide-react";
+import TipTapEditor from "@/components/TipTapEditor";
 
 type EventItem = {
   _id: string;
@@ -261,11 +262,12 @@ export default function AdminEventsPage() {
               </div>
               <div>
                 <label className="text-xs font-black uppercase tracking-wider text-teal block mb-2">Description</label>
-                <textarea
+                <TipTapEditor
                   value={form.description}
-                  onChange={(event) => setForm((previous) => ({ ...previous, description: event.target.value }))}
-                  rows={4}
-                  className="w-full border border-teal/20 rounded-lg px-3 py-2 text-navy font-semibold resize-y"
+                  onChange={(value) => setForm((previous) => ({ ...previous, description: value }))}
+                  placeholder="Event description..."
+                  uploadPage="events"
+                  uploadSection="events"
                 />
               </div>
               <div>

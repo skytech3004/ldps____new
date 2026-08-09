@@ -199,7 +199,7 @@ export default function AboutLpsPage() {
 
             <div className="relative w-full aspect-[4/3] max-w-md rounded-3xl overflow-hidden shadow-2xl border-8 border-white bg-white group hover:scale-[1.01] transition-transform duration-500">
               <Image
-                src="/lps-vidhyawadi/about-banner.jpg"
+                src="/lps-vidhyawadi/image.jpeg"
                 alt="LPS Vidyawadi campus building"
                 fill
                 sizes="(max-width: 1024px) 100vw, 450px"

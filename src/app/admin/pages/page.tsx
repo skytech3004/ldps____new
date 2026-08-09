@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Pencil, Plus, Trash2, X, Save, ArrowUpRight } from "lucide-react";
 import { gisMenuItems } from "@/data/gisMenu";
+import TipTapEditor from "@/components/TipTapEditor";
 
 type SectionForm = {
   title: string;
@@ -131,7 +132,7 @@ export default function AdminPagesPage() {
       record.sections.length > 0
         ? record.sections.map((section) => ({
             title: section.title,
-            contentText: section.content.join("\n"),
+            contentText: section.content.length === 1 ? section.content[0] : section.content.join("\n"),
           }))
         : [initialSection]
     );
@@ -168,10 +169,7 @@ export default function AdminPagesPage() {
           .filter((section) => section.title.trim() || section.contentText.trim())
           .map((section) => ({
             title: section.title.trim(),
-            content: section.contentText
-              .split("\n")
-              .map((line) => line.trim())
-              .filter(Boolean),
+            content: section.contentText.trim() ? [section.contentText.trim()] : [],
           })),
       };
 
@@ -438,12 +436,12 @@ export default function AdminPagesPage() {
                       placeholder="Section title"
                       className="w-full border border-teal/20 rounded-lg px-3 py-2 text-navy font-semibold"
                     />
-                    <textarea
+                    <TipTapEditor
                       value={section.contentText}
-                      onChange={(event) => updateSection(index, { contentText: event.target.value })}
-                      placeholder="One line per bullet"
-                      rows={5}
-                      className="w-full border border-teal/20 rounded-lg px-3 py-2 text-navy font-semibold resize-y"
+                      onChange={(value) => updateSection(index, { contentText: value })}
+                      placeholder="Write section content..."
+                      uploadPage="pages"
+                      uploadSection="documents"
                     />
                   </div>
                 ))}

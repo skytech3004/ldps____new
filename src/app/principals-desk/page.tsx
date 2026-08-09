@@ -1,196 +1,57 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Quote, Sparkles, Award, ArrowLeft, Heart, CheckCircle } from "lucide-react";
+import MessageDeskLayout from "@/components/about/MessageDeskLayout";
+import { aboutPageDefaults } from "@/data/aboutPages";
 
-export default function PrincipalsDesk() {
+export default function PrincipalsDeskPage() {
+  const defaults = aboutPageDefaults["principals-message"];
+  const [pageData, setPageData] = useState(defaults);
+
+  useEffect(() => {
+    async function fetchPage() {
+      try {
+        const response = await fetch("/api/admin/about-pages?slug=principals-message", { cache: "no-store" });
+        if (response.ok) {
+          const data = await response.json();
+          setPageData({
+            slug: "principals-message",
+            pageTitle: data.pageTitle || defaults.pageTitle,
+            pageSubtitle: data.pageSubtitle || defaults.pageSubtitle,
+            bannerImage: data.bannerImage || defaults.bannerImage,
+            portraitImage: data.portraitImage || defaults.portraitImage,
+            personName: data.personName || defaults.personName,
+            personDesignation: data.personDesignation || defaults.personDesignation,
+            content: data.content || defaults.content,
+            inspirationContent: data.inspirationContent || defaults.inspirationContent,
+            members: Array.isArray(data.members) ? data.members : defaults.members,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to load principal's message page:", error);
+      }
+    }
+
+    fetchPage();
+  }, []);
+
   return (
-    <main className="min-h-screen bg-[#F8F9FC] text-gray-800">
+    <>
       <Navbar />
-
-      {/* Decorative Breadcrumb Banner */}
-      <section className="relative pt-36 pb-12 md:pt-44 md:pb-16 px-6 bg-gradient-to-br from-primary to-[#2c246b] text-white">
-        <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto relative z-10 space-y-2">
-          <div className="flex items-center gap-2 text-xs md:text-sm text-accent font-bold uppercase tracking-wider">
-            <Link href="/" className="hover:underline hover:text-white transition-all">Home</Link>
-            <span>/</span>
-            <span>About</span>
-            <span>/</span>
-            <span className="text-white/80">Principal&apos;s Desk</span>
-          </div>
-          <h1 className="text-3xl md:text-5xl font-black font-montserrat uppercase tracking-tight text-accent">
-            Principal&apos;s Desk
-          </h1>
-          <p className="text-white/60 font-medium text-xs md:text-sm max-w-xl">
-            A balanced curriculum, caring atmosphere, and lifelong learning focus.
-          </p>
-        </div>
-      </section>
-
-      {/* Main Content Details */}
-      <section className="py-20 px-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-
-          {/* Left Column: Portrait Card */}
-          <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-32">
-
-            {/* The Professional Card */}
-            <div className="relative bg-white border border-primary/10 rounded-[2.5rem] p-6 shadow-2xl hover:shadow-[0_20px_50px_rgba(61,52,139,0.15)] transition-all duration-500 overflow-hidden group">
-              {/* Card Accent Gradients */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-bl-[8rem] -z-10 group-hover:scale-110 transition-transform duration-300" />
-              <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-primary/5 rounded-full -z-10 blur-xl" />
-
-              {/* Border accents */}
-              <div className="absolute top-4 left-4 right-4 h-[1px] bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 h-[1px] bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
-
-              {/* Portrait Wrapper */}
-              <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden shadow-md border-4 border-white bg-gray-100 mb-6">
-                <Image
-                  src="/principle.avif"
-                  alt="Ms. Jyoti Nath - Principal"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 420px"
-                  className="object-cover group-hover:scale-[1.02] transition-transform duration-700"
-                  priority
-                />
-                <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition-colors duration-300" />
-              </div>
-
-              {/* Title & Badge */}
-              <div className="text-center space-y-2">
-                <div className="inline-flex items-center gap-1.5 bg-accent/10 border border-accent/20 px-4.5 py-1 rounded-full text-accent-hover font-bold text-xs uppercase tracking-wider">
-                  <Sparkles size={12} />
-                  <span>Academic Leadership</span>
-                </div>
-
-                <h3 className="text-2xl md:text-3xl font-black text-primary uppercase font-montserrat tracking-tight mt-2">
-                  Ms. Jyoti Nath
-                </h3>
-                <p className="text-gray-400 font-bold uppercase tracking-widest text-[11px] md:text-xs">
-                  Principal, Leeladevi Parasmal Sancheti English Medium Sr.Sec. School
-                </p>
-              </div>
-
-              {/* Core Credentials list */}
-              <div className="mt-8 pt-6 border-t border-gray-100 space-y-3.5">
-                {[
-                  "Experienced educator and academic mentor",
-                  "Dedicated to child-centered competency learning",
-                  "Encouraging self-reliance and creative arts",
-                  "Committed to every student's happiness & success"
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <CheckCircle className="text-accent shrink-0 mt-0.5" size={16} />
-                    <span className="text-gray-600 font-medium text-xs md:text-sm">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Back Link */}
-            <Link
-              href="/about-lps"
-              className="inline-flex items-center gap-2 text-primary hover:text-accent-hover font-extrabold uppercase text-xs tracking-wider transition-colors ml-4 group"
-            >
-              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-              <span>Back to About LPS</span>
-            </Link>
-          </div>
-
-          {/* Right Column: Message Letter */}
-          <div className="lg:col-span-7 bg-white border border-primary/10 rounded-[2.5rem] p-8 md:p-12 shadow-xl space-y-8 leading-relaxed">
-
-            {/* Stylized Quote Block */}
-            <div className="relative bg-[#F8F9FC] border-l-4 border-secondary rounded-r-2xl p-6 md:p-8 space-y-4">
-              <Quote className="text-secondary/20 absolute -top-3 right-6" size={54} />
-              <p className="text-primary font-serif italic text-lg md:text-xl font-bold leading-relaxed relative z-10">
-                &ldquo;A society that educates its daughters rewrites its destiny.&rdquo;
-              </p>
-            </div>
-
-            {/* Greeting */}
-            <div>
-              <p className="text-gray-400 font-bold uppercase tracking-wider text-xs md:text-sm mb-1">Principal&apos;s Message</p>
-              <h2 className="text-3xl font-black text-primary uppercase font-montserrat tracking-tight">
-                Dear Students, Parents, and Community Members,
-              </h2>
-            </div>
-
-            {/* Body Text */}
-            <div className="text-gray-600 font-medium text-sm md:text-base space-y-6">
-              <p>
-                Welcome to LPS, Vidyawadi, where we take pride in fostering a nurturing
-                environment that empowers every learner to grow into a confident,
-                compassionate, and globally-minded citizen.
-              </p>
-
-              <p>
-                Founded in 2004, situated in the rural belt of Pali District in Rajasthan,
-                this Vidyalaya is a residential school providing quality education from
-                Nursery to XII primarily for girls, with a noble thought of promoting
-                girls&apos; education. Presently, the School accommodates more than 1000
-                girls.
-              </p>
-
-              <p>
-                At our core, we embrace a vision to nurture global citizens who are
-                equipped to thrive in an ever-changing world. Our mission is to provide a
-                healthy learning environment where every student feels safe, valued, and
-                inspired to pursue excellence.
-              </p>
-
-              <p>
-                Together, let us work to create a future where every child shines brightly,
-                empowered to shape their destiny and contribute meaningfully to the global
-                community.
-              </p>
-            </div>
-
-            {/* Closing and Signature */}
-            <div className="pt-8 border-t border-gray-100 flex justify-between items-end">
-              <div className="space-y-1">
-                <p className="text-gray-400 font-bold uppercase tracking-wider text-xs">Principal</p>
-                <p className="text-xl font-black text-primary font-montserrat uppercase tracking-tight">
-                  Ms. Jyoti Nath
-                </p>
-                <p className="text-xs font-semibold text-accent-hover uppercase tracking-wider">
-                  Principal, Leeladevi Parasmal Sancheti English Medium Sr.Sec. School
-                </p>
-                <p className="text-[11px] text-gray-400 font-medium">
-                  Vidyawadi, Khimel, Dist. Pali (Rajasthan)
-                </p>
-              </div>
-
-              <div className="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center text-primary/30 rotate-12 hidden xs:flex">
-                <Award size={36} />
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Philosophy Banner */}
-      <section className="bg-gradient-to-r from-primary to-[#282163] py-16 px-6 text-white text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay" />
-        <div className="max-w-3xl mx-auto space-y-4 relative z-10">
-          <Heart className="text-accent mx-auto animate-pulse" size={32} />
-          <h3 className="text-2xl md:text-3xl font-black font-montserrat uppercase">
-            &quot;A child-centered environment built for character and excellence.&quot;
-          </h3>
-          <p className="text-white/60 text-xs md:text-sm font-semibold uppercase tracking-wider">
-            Leeladevi Parasmal Sancheti School • Vidyawadi, Khimel
-          </p>
-        </div>
-      </section>
-
+      <MessageDeskLayout
+        breadcrumbLabel="Principal's Desk"
+        pageTitle={pageData.pageTitle}
+        subtitle={pageData.pageSubtitle}
+        portraitImage={pageData.portraitImage}
+        personName={pageData.personName}
+        personDesignation={pageData.personDesignation}
+        content={pageData.content}
+        backHref="/about-lps"
+        backLabel="Back to About LPS"
+      />
       <Footer />
-    </main>
+    </>
   );
 }

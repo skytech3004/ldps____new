@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Pencil, Plus, Trash2, X, Bell, Save, Upload } from "lucide-react";
+import TipTapEditor from "@/components/TipTapEditor";
 
 type NoticeItem = {
   _id: string;
@@ -349,13 +350,13 @@ export default function AdminNoticesPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-wider text-primary/60 ml-2">Announcement Body (Markdown supported)</label>
-                <textarea
+                <label className="text-xs font-black uppercase tracking-wider text-primary/60 ml-2">Announcement Body</label>
+                <TipTapEditor
                   value={form.body}
-                  onChange={(event) => setForm((previous) => ({ ...previous, body: event.target.value }))}
-                  rows={8}
-                  placeholder="The school will remain closed for winter vacation from..."
-                  className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-gray-600 font-medium focus:border-accent focus:outline-none transition-all resize-none"
+                  onChange={(value) => setForm((previous) => ({ ...previous, body: value }))}
+                  placeholder="Write the announcement content..."
+                  uploadPage="notices"
+                  uploadSection="notice"
                 />
               </div>
 

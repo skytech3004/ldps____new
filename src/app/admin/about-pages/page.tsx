@@ -14,13 +14,13 @@ type AboutPageRecord = {
   personName: string;
   personDesignation: string;
   content: string;
+  inspirationContent: string;
   members: ManagementMember[];
 };
 
 const PAGE_OPTIONS: { slug: AboutPageSlug; label: string }[] = [
+  { slug: "about-trust", label: "About Trust" },
   { slug: "management", label: "Management Committee" },
-  { slug: "management-message", label: "President's Message" },
-  { slug: "ceo-message", label: "CEO's Message" },
 ];
 
 export default function AdminAboutPagesPage() {
@@ -52,6 +52,7 @@ export default function AdminAboutPagesPage() {
             personName: data.personName ?? aboutPageDefaults[selectedSlug].personName,
             personDesignation: data.personDesignation ?? aboutPageDefaults[selectedSlug].personDesignation,
             content: data.content ?? aboutPageDefaults[selectedSlug].content,
+            inspirationContent: data.inspirationContent ?? aboutPageDefaults[selectedSlug].inspirationContent,
             members: Array.isArray(data.members) ? data.members : aboutPageDefaults[selectedSlug].members,
           });
         }
@@ -77,8 +78,8 @@ export default function AdminAboutPagesPage() {
     try {
       const formData = new FormData();
       formData.set("file", file);
-      formData.set("page", "about");
-      formData.set("section", "about");
+      formData.set("page", selectedSlug === "about-trust" ? "about-trust" : "about");
+      formData.set("section", selectedSlug === "about-trust" ? "about-trust" : "about");
       formData.set("title", `${selectedSlug}-${kind}`);
 
       const response = await fetch("/api/admin/upload", {
@@ -124,6 +125,7 @@ export default function AdminAboutPagesPage() {
         personName: data.personName ?? form.personName,
         personDesignation: data.personDesignation ?? form.personDesignation,
         content: data.content ?? form.content,
+        inspirationContent: data.inspirationContent ?? form.inspirationContent,
         members: Array.isArray(data.members) ? data.members : form.members,
       });
     } catch (saveError) {
@@ -134,7 +136,11 @@ export default function AdminAboutPagesPage() {
     }
   }
 
-  const isMessagePage = selectedSlug !== "management";
+  const isManagementPage = selectedSlug === "management";
+  const isTrustPage = selectedSlug === "about-trust";
+  const showBanner = isManagementPage || isTrustPage;
+  const showPortrait = isTrustPage;
+  const showPersonFields = isTrustPage;
 
   function updateMember(index: number, field: keyof ManagementMember, value: string | number) {
     setForm((previous) => ({
@@ -168,7 +174,9 @@ export default function AdminAboutPagesPage() {
         <div>
           <p className="text-xs font-black uppercase tracking-[0.3em] text-green-primary">Admin</p>
           <h1 className="text-3xl md:text-4xl font-black text-navy mt-2">About Pages</h1>
-          <p className="text-sm text-teal mt-2">Edit management and leadership message pages with images and rich text.</p>
+          <p className="text-sm text-teal mt-2">
+            Edit About Trust and Management Committee content. For President, CEO, and Principal messages, use About Messages.
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           {PAGE_OPTIONS.map((option) => (
@@ -204,7 +212,7 @@ export default function AdminAboutPagesPage() {
                   className="w-full border border-teal/20 rounded-lg px-3 py-2 text-navy font-semibold"
                 />
               </div>
-              {isMessagePage ? (
+              {showPersonFields ? (
                 <>
                   <div>
                     <label className="text-xs font-black uppercase tracking-wider text-teal block mb-2">Person Name</label>
@@ -228,7 +236,7 @@ export default function AdminAboutPagesPage() {
               ) : null}
             </div>
 
-            {!isMessagePage ? (
+            {showBanner ? (
               <div>
                 <label className="text-xs font-black uppercase tracking-wider text-teal block mb-2">Banner Image</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -264,7 +272,9 @@ export default function AdminAboutPagesPage() {
                   </div>
                 </div>
               </div>
-            ) : (
+            ) : null}
+
+            {showPortrait ? (
               <div>
                 <label className="text-xs font-black uppercase tracking-wider text-teal block mb-2">Portrait Image</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -300,9 +310,9 @@ export default function AdminAboutPagesPage() {
                   </div>
                 </div>
               </div>
-            )}
+            ) : null}
 
-            {!isMessagePage ? (
+            {isManagementPage ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between gap-4">
                   <label className="text-xs font-black uppercase tracking-wider text-teal">Office Bearers Table</label>
@@ -379,16 +389,32 @@ export default function AdminAboutPagesPage() {
             ) : null}
 
             <div>
-              <label className="text-xs font-black uppercase tracking-wider text-teal block mb-2">Page Content</label>
+              <label className="text-xs font-black uppercase tracking-wider text-teal block mb-2">
+                {isTrustPage ? "Main About Content" : "Page Content"}
+              </label>
               <TipTapEditor
                 value={form.content}
                 onChange={(value) => setForm((previous) => ({ ...previous, content: value }))}
-                enableImages
-                uploadPage="about"
-                uploadSection="about"
+                uploadPage={isTrustPage ? "about-trust" : "about"}
+                uploadSection={isTrustPage ? "about-trust" : "about"}
                 placeholder="Write page content here..."
               />
             </div>
+
+            {isTrustPage ? (
+              <div>
+                <label className="text-xs font-black uppercase tracking-wider text-teal block mb-2">
+                  Inspiration Section Content
+                </label>
+                <TipTapEditor
+                  value={form.inspirationContent}
+                  onChange={(value) => setForm((previous) => ({ ...previous, inspirationContent: value }))}
+                  uploadPage="about-trust"
+                  uploadSection="about-trust"
+                  placeholder="Write the inspiration section about Smt. Subhadraji Jain..."
+                />
+              </div>
+            ) : null}
 
             <div className="flex justify-end">
               <button

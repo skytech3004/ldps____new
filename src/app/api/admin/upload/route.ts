@@ -15,6 +15,8 @@ const SECTION_FOLDERS: Record<string, string> = {
   logo: "logo",
   leadership: "leadership",
   about: "about",
+  "about-trust": "about-trust",
+  "about-messages": "about-messages",
   "media-items": "media-items",
   hostel: "hostel",
   blogs: "blogs",

@@ -6,6 +6,7 @@ import {
   Plus, Pencil, Trash2, X, Save, Image, Shield, 
   HelpCircle, CalendarRange, Ban, Upload, ArrowUpRight 
 } from "lucide-react";
+import TipTapEditor from "@/components/TipTapEditor";
 
 type Facility = {
   _id: string;
@@ -531,12 +532,12 @@ export default function AdminHostelPage() {
                   </div>
                   <div>
                     <label className="text-[10px] font-black uppercase tracking-wider text-white/60 block mb-2">Description</label>
-                    <textarea 
-                      rows={3} 
-                      value={facDesc} 
-                      onChange={(e) => setFacDesc(e.target.value)}
-                      placeholder="Brief detail of the facility..." 
-                      className="w-full border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-bold bg-[#081a3a] focus:outline-none focus:border-[#F7B801] resize-none"
+                    <TipTapEditor
+                      value={facDesc}
+                      onChange={setFacDesc}
+                      placeholder="Brief detail of the facility..."
+                      uploadPage="hostel"
+                      uploadSection="hostel"
                     />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

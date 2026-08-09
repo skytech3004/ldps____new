@@ -6,6 +6,7 @@ import {
   Plus, Pencil, Trash2, X, Save, Eye, Mail, 
   Phone, Calendar, Briefcase, FileText, ArrowUpRight, ClipboardList 
 } from "lucide-react";
+import TipTapEditor from "@/components/TipTapEditor";
 
 type JobOpening = {
   _id: string;
@@ -427,13 +428,12 @@ export default function AdminCareerPage() {
 
               <div>
                 <label className="text-[10px] font-black uppercase tracking-wider text-white/60 block mb-2">Job Description *</label>
-                <textarea 
-                  rows={3} 
-                  required
-                  value={jobDesc} 
-                  onChange={(e) => setJobDesc(e.target.value)}
-                  placeholder="Summarize the key role responsibilities..." 
-                  className="w-full border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-bold bg-[#081a3a] focus:outline-none focus:border-[#F7B801] resize-none"
+                <TipTapEditor
+                  value={jobDesc}
+                  onChange={setJobDesc}
+                  placeholder="Summarize the key role responsibilities..."
+                  uploadPage="career"
+                  uploadSection="career"
                 />
               </div>
 

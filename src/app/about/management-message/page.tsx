@@ -19,11 +19,13 @@ export default function ManagementMessagePage() {
           setPageData({
             slug: "management-message",
             pageTitle: data.pageTitle || defaults.pageTitle,
+            pageSubtitle: data.pageSubtitle || defaults.pageSubtitle,
             bannerImage: data.bannerImage || defaults.bannerImage,
             portraitImage: data.portraitImage || defaults.portraitImage,
             personName: data.personName || defaults.personName,
             personDesignation: data.personDesignation || defaults.personDesignation,
             content: data.content || defaults.content,
+            inspirationContent: data.inspirationContent || defaults.inspirationContent,
             members: Array.isArray(data.members) ? data.members : defaults.members,
           });
         }
@@ -41,7 +43,7 @@ export default function ManagementMessagePage() {
       <MessageDeskLayout
         breadcrumbLabel="President's Message"
         pageTitle={pageData.pageTitle}
-        subtitle="A message from the President of Marudhar Mahila Shikshan Sangh, Vidyawadi."
+        subtitle={pageData.pageSubtitle}
         portraitImage={pageData.portraitImage}
         personName={pageData.personName}
         personDesignation={pageData.personDesignation}

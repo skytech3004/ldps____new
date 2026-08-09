@@ -59,11 +59,13 @@ export async function PUT(request: Request) {
       {
         slug,
         pageTitle: String(body.pageTitle ?? ""),
+        pageSubtitle: String(body.pageSubtitle ?? ""),
         bannerImage: String(body.bannerImage ?? ""),
         portraitImage: String(body.portraitImage ?? ""),
         personName: String(body.personName ?? ""),
         personDesignation: String(body.personDesignation ?? ""),
         content: String(body.content ?? ""),
+        inspirationContent: String(body.inspirationContent ?? ""),
         members: Array.isArray(body.members)
           ? body.members.map((member: { name?: string; designation?: string; sortOrder?: number }, index: number) => ({
               name: String(member.name ?? "").trim(),

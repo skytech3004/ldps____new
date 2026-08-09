@@ -496,7 +496,9 @@ export default function AdminBlogPage() {
                 <TipTapEditor 
                   value={formContent} 
                   onChange={(val) => setFormContent(val)}
-                  placeholder="Write your blog contents here..." 
+                  placeholder="Write your blog contents here..."
+                  uploadPage="blog"
+                  uploadSection="blogs"
                 />
               </div>
 

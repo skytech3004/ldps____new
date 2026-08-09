@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { 
   Trophy, Plus, Trash2, Save, Loader2, Sparkles, Upload, X, Shield, ArrowUp, ArrowDown, Users, Image as ImageIcon, ClipboardList
 } from "lucide-react";
+import TipTapEditor from "@/components/TipTapEditor";
 
 interface Player {
   _id?: string;
@@ -439,13 +440,12 @@ export default function AdminSportsPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-white/50 uppercase">Description / Selection details *</label>
-                  <textarea 
-                    required
-                    rows={3}
+                  <TipTapEditor
                     value={newGame.desc}
-                    onChange={(e) => setNewGame({ ...newGame, desc: e.target.value })}
+                    onChange={(value) => setNewGame({ ...newGame, desc: value })}
                     placeholder="Provide details about divisions, district/state selections..."
-                    className="w-full bg-[#081736] border border-white/10 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-accent text-white"
+                    uploadPage="sports"
+                    uploadSection="sports"
                   />
                 </div>
                 <div className="flex justify-end">

@@ -39,9 +39,11 @@ export default function Navbar() {
       href: "/about-lps",
       dropdown: [
         { label: "About LPS", href: "/about-lps" },
-        { label: "Management", href: "/about/management" },
+        { label: "About Trust", href: "/about-trust" },
+        { label: "Management Committee", href: "/about/management" },
         { label: "President's Message", href: "/about/management-message" },
         { label: "CEO's Message", href: "/about/ceo-message" },
+        { label: "Secretary's Message", href: "/about/secretary-message" },
         { label: "Principal's Desk", href: "/principals-desk" },
         { label: "Academic Excellence Team", href: "/managing-committee" },
       ],
@@ -116,6 +118,7 @@ export default function Navbar() {
     { name: "Blog", href: "/blog" },
     { name: "Careers", href: "/career" },
     { name: "Contact", href: "/contact" },
+    
   ];
 
   const toggleMobileDropdown = (name: string) => {
