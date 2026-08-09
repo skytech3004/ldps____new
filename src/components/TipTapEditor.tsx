@@ -2,19 +2,43 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useEffect } from "react";
-import { 
-  Bold, Italic, Strikethrough, Heading1, Heading2, 
-  List, ListOrdered, Quote, Undo, Redo 
+import Image from "@tiptap/extension-image";
+import { useEffect, useRef, useState } from "react";
+import {
+  Bold,
+  Italic,
+  Strikethrough,
+  Heading1,
+  Heading2,
+  List,
+  ListOrdered,
+  Quote,
+  Undo,
+  Redo,
+  ImagePlus,
+  Loader2,
 } from "lucide-react";
 
 interface TipTapEditorProps {
   value: string;
   onChange: (val: string) => void;
   placeholder?: string;
+  enableImages?: boolean;
+  uploadPage?: string;
+  uploadSection?: string;
 }
 
-const MenuBar = ({ editor }: { editor: any }) => {
+const MenuBar = ({
+  editor,
+  enableImages,
+  onImageUpload,
+  uploadingImage,
+}: {
+  editor: any;
+  enableImages?: boolean;
+  onImageUpload: () => void;
+  uploadingImage: boolean;
+}) => {
   if (!editor) {
     return null;
   }
@@ -88,7 +112,22 @@ const MenuBar = ({ editor }: { editor: any }) => {
           </button>
         );
       })}
-      
+
+      {enableImages ? (
+        <>
+          <div className="w-[1px] h-6 bg-white/10 self-center mx-1" />
+          <button
+            type="button"
+            onClick={onImageUpload}
+            disabled={uploadingImage}
+            title="Insert Image"
+            className="p-2 rounded-lg text-white/80 hover:bg-white/10 disabled:opacity-30 cursor-pointer inline-flex items-center gap-1"
+          >
+            {uploadingImage ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}
+          </button>
+        </>
+      ) : null}
+
       <div className="w-[1px] h-6 bg-white/10 self-center mx-1" />
 
       <button
@@ -113,32 +152,120 @@ const MenuBar = ({ editor }: { editor: any }) => {
   );
 };
 
-export default function TipTapEditor({ value, onChange, placeholder }: TipTapEditorProps) {
+export default function TipTapEditor({
+  value,
+  onChange,
+  placeholder,
+  enableImages = false,
+  uploadPage = "home",
+  uploadSection = "gallery",
+}: TipTapEditorProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      ...(enableImages
+        ? [
+            Image.configure({
+              HTMLAttributes: {
+                class: "rounded-xl shadow-lg max-w-full h-auto mx-auto",
+              },
+            }),
+          ]
+        : []),
+    ],
     content: value,
     editorProps: {
       attributes: {
-        class: "prose prose-invert prose-sm max-w-none text-slate-200 focus:outline-none p-4 min-h-[300px] max-h-[600px] overflow-y-auto bg-[#081a3a] font-medium text-sm leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h1]:text-xl [&_h1]:font-black [&_h2]:text-lg [&_h2]:font-bold [&_blockquote]:border-l-4 [&_blockquote]:border-[#F7B801] [&_blockquote]:pl-4 [&_blockquote]:italic",
+        class:
+          "prose prose-invert prose-sm max-w-none text-slate-200 focus:outline-none p-4 min-h-[300px] max-h-[600px] overflow-y-auto bg-[#081a3a] font-medium text-sm leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h1]:text-xl [&_h1]:font-black [&_h2]:text-lg [&_h2]:font-bold [&_blockquote]:border-l-4 [&_blockquote]:border-[#F7B801] [&_blockquote]:pl-4 [&_blockquote]:italic [&_img]:rounded-xl [&_img]:shadow-lg [&_img]:max-w-full [&_img]:h-auto [&_img]:mx-auto",
+        ...(placeholder ? { "data-placeholder": placeholder } : {}),
       },
     },
-    onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-      onChange(html);
+    onUpdate: ({ editor: currentEditor }) => {
+      onChange(currentEditor.getHTML());
     },
   });
 
-  // Sync value changes from outside (e.g. form edits)
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
       editor.commands.setContent(value || "");
     }
   }, [value, editor]);
 
+  async function uploadImageFile(file: File) {
+    const formData = new FormData();
+    formData.set("file", file);
+    formData.set("page", uploadPage);
+    formData.set("section", uploadSection);
+    formData.set("title", file.name || "Editor Image");
+
+    const response = await fetch("/api/admin/upload", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error ?? "Upload failed.");
+    }
+
+    return String(data.upload.src ?? "");
+  }
+
+  async function handleImageUpload() {
+    if (!editor || !enableImages) return;
+
+    const useFileUpload = window.confirm("Click OK to upload an image file, or Cancel to paste an image URL.");
+    if (useFileUpload) {
+      fileInputRef.current?.click();
+      return;
+    }
+
+    const url = window.prompt("Enter image URL:");
+    if (url?.trim()) {
+      editor.chain().focus().setImage({ src: url.trim() }).run();
+    }
+  }
+
+  async function handleFileSelected(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file || !editor) return;
+
+    try {
+      setUploadingImage(true);
+      const src = await uploadImageFile(file);
+      if (src) {
+        editor.chain().focus().setImage({ src }).run();
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Image upload failed.";
+      window.alert(message);
+    } finally {
+      setUploadingImage(false);
+    }
+  }
+
   return (
     <div className="w-full text-white bg-[#081a3a] rounded-xl overflow-hidden shadow-inner border border-white/10 flex flex-col">
-      <MenuBar editor={editor} />
+      <MenuBar
+        editor={editor}
+        enableImages={enableImages}
+        onImageUpload={handleImageUpload}
+        uploadingImage={uploadingImage}
+      />
       <EditorContent editor={editor} className="flex-1 w-full" />
+      {enableImages ? (
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileSelected}
+        />
+      ) : null}
     </div>
   );
 }

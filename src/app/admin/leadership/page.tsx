@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Plus, Pencil, Trash2, X, Upload, Loader2, UserRound } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Upload, Loader2, UserRound, Save } from "lucide-react";
+import TipTapEditor from "@/components/TipTapEditor";
+import { defaultLeadershipIntroContent } from "@/data/leadershipPageIntro";
 
 type LeadershipMember = {
   _id: string;
@@ -37,6 +39,9 @@ export default function AdminLeadershipPage() {
   const [form, setForm] = useState<LeadershipForm>(initialForm);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewSrc, setPreviewSrc] = useState("");
+  const [introContent, setIntroContent] = useState(defaultLeadershipIntroContent);
+  const [introSaving, setIntroSaving] = useState(false);
+  const [introLoading, setIntroLoading] = useState(true);
 
   async function fetchItems() {
     try {
@@ -79,6 +84,37 @@ export default function AdminLeadershipPage() {
       } finally {
         if (!cancelled) {
           setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setIntroLoading(true);
+        const response = await fetch("/api/admin/leadership-settings", { cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error ?? "Failed to fetch intro content.");
+        }
+        if (!cancelled) {
+          setIntroContent(data.introContent || defaultLeadershipIntroContent);
+        }
+      } catch (fetchError) {
+        const message = fetchError instanceof Error ? fetchError.message : "Failed to fetch intro content.";
+        if (!cancelled) {
+          setError(message);
+        }
+      } finally {
+        if (!cancelled) {
+          setIntroLoading(false);
         }
       }
     })();
@@ -193,6 +229,28 @@ export default function AdminLeadershipPage() {
     }
   }
 
+  async function onSaveIntro() {
+    try {
+      setIntroSaving(true);
+      setError("");
+      const response = await fetch("/api/admin/leadership-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ introContent }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error ?? "Failed to save intro content.");
+      }
+      setIntroContent(data.introContent || introContent);
+    } catch (saveError) {
+      const message = saveError instanceof Error ? saveError.message : "Failed to save intro content.";
+      setError(message);
+    } finally {
+      setIntroSaving(false);
+    }
+  }
+
   async function onDelete(id: string) {
     const confirmed = window.confirm("Delete this leadership member?");
     if (!confirmed) return;
@@ -217,12 +275,47 @@ export default function AdminLeadershipPage() {
 
   return (
     <>
+      <section className="bg-white rounded-2xl border border-teal/10 shadow-sm overflow-hidden mb-8">
+        <div className="p-6 md:p-8 border-b border-teal/10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-green-primary">Page Intro</p>
+            <h2 className="text-2xl md:text-3xl font-black text-navy mt-2">Management Committee Intro</h2>
+            <p className="text-sm text-teal mt-2">
+              Edit the photo and text shown above the committee table on the public leadership page.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onSaveIntro}
+            disabled={introSaving || introLoading}
+            className="inline-flex items-center gap-2 bg-navy text-white px-5 py-3 rounded-xl font-black text-sm uppercase tracking-wider hover:bg-teal transition-colors disabled:opacity-70"
+          >
+            {introSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            {introSaving ? "Saving..." : "Save Intro"}
+          </button>
+        </div>
+        <div className="p-6">
+          {introLoading ? (
+            <p className="text-sm text-teal/70 font-semibold">Loading intro content...</p>
+          ) : (
+            <TipTapEditor
+              value={introContent}
+              onChange={setIntroContent}
+              enableImages
+              uploadPage="leadership"
+              uploadSection="leadership"
+              placeholder="Write the intro section with image, heading, and paragraphs..."
+            />
+          )}
+        </div>
+      </section>
+
       <section className="bg-white rounded-2xl border border-teal/10 shadow-sm overflow-hidden">
         <div className="p-6 md:p-8 border-b border-teal/10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.3em] text-green-primary">Admin</p>
             <h1 className="text-3xl md:text-4xl font-black text-navy mt-2">Leadership Management</h1>
-            <p className="text-sm text-teal mt-2">Add, edit, and delete the CEO / chairman / trustee cards.</p>
+            <p className="text-sm text-teal mt-2">Add, edit, and delete management committee members shown in the table.</p>
           </div>
           <button
             onClick={openCreateModal}

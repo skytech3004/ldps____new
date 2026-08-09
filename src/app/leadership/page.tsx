@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Users2, ArrowRight, UserRound } from "lucide-react";
+import { defaultLeadershipIntroContent } from "@/data/leadershipPageIntro";
 
 type LeadershipMember = {
   _id: string;
@@ -17,25 +18,34 @@ type LeadershipMember = {
 
 export default function LeadershipPage() {
   const [items, setItems] = useState<LeadershipMember[]>([]);
+  const [introContent, setIntroContent] = useState(defaultLeadershipIntroContent);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchLeadership() {
+    async function fetchPageData() {
       try {
-        const response = await fetch("/api/admin/leadership", { cache: "no-store" });
-        if (!response.ok) {
-          throw new Error("Failed to fetch leadership members.");
+        const [membersResponse, settingsResponse] = await Promise.all([
+          fetch("/api/admin/leadership", { cache: "no-store" }),
+          fetch("/api/admin/leadership-settings", { cache: "no-store" }),
+        ]);
+
+        if (membersResponse.ok) {
+          const membersData = await membersResponse.json();
+          setItems(membersData as LeadershipMember[]);
         }
-        const data = await response.json();
-        setItems(data as LeadershipMember[]);
+
+        if (settingsResponse.ok) {
+          const settingsData = await settingsResponse.json();
+          setIntroContent(settingsData.introContent || defaultLeadershipIntroContent);
+        }
       } catch (error) {
-        console.error("Failed to load leadership:", error);
+        console.error("Failed to load leadership page:", error);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchLeadership();
+    fetchPageData();
   }, []);
 
   return (
@@ -58,49 +68,60 @@ export default function LeadershipPage() {
         </div>
       </section>
 
-      <section className="px-6 py-20 max-w-7xl mx-auto">
+      <section className="px-6 py-16 max-w-5xl mx-auto">
+        <div
+          className="leadership-intro text-center space-y-6 [&_img]:mx-auto [&_img]:w-full [&_img]:max-w-4xl [&_img]:rounded-xl [&_img]:shadow-lg [&_h1]:text-2xl [&_h1]:md:text-3xl [&_h1]:font-black [&_h1]:text-[#b34454] [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:font-black [&_h2]:text-[#b34454] [&_p]:text-[#4a4a4a] [&_p]:text-sm [&_p]:md:text-base [&_p]:leading-relaxed [&_p]:max-w-3xl [&_p]:mx-auto"
+          dangerouslySetInnerHTML={{ __html: introContent }}
+        />
+      </section>
+
+      <section className="px-6 pb-20 max-w-7xl mx-auto">
         {loading ? (
           <div className="bg-white border border-primary/10 rounded-[2rem] p-10 text-center text-primary font-black uppercase tracking-wider">
             Loading Management Committee...
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-            {items.map((member) => {
-              const hasImage = Boolean(member.image);
+          <div className="overflow-x-auto rounded-[2rem] shadow-lg border border-primary/10 bg-white">
+            <table className="w-full min-w-[700px] text-left border-collapse">
+              <thead>
+                <tr className="bg-primary text-white">
+                  <th className="p-5 md:p-6 text-xs font-black uppercase tracking-widest">Photo</th>
+                  <th className="p-5 md:p-6 text-xs font-black uppercase tracking-widest">Name</th>
+                  <th className="p-5 md:p-6 text-xs font-black uppercase tracking-widest">Designation</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-primary/10">
+                {items.map((member) => {
+                  const hasImage = Boolean(member.image);
 
-              return (
-                <article
-                  key={member._id}
-                  className="bg-white border border-primary/10 rounded-[2rem] overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
-                >
-                  <div className="relative aspect-[4/5]">
-                    {hasImage ? (
-                      <Image
-                        src={member.image}
-                        alt={member.name}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center">
-                        <div className="w-28 h-28 rounded-full bg-white/15 flex items-center justify-center backdrop-blur-sm border border-white/20">
-                          <UserRound size={64} className="text-white/90" />
+                  return (
+                    <tr key={member._id} className="hover:bg-primary/5 transition-colors">
+                      <td className="p-5 md:p-6">
+                        <div className="relative w-16 h-20 rounded-xl overflow-hidden border border-primary/10 bg-gray-100">
+                          {hasImage ? (
+                            <Image src={member.image} alt={member.name} fill className="object-cover" />
+                          ) : (
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center">
+                              <UserRound size={28} className="text-white/90" />
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-6 space-y-2">
-                    <h2 className="text-2xl font-black text-primary uppercase font-montserrat tracking-tight">
-                      {member.name}
-                    </h2>
-                    <p className="text-[11px] font-black uppercase tracking-[0.25em] text-gray-500">
-                      {member.designation}
-                    </p>
-                  </div>
-                </article>
-              );
-            })}
+                      </td>
+                      <td className="p-5 md:p-6">
+                        <h2 className="text-lg md:text-xl font-black text-primary uppercase font-montserrat tracking-tight">
+                          {member.name}
+                        </h2>
+                      </td>
+                      <td className="p-5 md:p-6">
+                        <p className="text-[11px] font-black uppercase tracking-[0.25em] text-gray-500">
+                          {member.designation}
+                        </p>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
 
