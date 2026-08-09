@@ -52,10 +52,11 @@ const modules = [
     icon: Images
   },
   {
-    title: "Leadership Team",
-    description: "Manage the public leadership page with names, designations, and portrait images.",
-    href: "/admin/leadership",
-    icon: ShieldCheck
+    title: "About Pages",
+    description: "Edit management committee, president's message, CEO message, and office bearers table.",
+    href: "/admin/about-pages",
+    icon: FileText,
+    badge: "CMS"
   },
   {
     title: "Managing Committee",

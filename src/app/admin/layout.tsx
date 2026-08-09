@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   Bell, Database, FileText, FolderKanban, Images, LayoutDashboard, LogOut, 
-  ClipboardList, LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar, Download, 
+  ClipboardList, LayoutGrid, BookOpen, Bus, Calendar, Download, 
   Award, GraduationCap, Trophy, Home, Briefcase, ChevronRight, Users
 } from "lucide-react";
 
@@ -16,7 +16,7 @@ const navItems = [
   { href: "/admin/pre-primary", label: "Pre-Primary Showcase", icon: Images },
   { href: "/admin/career", label: "Career Listings", icon: Briefcase },
   { href: "/admin/notices", label: "Notice Board", icon: Bell },
-  { href: "/admin/leadership", label: "Leadership Team", icon: ShieldCheck },
+  { href: "/admin/about-pages", label: "About Pages", icon: FileText },
   { href: "/admin/managing-committee", label: "Managing Committee", icon: Users },
   { href: "/admin/investiture", label: "Investiture Cabinet", icon: Award },
   { href: "/admin/investiture-ceremony", label: "Investiture Ceremony", icon: Award },
