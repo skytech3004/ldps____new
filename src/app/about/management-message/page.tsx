@@ -24,6 +24,7 @@ export default function ManagementMessagePage() {
             personName: data.personName || defaults.personName,
             personDesignation: data.personDesignation || defaults.personDesignation,
             content: data.content || defaults.content,
+            members: Array.isArray(data.members) ? data.members : defaults.members,
           });
         }
       } catch (error) {
