@@ -114,7 +114,7 @@ export default function AboutTrustPage() {
         </div>
       </section>
       <section className="px-6 py-16 max-w-5xl mx-auto">
-        <div className="about-trust-content text-center space-y-6 [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:font-black [&_h2]:text-[#b34454] [&_p]:text-[#4a4a4a] [&_p]:text-sm [&_p]:md:text-base [&_p]:leading-relaxed [&_p]:max-w-3xl [&_p]:mx-auto">
+        <div className="about-trust-content text-center space-y-6 [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:font-black [&_h2]:text-[#2f2771] [&_p]:text-[#4a4a4a] [&_p]:text-sm [&_p]:md:text-base [&_p]:leading-relaxed [&_p]:max-w-3xl [&_p]:mx-auto">
           <RichHtmlContent html={pageData.content} />
         </div>
       </section>

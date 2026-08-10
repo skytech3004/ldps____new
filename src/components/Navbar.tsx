@@ -42,8 +42,9 @@ export default function Navbar() {
         { label: "About Trust", href: "/about-trust" },
         { label: "Management Committee", href: "/about/management" },
         { label: "President's Message", href: "/about/management-message" },
-        { label: "CEO's Message", href: "/about/ceo-message" },
         { label: "Secretary's Message", href: "/about/secretary-message" },
+
+        { label: "CEO's Message", href: "/about/ceo-message" },
         { label: "Principal's Desk", href: "/principals-desk" },
         { label: "Academic Excellence Team", href: "/managing-committee" },
       ],
