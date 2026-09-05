@@ -1,14 +1,31 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { Sun, Moon, Coffee, BookOpen, Utensils, Trophy, BookMarked, ArrowRight, ShieldCheck, Heart } from "lucide-react";
+import PageLayout, { PageSectionHeader } from "@/components/ui/PageLayout";
+import { Sun, Moon, Coffee, BookOpen, Utensils, Trophy, BookMarked, ArrowRight, Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function DayAtSchoolPage() {
   const [activeStep, setActiveStep] = useState(0);
+  const [dbContent, setDbContent] = useState<any>(null);
+
+  useEffect(() => {
+    async function fetchDbPage() {
+      try {
+        const res = await fetch("/api/admin/pages?slug=a-day-at-school");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.sections) {
+            setDbContent(data);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching dynamic page content:", err);
+      }
+    }
+    fetchDbPage();
+  }, []);
 
   const timelineSteps = [
     {
@@ -43,7 +60,7 @@ export default function DayAtSchoolPage() {
       time: "04:00 PM",
       label: "Sports & Skill Clubs",
       icon: Trophy,
-      color: "text-accent-hover",
+      color: "text-accent",
       desc: "After recess, girls head to the sports complex for softball, basketball, table tennis, skating, or attend designated clubs (music, art & craft, ecological awareness)."
     },
     {
@@ -66,28 +83,11 @@ export default function DayAtSchoolPage() {
   const StepIcon = currentStep.icon;
 
   return (
-    <main className="min-h-screen bg-[#F8F9FC] text-gray-800">
-      <Navbar />
-
-      {/* Decorative Breadcrumb Banner */}
-      <section className="relative pt-36 pb-12 md:pt-44 md:pb-16 px-6 bg-gradient-to-br from-primary to-[#2c246b] text-white">
-        <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto relative z-10 space-y-2">
-          <div className="flex items-center gap-2 text-xs md:text-sm text-accent font-bold uppercase tracking-wider">
-            <Link href="/" className="hover:underline hover:text-white transition-all">Home</Link>
-            <span>/</span>
-            <span>Schooling</span>
-            <span>/</span>
-            <span className="text-white/80">A Day at School</span>
-          </div>
-          <h1 className="text-3xl md:text-5xl font-black font-montserrat uppercase tracking-tight text-accent">
-            A Day at LPS Vidyawadi
-          </h1>
-          <p className="text-white/60 font-medium text-xs md:text-sm max-w-xl">
-            Take a visual scroll through a boarder student&apos;s daily routine and learning milestones.
-          </p>
-        </div>
-      </section>
+    <PageLayout
+      groupName="Schooling"
+      pageTitle={dbContent?.title || "A Day at LPS Vidyawadi"}
+      subtitle={dbContent?.subtitle || "Take a visual scroll through a boarder student's daily routine and learning milestones."}
+    >
 
       {/* Interactive Timeline Slider Section */}
       <section className="py-20 px-6 max-w-7xl mx-auto space-y-16">
@@ -189,8 +189,6 @@ export default function DayAtSchoolPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
-    </main>
+    </PageLayout>
   );
 }

@@ -3,17 +3,29 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import PageLayout, { PageSectionHeader } from "@/components/ui/PageLayout";
 import { motion } from "framer-motion";
 import {
   ArrowRight, Compass, Shield, Target, Award, Heart, Check,
   Sparkles, BookOpen, Home, Users, GraduationCap, CheckCircle2, ShieldCheck
 } from "lucide-react";
 
+const ABOUT_LPS_SECTION_IDS = {
+  hero: "about-lps-hero"x
+  foundation: "about-lps-foundation",
+  parentTrust: "about-lps-parent-trust",
+  academics: "about-lps-academics",
+  hostel: "about-lps-hostel",
+  ideology: "about-lps-ideology",
+  extracurricular: "about-lps-extracurricular",
+  showcase: "about-lps-showcase",
+  cta: "about-lps-cta",
+} as const;
+
 export default function AboutLpsPage() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [categories, setCategories] = useState<any[]>([]);
+  const [dbContent, setDbContent] = useState<any>(null);
 
   useEffect(() => {
     async function fetchCategories() {
@@ -29,7 +41,22 @@ export default function AboutLpsPage() {
         console.error("Failed to fetch categories:", err);
       }
     }
-    fetchCategories();
+
+    async function fetchDbPage() {
+      try {
+        const res = await fetch("/api/admin/pages?slug=about-lps");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.sections) {
+            setDbContent(data);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching dynamic about-lps page content:", err);
+      }
+    }
+
+    Promise.all([fetchCategories(), fetchDbPage()]);
   }, []);
 
   const staticCarousel = [
@@ -124,18 +151,17 @@ export default function AboutLpsPage() {
     "Sports & Athletics", "Yoga & Meditation", "NCC & Leadership Activities",
     "STEM Learning", "Science Exhibitions", "Robotics & Tech Exposure",
     "Debate & Public Speaking", "Performing Arts", "Music & Dance",
-    "Creative Arts", "Cultural Celebrations", "Educational Tours"
+    "Creative Arts", "Cultural Celebrations", "Educational Tours","Guide and Bulbul"
   ];
 
   return (
-    <main className="min-h-screen bg-[#F8F9FC] text-gray-800">
-      <Navbar />
-
+    <PageLayout
+      groupName="About"
+      pageTitle={dbContent?.title || "About LPS Vidyawadi"}
+      subtitle={dbContent?.subtitle || "Leeladevi Parasmal Sancheti English Medium Sr. Sec. School - Empowering girls through holistic education."}
+    >
       {/* Hero Section */}
-      <section className="relative pt-36 pb-20 md:pt-48 md:pb-28 px-6 overflow-hidden bg-gradient-to-b from-primary/5 via-white to-transparent">
-        {/* Background Grid Pattern */}
-        <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#3D348B_1px,transparent_1px)] [background-size:20px_20px]" />
-
+      <section data-cms-section-id={ABOUT_LPS_SECTION_IDS.hero} className="relative pb-20 md:pb-28 px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
           {/* Text Content */}
           <div className="lg:col-span-7 space-y-6">
@@ -213,7 +239,7 @@ export default function AboutLpsPage() {
       </section>
 
       {/* Legacy and Foundation Section (Dark Navy Blue Gradient) */}
-      <section className="relative py-20 px-6 bg-gradient-to-br from-primary to-[#251f59] text-white overflow-hidden shadow-inner">
+      <section data-cms-section-id={ABOUT_LPS_SECTION_IDS.foundation} className="relative py-20 px-6 bg-gradient-to-br from-primary to-[#251f59] text-white overflow-hidden shadow-inner">
         <div className="absolute right-0 bottom-0 w-96 h-96 bg-accent opacity-5 blur-[100px] rounded-full pointer-events-none" />
 
         <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
@@ -252,7 +278,7 @@ export default function AboutLpsPage() {
       </section>
 
       {/* Why Parents Choose Us Section */}
-      <section className="py-24 px-6 max-w-7xl mx-auto space-y-16">
+      <section data-cms-section-id={ABOUT_LPS_SECTION_IDS.parentTrust} className="py-24 px-6 max-w-7xl mx-auto space-y-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-5 space-y-6">
             <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">Parent Trust</span>
@@ -293,7 +319,7 @@ export default function AboutLpsPage() {
       </section>
 
       {/* Academic Excellence Section */}
-      <section className="py-20 px-6 bg-[#F0F2F6] border-y border-gray-150">
+      <section data-cms-section-id={ABOUT_LPS_SECTION_IDS.academics} className="py-20 px-6 bg-[#F0F2F6] border-y border-gray-150">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center space-y-3">
             <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">Academic Focus</span>
@@ -331,7 +357,7 @@ export default function AboutLpsPage() {
       </section>
 
       {/* A Home Away From Home (Hostels) Section */}
-      <section className="py-24 px-6 max-w-7xl mx-auto">
+      <section data-cms-section-id={ABOUT_LPS_SECTION_IDS.hostel} className="py-24 px-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-6 space-y-6">
             <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">Residential Life</span>
@@ -376,7 +402,7 @@ export default function AboutLpsPage() {
       </section>
 
       {/* Vision, Mission & Objectives Section */}
-      <section className="py-24 px-6 bg-gradient-to-br from-primary to-[#1f1947] text-white">
+      <section data-cms-section-id={ABOUT_LPS_SECTION_IDS.ideology} className="py-24 px-6 bg-gradient-to-br from-primary to-[#1f1947] text-white">
         <div className="max-w-7xl mx-auto space-y-16">
           <div className="text-center space-y-3">
             <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">Our Ideology</span>
@@ -448,7 +474,7 @@ export default function AboutLpsPage() {
       </section>
 
       {/* Beyond Academics Section */}
-      <section className="py-24 px-6 max-w-7xl mx-auto space-y-16">
+      <section data-cms-section-id={ABOUT_LPS_SECTION_IDS.extracurricular} className="py-24 px-6 max-w-7xl mx-auto space-y-16">
         <div className="text-center space-y-3">
           <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">Extracurricular</span>
           <h2 className="text-3xl md:text-4xl font-black text-primary uppercase font-montserrat">
@@ -471,7 +497,7 @@ export default function AboutLpsPage() {
       </section>
 
       {/* Existing Campus Showcase */}
-      <section className="bg-white border-t border-primary/5 py-20 px-6">
+      <section data-cms-section-id={ABOUT_LPS_SECTION_IDS.showcase} className="bg-white border-t border-primary/5 py-20 px-6">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center space-y-3">
             <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">Experience LPS Life</span>
@@ -534,7 +560,7 @@ export default function AboutLpsPage() {
       </section>
 
       {/* Call to Action Section (Building Tomorrow's Women Leaders) */}
-      <section className="bg-gradient-to-r from-primary/5 to-secondary/5 py-16 px-6">
+      <section data-cms-section-id={ABOUT_LPS_SECTION_IDS.cta} className="bg-gradient-to-r from-primary/5 to-secondary/5 py-16 px-6">
         <div className="max-w-4xl mx-auto rounded-[2.5rem] bg-white border border-primary/10 p-8 md:p-12 text-center space-y-6 shadow-xl relative overflow-hidden">
           <div className="absolute -top-10 -left-10 w-24 h-24 bg-accent/5 rounded-full blur-xl" />
           <Heart className="text-accent mx-auto animate-bounce" size={40} />
@@ -562,8 +588,6 @@ export default function AboutLpsPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
-    </main>
+    </PageLayout>
   );
 }

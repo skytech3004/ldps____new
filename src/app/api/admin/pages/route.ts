@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
+import { defaultPage, listCmsPages, normalizePage } from "@/lib/cms-pages";
 import { connectToDatabase } from "@/lib/mongodb";
+import { PageModel } from "@/models/Page";
 import { PageContentModel } from "@/models/PageContent";
 
 export async function GET(request: Request) {
@@ -13,7 +16,10 @@ export async function GET(request: Request) {
       return NextResponse.json(item);
     }
 
-    const items = await PageContentModel.find().sort({ title: 1 }).lean();
+    const unauthorized = await requireAdmin();
+    if (unauthorized) return unauthorized;
+
+    const items = await listCmsPages();
     return NextResponse.json(items);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch page content.";
@@ -22,25 +28,54 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   try {
     await connectToDatabase();
     const body = await request.json();
+    const slug = String(body.slug ?? "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
-    const created = await PageContentModel.create({
-      slug: body.slug,
-      title: body.title,
-      group: body.group,
-      sections: body.sections || [],
-    });
+    if (!slug) {
+      return NextResponse.json({ error: "Slug is required." }, { status: 400 });
+    }
 
-    return NextResponse.json(created, { status: 201 });
+    const starter = defaultPage(slug);
+    starter.title = String(body.title ?? starter.title).trim() || starter.title;
+    const page = normalizePage(starter);
+
+    const created = await PageModel.findOneAndUpdate(
+      { slug },
+      { slug: page.slug, title: page.title, sections: page.sections },
+      { new: true, upsert: true, runValidators: true }
+    ).lean();
+
+    if (!created) {
+      return NextResponse.json({ error: "Failed to create page." }, { status: 500 });
+    }
+
+    return NextResponse.json(
+      normalizePage({
+        slug: created.slug,
+        title: created.title,
+        sections: (created.sections ?? []) as typeof page.sections,
+      }),
+      { status: 201 }
+    );
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to create page content.";
+    const message = error instanceof Error ? error.message : "Failed to create page.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
 export async function PUT(request: Request) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   try {
     await connectToDatabase();
     const body = await request.json();
@@ -55,7 +90,9 @@ export async function PUT(request: Request) {
       query,
       {
         title: body.title,
+        subtitle: body.subtitle,
         group: body.group,
+        heroImage: body.heroImage,
         sections: body.sections || [],
       },
       { new: true, runValidators: true, upsert: true }
@@ -69,6 +106,9 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   try {
     await connectToDatabase();
     const body = await request.json();

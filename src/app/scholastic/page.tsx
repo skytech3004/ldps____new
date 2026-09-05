@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import PageLayout, { PageSectionHeader } from "@/components/ui/PageLayout";
 import { motion } from "framer-motion";
 import {
   BookOpen,
@@ -32,6 +31,7 @@ import { curriculumPage, getSection } from "@/data/lpsVidhyawadiDatabase";
 
 export default function ScholasticPage() {
   const [facilities, setFacilities] = useState<any[]>([]);
+  const [dbContent, setDbContent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [prospectusUrl, setProspectusUrl] = useState<string | null>(null);
 
@@ -50,6 +50,20 @@ export default function ScholasticPage() {
       }
     }
 
+    async function fetchDbPage() {
+      try {
+        const res = await fetch("/api/admin/pages?slug=scholastic");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.sections) {
+            setDbContent(data);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching dynamic page content:", err);
+      }
+    }
+
     async function checkProspectus() {
       try {
         const res = await fetch("/api/admin/prospectus");
@@ -64,7 +78,7 @@ export default function ScholasticPage() {
       }
     }
 
-    Promise.all([fetchFacilities(), checkProspectus()]);
+    Promise.all([fetchFacilities(), fetchDbPage(), checkProspectus()]);
   }, []);
 
   const primaryCurriculum = getSection(curriculumPage, "The Curriculum");
@@ -110,74 +124,45 @@ export default function ScholasticPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#F8F9FC] text-gray-800">
-      <Navbar />
-
-      {/* Hero Section */}
-      <section className="relative pt-36 pb-24 md:pt-48 md:pb-32 px-6 overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#3D348B_1px,transparent_1px)] [background-size:24px_24px]" />
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="space-y-8"
+    <PageLayout
+      groupName="Academics"
+      pageTitle={dbContent?.title || "Scholastic Curriculum"}
+      subtitle={dbContent?.subtitle || "Nurturing young minds through a balanced, child-centered approach that blends traditional values with modern educational methodologies."}
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="space-y-6">
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href="/apply-for-admission"
+              className="bg-primary text-white font-black px-8 py-4 rounded-2xl hover:bg-secondary hover:shadow-2xl hover:shadow-secondary/20 transition-all flex items-center gap-3 group text-sm uppercase tracking-widest"
             >
-              <div className="inline-flex items-center gap-2 bg-primary/5 border border-primary/10 text-primary px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest">
-                <Library size={14} className="text-accent" />
-                <span>Academic Excellence</span>
-              </div>
-
-              <h1 className="text-5xl md:text-7xl font-black text-primary leading-[0.95] uppercase font-montserrat tracking-tight">
-                Scholastic <br />
-                <span className="text-accent">Curriculum.</span>
-              </h1>
-
-              <p className="text-gray-500 text-lg md:text-xl font-medium leading-relaxed max-w-xl">
-                Nurturing young minds through a balanced, child-centered approach that blends traditional values with modern educational methodologies.
-              </p>
-
-              <div className="flex flex-wrap gap-4 pt-4">
-                <Link
-                  href="/apply-for-admission"
-                  className="bg-primary text-white font-black px-8 py-4 rounded-2xl hover:bg-secondary hover:shadow-2xl hover:shadow-secondary/20 transition-all flex items-center gap-3 group text-sm uppercase tracking-widest"
-                >
-                  <span>Admission Query</span>
-                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  href="/school-planner"
-                  className="bg-white border-2 border-primary/10 text-primary font-black px-8 py-4 rounded-2xl hover:bg-primary/5 transition-all text-sm uppercase tracking-widest"
-                >
-                  School Planner
-                </Link>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1 }}
-              className="relative"
+              <span>Admission Query</span>
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              href="/school-planner"
+              className="bg-white border-2 border-primary/10 text-primary font-black px-8 py-4 rounded-2xl hover:bg-primary/5 transition-all text-sm uppercase tracking-widest"
             >
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-accent/20 rounded-full blur-3xl animate-pulse" />
-              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl" />
-
-              <div className="relative aspect-[4/3] rounded-[3rem] overflow-hidden border-[12px] border-white shadow-2xl">
-                <Image
-                  src="/lps-vidhyawadi/gallery-04.jpg"
-                  alt="Students in classroom"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-            </motion.div>
+              School Planner
+            </Link>
           </div>
         </div>
-      </section>
+
+        <div className="relative">
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-accent/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl" />
+
+          <div className="relative aspect-[4/3] rounded-[3rem] overflow-hidden border-[12px] border-white shadow-2xl">
+            <Image
+              src="/lps-vidhyawadi/gallery-04.jpg"
+              alt="Students in classroom"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Academic Philosophy */}
       <section className="py-24 px-6 bg-primary text-white relative overflow-hidden">
@@ -609,8 +594,6 @@ export default function ScholasticPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
-    </main>
+    </PageLayout>
   );
 }

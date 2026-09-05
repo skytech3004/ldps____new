@@ -8,6 +8,7 @@ import { gisMenuItems } from "@/data/gisMenu";
 import { schoolDatabase, schoolImages, type SchoolPage } from "@/data/lpsVidhyawadiDatabase";
 import Image from "next/image";
 import RichHtmlContent, { isHtmlContent } from "@/components/RichHtmlContent";
+import PageLayout, { PageSectionHeader } from "@/components/ui/PageLayout";
 
 type DBPageContent = {
   title: string;
@@ -107,100 +108,84 @@ export default function GisStaticPage({ slug }: { slug: string }) {
   const gallery = schoolImages.filter((image) => image.category === "gallery").slice(0, 6);
 
   return (
-    <main className="min-h-screen pt-32 lg:pt-40 bg-[#f7fbf8] text-gray-800">
-      <Navbar />
-      <section className="px-6 pb-24">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-8 text-white shadow-xl">
-            <p className="text-accent uppercase text-xs font-black tracking-[0.35em] mb-2">{menu.group}</p>
-            <h1 className="text-4xl font-black uppercase tracking-tight text-accent">{menu.title}</h1>
-            {menu.sourceUrl ? (
-              <p className="mt-3 text-white/60 text-[10px] uppercase font-bold tracking-widest">
-                Source Reference:{" "}
-                <a href={menu.sourceUrl} target="_blank" rel="noreferrer" className="underline hover:text-white transition-colors">
-                  {menu.sourceUrl}
-                </a>
-              </p>
-            ) : null}
-          </div>
-
-          {loading ? (
-            <div className="h-64 flex items-center justify-center bg-white rounded-2xl border border-primary/5">
-              <div className="animate-pulse text-primary font-black uppercase tracking-widest">Loading Content...</div>
+    <PageLayout
+      groupName={menu.group || "Schooling"}
+      pageTitle={menu.title}
+      subtitle={`Detailed information for ${menu.title} at LPS Vidyawadi.`}
+    >
+      {loading ? (
+        <div className="h-64 flex items-center justify-center bg-white rounded-3xl border border-primary/10">
+          <div className="animate-pulse text-primary font-black uppercase tracking-widest">Loading Content...</div>
+        </div>
+      ) : displayPages.length === 0 ? (
+        <section className="bg-white border border-primary/10 rounded-3xl p-8 text-center">
+          <h2 className="text-2xl font-black text-primary mb-4">{menu.title}</h2>
+          <p className="text-gray-500 font-medium">Content will be updated from LPS data for this menu section.</p>
+        </section>
+      ) : (
+        displayPages.map((page, pIdx) => (
+          <section key={pIdx} className="bg-white border border-primary/10 rounded-[2.5rem] p-8 md:p-12 shadow-xl space-y-10">
+            <div className="border-l-4 border-accent pl-6">
+              <h2 className="text-2xl md:text-3xl font-black text-primary uppercase tracking-tight">{page.title}</h2>
+              {page.status ? <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mt-2">{page.status}</p> : null}
             </div>
-          ) : displayPages.length === 0 ? (
-            <section className="bg-white border border-primary/10 rounded-xl p-8 text-center">
-              <h2 className="text-2xl font-black text-primary mb-4">{menu.title}</h2>
-              <p className="text-gray-500 font-medium">Content will be updated from LPS data for this menu section.</p>
-            </section>
-          ) : (
-            displayPages.map((page, pIdx) => (
-              <section key={pIdx} className="bg-white border border-primary/10 rounded-[2rem] p-8 md:p-10 shadow-sm space-y-10">
-                <div className="border-l-4 border-accent pl-6">
-                  <h2 className="text-3xl font-black text-primary uppercase tracking-tight">{page.title}</h2>
-                  {page.status ? <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mt-2">{page.status}</p> : null}
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {page.sections.map((section, sIdx) => (
-                    <article key={sIdx} className="bg-gray-50/50 border border-primary/5 rounded-2xl p-6 hover:shadow-md transition-shadow">
-                      <h3 className="text-lg font-black text-primary mb-4 uppercase tracking-tight flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-accent" />
-                        {section.title}
-                      </h3>
-                      {section.content.length === 1 && isHtmlContent(section.content[0]) ? (
-                        <RichHtmlContent html={section.content[0]} className="text-gray-600 font-medium text-sm" />
-                      ) : (
-                        <ul className="space-y-3">
-                          {section.content.map((line, lIdx) => (
-                            <li key={lIdx} className="text-gray-600 font-medium text-sm leading-relaxed flex gap-3">
-                              <span className="text-accent mt-1.5 shrink-0">•</span>
-                              {isHtmlContent(line) ? (
-                                <RichHtmlContent html={line} className="flex-1" />
-                              ) : (
-                                <span>{line}</span>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </article>
-                  ))}
-                </div>
-              </section>
-            ))
-          )}
-
-          <section className="bg-white border border-primary/10 rounded-[2rem] p-8 md:p-10 shadow-sm">
-            <h2 className="text-2xl font-black text-primary mb-8 uppercase tracking-tight flex items-center gap-3">
-              <span className="w-8 h-1 bg-accent rounded-full" />
-              Campus Gallery
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {gallery.map((image) => (
-                <div key={image.file} className="relative aspect-square rounded-2xl overflow-hidden group shadow-md">
-                  <Image
-                    src={image.src}
-                    alt={image.alt}
-                    fill
-                    sizes="(max-width: 768px) 50vw, 16vw"
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {page.sections.map((section, sIdx) => (
+                <article key={sIdx} className="bg-gray-50/50 border border-primary/10 rounded-2xl p-6 hover:shadow-md transition-shadow">
+                  <h3 className="text-lg font-black text-primary mb-4 uppercase tracking-tight flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-accent" />
+                    {section.title}
+                  </h3>
+                  {section.content.length === 1 && isHtmlContent(section.content[0]) ? (
+                    <RichHtmlContent html={section.content[0]} className="text-gray-600 font-medium text-sm leading-relaxed" />
+                  ) : (
+                    <ul className="space-y-3">
+                      {section.content.map((line, lIdx) => (
+                        <li key={lIdx} className="text-gray-600 font-medium text-sm leading-relaxed flex gap-3">
+                          <span className="text-accent font-bold mt-0.5 shrink-0">•</span>
+                          {isHtmlContent(line) ? (
+                            <RichHtmlContent html={line} className="flex-1" />
+                          ) : (
+                            <span>{line}</span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </article>
               ))}
             </div>
           </section>
+        ))
+      )}
 
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-white font-black uppercase text-xs tracking-widest hover:bg-secondary transition-all shadow-lg shadow-primary/10"
-          >
-            Back to Home
-          </Link>
+      <section className="bg-white border border-primary/10 rounded-[2.5rem] p-8 md:p-12 shadow-xl space-y-8">
+        <PageSectionHeader title="Campus Gallery" badge="Visual Catalog" centered={false} />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {gallery.map((image) => (
+            <div key={image.file} className="relative aspect-square rounded-2xl overflow-hidden group shadow-md border-2 border-white bg-gray-100">
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                sizes="(max-width: 768px) 50vw, 16vw"
+                className="object-cover group-hover:scale-110 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          ))}
         </div>
       </section>
-      <Footer />
-    </main>
+
+      <div className="pt-4">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-primary text-white font-black uppercase text-xs tracking-widest hover:bg-secondary transition-all shadow-xl shadow-primary/20"
+        >
+          Back to Home
+        </Link>
+      </div>
+    </PageLayout>
   );
 }

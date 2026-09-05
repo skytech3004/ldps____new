@@ -2,10 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { CheckSquare, ClipboardList, ShoppingBag, ShieldCheck, HelpCircle } from "lucide-react";
-import { motion } from "framer-motion";
+import PageLayout, { PageSectionHeader } from "@/components/ui/PageLayout";
+import { CheckSquare, ShieldCheck, HelpCircle, ClipboardList } from "lucide-react";
 
 type DBPageContent = {
   title: string;
@@ -100,28 +98,11 @@ export default function ItemsRequiredByBoardersPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#F8F9FC] text-gray-800">
-      <Navbar />
-
-      {/* Hero Header */}
-      <section className="relative pt-36 pb-16 md:pt-44 md:pb-20 px-6 bg-gradient-to-br from-primary to-[#2c246b] text-white">
-        <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto relative z-10 space-y-2">
-          <div className="flex items-center gap-2 text-xs md:text-sm text-accent font-bold uppercase tracking-wider">
-            <Link href="/" className="hover:underline hover:text-white transition-all">Home</Link>
-            <span>/</span>
-            <span>Schooling</span>
-            <span>/</span>
-            <span className="text-white/80">Items Required</span>
-          </div>
-          <h1 className="text-4xl md:text-6xl font-black font-montserrat uppercase tracking-tight text-accent">
-            Required Packing List
-          </h1>
-          <p className="text-white/70 font-medium text-sm md:text-base max-w-xl">
-            A comprehensive checklist of uniforms, apparel, bedding, and toiletries boarder students should carry when joining.
-          </p>
-        </div>
-      </section>
+    <PageLayout
+      groupName="Schooling"
+      pageTitle={dbContent?.title || "Required Packing List"}
+      subtitle="A comprehensive checklist of uniforms, apparel, bedding, and toiletries boarder students should carry when joining."
+    >
 
       {loading ? (
         <div className="py-24 text-center">
@@ -228,8 +209,6 @@ export default function ItemsRequiredByBoardersPage() {
           </section>
         </div>
       )}
-
-      <Footer />
-    </main>
+    </PageLayout>
   );
 }

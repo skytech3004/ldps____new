@@ -2,10 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { Heart, ShieldAlert, ShoppingBag, Shirt, ChevronRight, Activity } from "lucide-react";
-import { motion } from "framer-motion";
+import PageLayout, { PageSectionHeader } from "@/components/ui/PageLayout";
+import { Heart, ShoppingBag, Shirt, Activity, ShieldAlert, ChevronRight } from "lucide-react";
 
 type DBPageContent = {
   title: string;
@@ -71,28 +69,11 @@ export default function HostelCarePage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#F8F9FC] text-gray-800">
-      <Navbar />
-
-      {/* Hero Header */}
-      <section className="relative pt-36 pb-16 md:pt-44 md:pb-20 px-6 bg-gradient-to-br from-primary to-[#2c246b] text-white">
-        <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto relative z-10 space-y-2">
-          <div className="flex items-center gap-2 text-xs md:text-sm text-accent font-bold uppercase tracking-wider">
-            <Link href="/" className="hover:underline hover:text-white transition-all">Home</Link>
-            <span>/</span>
-            <span>Schooling</span>
-            <span>/</span>
-            <span className="text-white/80">Hostel Care</span>
-          </div>
-          <h1 className="text-4xl md:text-6xl font-black font-montserrat uppercase tracking-tight text-accent">
-            Hostel Care & Health
-          </h1>
-          <p className="text-white/70 font-medium text-sm md:text-base max-w-xl">
-            Ensuring physical wellness, emotional counseling support, daily utilities, and safety parameters for boarders.
-          </p>
-        </div>
-      </section>
+    <PageLayout
+      groupName="Schooling"
+      pageTitle={dbContent?.title || "Hostel Care & Health"}
+      subtitle="Ensuring physical wellness, emotional counseling support, daily utilities, and safety parameters for boarders."
+    >
 
       {loading ? (
         <div className="py-24 text-center">
@@ -194,8 +175,6 @@ export default function HostelCarePage() {
           </section>
         </div>
       )}
-
-      <Footer />
-    </main>
+    </PageLayout>
   );
 }

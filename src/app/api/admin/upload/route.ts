@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { requireAdmin } from "@/lib/admin-auth";
 
 export const runtime = "nodejs";
 
@@ -17,6 +18,7 @@ const SECTION_FOLDERS: Record<string, string> = {
   about: "about",
   "about-trust": "about-trust",
   "about-messages": "about-messages",
+  pages: "pages",
   "media-items": "media-items",
   hostel: "hostel",
   blogs: "blogs",
@@ -56,6 +58,9 @@ async function readManifest(manifestPath: string) {
 }
 
 export async function POST(request: Request) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
+
   try {
     const formData = await request.formData();
     const page = String(formData.get("page") ?? "home").trim() || "home";

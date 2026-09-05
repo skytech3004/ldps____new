@@ -1,14 +1,30 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { CreditCard, Copy, Check, ArrowRight, ShieldCheck, HelpCircle, FileText } from "lucide-react";
-import { motion } from "framer-motion";
+import PageLayout, { PageSectionHeader } from "@/components/ui/PageLayout";
+import { CreditCard, Copy, Check, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function FeeStructure() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [dbContent, setDbContent] = useState<any>(null);
+
+  useEffect(() => {
+    async function fetchDbPage() {
+      try {
+        const res = await fetch("/api/admin/pages?slug=fee-structure");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.sections) {
+            setDbContent(data);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching dynamic page content:", err);
+      }
+    }
+    fetchDbPage();
+  }, []);
 
   const feeList = [
     { class: "Nursery", annualFee: "₹17,700", installment: "₹8,850" },
@@ -49,28 +65,11 @@ export default function FeeStructure() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#F8F9FC] text-gray-800">
-      <Navbar />
-
-      {/* Decorative Breadcrumb Banner */}
-      <section className="relative pt-36 pb-12 md:pt-44 md:pb-16 px-6 bg-gradient-to-br from-primary to-[#2c246b] text-white">
-        <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto relative z-10 space-y-2">
-          <div className="flex items-center gap-2 text-xs md:text-sm text-accent font-bold uppercase tracking-wider">
-            <Link href="/" className="hover:underline hover:text-white transition-all">Home</Link>
-            <span>/</span>
-            <span>Academics</span>
-            <span>/</span>
-            <span className="text-white/80">Fee Structure</span>
-          </div>
-          <h1 className="text-3xl md:text-5xl font-black font-montserrat uppercase tracking-tight text-accent">
-            Fee Portal & Bank Info
-          </h1>
-          <p className="text-white/60 font-medium text-xs md:text-sm max-w-xl">
-            Official bank account details, caution money, deposit procedures, and terms.
-          </p>
-        </div>
-      </section>
+    <PageLayout
+      groupName="Academics"
+      pageTitle={dbContent?.title || "Fee Structure"}
+      subtitle={dbContent?.subtitle || "Transparent fee details and fee schedule for the current academic session."}
+    >
 
       {/* Content Details Section */}
       <section className="py-20 px-6 max-w-7xl mx-auto space-y-20">
@@ -277,8 +276,6 @@ export default function FeeStructure() {
           ))}
         </div>
       </section>
-
-      <Footer />
-    </main>
+    </PageLayout>
   );
 }
