@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 const ABOUT_LPS_SECTION_IDS = {
-  hero: "about-lps-hero"x
+  hero: "about-lps-hero",
   foundation: "about-lps-foundation",
   parentTrust: "about-lps-parent-trust",
   academics: "about-lps-academics",
