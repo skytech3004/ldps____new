@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MessageDeskLayout from "@/components/about/MessageDeskLayout";
 import { aboutPageDefaults } from "@/data/aboutPages";
-
+//hello
 export default function CeoMessagePage() {
   const defaults = aboutPageDefaults["ceo-message"];
   const [pageData, setPageData] = useState(defaults);
