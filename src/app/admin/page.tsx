@@ -4,10 +4,24 @@ import Link from "next/link";
 import { 
   Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle, ClipboardList, 
   LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar, Download, Award, 
-  GraduationCap, Trophy, Home, Briefcase, Sparkles, Terminal, Activity, Users, MessageSquare, Phone 
+  GraduationCap, Trophy, Home, Briefcase, Sparkles, Terminal, Activity, Users, MessageSquare, Phone, CreditCard
 } from "lucide-react";
 
 const modules = [
+  {
+    title: "School Fee Structure",
+    description: "Manage the Academic Session Annual Fee Details shown on the public fee page.",
+    href: "/admin/school-fees",
+    icon: CreditCard,
+    badge: "Live Rates"
+  },
+  {
+    title: "Hostel Fee Structure",
+    description: "Add, edit, and order the live AC and Non-AC hostel fee table.",
+    href: "/admin/hostel?tab=fees",
+    icon: CreditCard,
+    badge: "Live Rates"
+  },
   {
     title: "Hostel & Residences",
     description: "Manage residential rooms, facilities grid, guidelines, and session fees table.",

@@ -2,9 +2,24 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { NoticeModel } from "@/models/Notice";
 
+const NEWS_AND_CIRCULARS = "News & Circulars";
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+function expiryDate(date: Date) {
+  return new Date(date.getTime() + ONE_WEEK_MS);
+}
+
+async function removeExpiredNewsAndCirculars() {
+  await NoticeModel.deleteMany({
+    category: NEWS_AND_CIRCULARS,
+    date: { $lte: new Date(Date.now() - ONE_WEEK_MS) },
+  });
+}
+
 export async function GET(request: Request) {
   try {
     await connectToDatabase();
+    await removeExpiredNewsAndCirculars();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     const slug = searchParams.get("slug");
@@ -38,6 +53,8 @@ export async function POST(request: Request) {
   try {
     await connectToDatabase();
     const body = await request.json();
+    const date = body.date ? new Date(body.date) : new Date();
+    const category = body.category;
 
     const created = await NoticeModel.create({
       title: body.title,
@@ -45,10 +62,11 @@ export async function POST(request: Request) {
       body: body.body ?? "",
       refNo: body.refNo ?? "",
       signatory: body.signatory ?? "Principal,\nLPS English Medium School",
-      category: body.category,
-      date: body.date ? new Date(body.date) : new Date(),
+      category,
+      date,
       isNew: body.isNew ?? true,
       link: body.link ?? "",
+      expiresAt: category === NEWS_AND_CIRCULARS ? expiryDate(date) : undefined,
     });
 
     return NextResponse.json(created, { status: 201 });
@@ -67,19 +85,25 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Notice ID is required." }, { status: 400 });
     }
 
+    const date = body.date ? new Date(body.date) : new Date();
+    const update = {
+      title: body.title,
+      subject: body.subject ?? "",
+      body: body.body ?? "",
+      refNo: body.refNo ?? "",
+      signatory: body.signatory ?? "Principal,\nLPS English Medium School",
+      category: body.category,
+      date,
+      isNew: body.isNew ?? true,
+      link: body.link ?? "",
+      ...(body.category === NEWS_AND_CIRCULARS
+        ? { expiresAt: expiryDate(date) }
+        : { $unset: { expiresAt: 1 } }),
+    };
+
     const updated = await NoticeModel.findByIdAndUpdate(
       body.id,
-      {
-        title: body.title,
-        subject: body.subject ?? "",
-        body: body.body ?? "",
-        refNo: body.refNo ?? "",
-        signatory: body.signatory ?? "Principal,\nLPS English Medium School",
-        category: body.category,
-        date: body.date ? new Date(body.date) : new Date(),
-        isNew: body.isNew ?? true,
-        link: body.link ?? "",
-      },
+      update,
       { new: true, runValidators: true }
     );
 

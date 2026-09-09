@@ -48,9 +48,9 @@ const defaultRules = [
   },
   {
     category: "Prohibited Items",
-    title: "Prohibited Electronic items",
+    title: "Prohibited items",
     bullets: [
-      "Electronic gadgets (mobile phones, tablets, smart watches, music players) are strictly banned.",
+      "Electronic gadgets (Laptop, mobile phones, tablets, smart watches, music players) are strictly banned.",
       "Fine of ₹1000 and confiscation applies if electronic devices are found with a boarder.",
       "Valuable jewelry, extra cash, and expensive personal items are not allowed."
     ],

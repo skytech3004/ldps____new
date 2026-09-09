@@ -475,7 +475,7 @@ export default function AdminMediaGallery() {
           }`}
         >
           <ImageIcon size={20} />
-          NSS Photos ({nssItems.length})
+          Guide & Bulbul Photos ({nssItems.length})
         </button>
         <button
           onClick={() => handleTabChange("ncc-photo")}
@@ -501,7 +501,7 @@ export default function AdminMediaGallery() {
               : activeTab === "video"
               ? "Manage General Videos"
               : activeTab === "nss-photo"
-              ? "Manage NSS Photos"
+              ? "Manage Guide & Bulbul Photos"
               : "Manage NCC Photos"}
           </h2>
           <p className="text-white/60 text-xs mt-2">
@@ -512,7 +512,7 @@ export default function AdminMediaGallery() {
               : activeTab === "video"
               ? "Upload and manage videos for the general school video gallery."
               : activeTab === "nss-photo"
-              ? "Upload and manage photos for the NSS academic gallery."
+              ? "Upload and manage photos for the Guide & Bulbul academic gallery."
               : "Upload and manage photos for the NCC academic gallery."}
           </p>
         </div>
@@ -526,7 +526,7 @@ export default function AdminMediaGallery() {
         </button>
       </div>
 
-      {/* Featured Banner Image Manager for NSS / NCC */}
+      {/* Featured Banner Image Manager for Guide & Bulbul / NCC */}
       {(activeTab === "nss-photo" || activeTab === "ncc-photo") && !loading && (
         <div className="bg-[#111c38]/40 border border-white/5 p-6 rounded-2xl mb-8 flex flex-col md:flex-row gap-6 items-center text-left">
           <div className="flex-1 space-y-2">

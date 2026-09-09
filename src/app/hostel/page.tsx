@@ -584,7 +584,7 @@ export default function HostelPage() {
       </section>
 
       {/* Fee Structure - Clean Stripe-inspired table layout */}
-      <section className="py-32 md:py-40 px-6 bg-[#F8F9FC]">
+      <section id="fee-structure" className="py-32 md:py-40 px-6 bg-[#F8F9FC]">
         <div className="max-w-7xl mx-auto space-y-20">
           <div className="text-center space-y-4">
             <Reveal>

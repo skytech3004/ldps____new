@@ -148,6 +148,9 @@ export default function AdminHostelPage() {
   useEffect(() => {
     fetchData();
     fetchFilters();
+    if (new URLSearchParams(window.location.search).get("tab") === "fees") {
+      setActiveTab("fees");
+    }
   }, []);
 
   // Handle facility / photo image upload
@@ -318,6 +321,10 @@ export default function AdminHostelPage() {
           <p className="text-white/70 mt-2">Manage live facilities grid, session fees list, and rules/guidelines accordions.</p>
         </div>
         <div className="flex gap-3">
+          <Link href="/hostel#fee-structure" target="_blank" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors text-white">
+            <ArrowUpRight size={14} />
+            View Hostel Fees
+          </Link>
           <Link href="/hostel" target="_blank" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors text-white">
             <ArrowUpRight size={14} />
             View Hostel Page

@@ -128,7 +128,7 @@ Capture status: Captured from live page/search cache.
 - Gymnasium: Well-equipped gym.
 - Bal Dukan: Tuck shop for daily-use items.
 - Transportation: Fleet of buses for surrounding areas up to 50 km.
-- Facilities: Extracurricular activities, NCC and NSS wing; 1800 girls enrolled, 650 staying on campus.
+- Facilities: Extracurricular activities, NCC and Guide & Bulbul wing; 1800 girls enrolled, 650 staying on campus.
 
 ## Leave Application
 Source URL: https://www.lpsvidhyawadi.com/LeaveApplication.aspx

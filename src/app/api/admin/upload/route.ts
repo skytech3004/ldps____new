@@ -25,6 +25,8 @@ const SECTION_FOLDERS: Record<string, string> = {
   events: "events",
   results: "results",
   sports: "sports",
+  "managing-committee": "managing-committee",
+  teachers: "teachers",
 };
 
 type UploadRecord = {

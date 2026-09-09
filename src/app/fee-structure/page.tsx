@@ -1,16 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { CreditCard, Copy, Check, ArrowRight, ShieldCheck, HelpCircle, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 
+type FeeListItem = {
+  class: string;
+  annualFee: string;
+  installment: string;
+};
+
+type SchoolFeeResponse = {
+  classLevel: string;
+  annualFee: string;
+  installment: string;
+};
+
 export default function FeeStructure() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
-
-  const feeList = [
+  const defaultFeeList: FeeListItem[] = [
     { class: "Nursery", annualFee: "₹17,700", installment: "₹8,850" },
     { class: "KG-Prep", annualFee: "₹18,400", installment: "₹9,200" },
     { class: "Class I – II", annualFee: "₹21,300", installment: "₹10,650" },
@@ -26,6 +37,27 @@ export default function FeeStructure() {
     { class: "Class XI – XII (Commerce - General)", annualFee: "₹41,500", installment: "₹20,750" },
     { class: "Class XI – XII (Arts)", annualFee: "₹43,600", installment: "₹21,800" }
   ];
+  const [feeList, setFeeList] = useState(defaultFeeList);
+
+  useEffect(() => {
+    async function loadFeeList() {
+      try {
+        const response = await fetch("/api/school-fees", { cache: "no-store" });
+        const fees = (await response.json()) as SchoolFeeResponse[];
+        if (response.ok && Array.isArray(fees) && fees.length > 0) {
+          setFeeList(fees.map((fee) => ({
+            class: fee.classLevel,
+            annualFee: fee.annualFee,
+            installment: fee.installment,
+          })));
+        }
+      } catch (error) {
+        console.error("Failed to load school fees:", error);
+      }
+    }
+
+    loadFeeList();
+  }, []);
 
   const bankDetails = [
     { label: "Account Name", value: "Leeladevi Parasmal Sancheti English Medium Sr. Sec. School Vidyawadi", key: "name" },

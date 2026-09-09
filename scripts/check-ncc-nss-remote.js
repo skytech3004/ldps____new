@@ -4,7 +4,7 @@ async function main() {
     const gallery = await res.json();
     const galleryArr = Array.isArray(gallery) ? gallery : (gallery.data || []);
     const nccNssAlbum = galleryArr.find(item => String(item.albumTitle).toLowerCase().includes('ncc'));
-    console.log("Remote NCC & NSS Album:", JSON.stringify(nccNssAlbum, null, 2));
+    console.log("Remote NCC & Guide & Bulbul Album:", JSON.stringify(nccNssAlbum, null, 2));
   } catch (err) {
     console.error(err);
   }

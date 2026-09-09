@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { 
-  Trophy, Plus, Trash2, Save, Loader2, Sparkles, Upload, X, Shield, ArrowUp, ArrowDown, Users, Image as ImageIcon, ClipboardList
+  Trophy, Plus, Trash2, Save, Loader2, Sparkles, Upload, X, Shield, ArrowUp, ArrowDown, Users, Image as ImageIcon, ClipboardList, Pencil
 } from "lucide-react";
 import TipTapEditor from "@/components/TipTapEditor";
 
@@ -40,11 +40,13 @@ export default function AdminSportsPage() {
   const [uploadingComplex, setUploadingComplex] = useState(false);
 
   const [newPlayer, setNewPlayer] = useState<Player>({ name: "", role: "", achievement: "", image: "" });
+  const [editingPlayerIndex, setEditingPlayerIndex] = useState<number | null>(null);
   const [newPlayerFile, setNewPlayerFile] = useState<File | null>(null);
   const [playerUploadPreview, setPlayerUploadPreview] = useState<string | null>(null);
   const [uploadingPlayer, setUploadingPlayer] = useState(false);
 
   const [newGame, setNewGame] = useState<Game>({ title: "", desc: "" });
+  const [editingGameIndex, setEditingGameIndex] = useState<number | null>(null);
 
   const fetchSportsData = async () => {
     try {
@@ -191,18 +193,21 @@ export default function AdminSportsPage() {
       }
     }
 
-    const added: Player = {
+    const player: Player = {
       name: newPlayer.name,
       role: newPlayer.role,
       achievement: newPlayer.achievement,
-      image: pImage
+      image: pImage || newPlayer.image,
     };
 
-    const nextPlayers = [...players, added];
+    const nextPlayers = editingPlayerIndex === null
+      ? [...players, player]
+      : players.map((existing, index) => index === editingPlayerIndex ? { ...existing, ...player } : existing);
     setPlayers(nextPlayers);
     saveSportsData(complexImages, nextPlayers, games, stats);
 
     setNewPlayer({ name: "", role: "", achievement: "", image: "" });
+    setEditingPlayerIndex(null);
     setNewPlayerFile(null);
     setPlayerUploadPreview(null);
   };
@@ -213,6 +218,20 @@ export default function AdminSportsPage() {
     saveSportsData(complexImages, nextPlayers, games, stats);
   };
 
+  const editPlayer = (index: number) => {
+    setNewPlayer(players[index]);
+    setEditingPlayerIndex(index);
+    setNewPlayerFile(null);
+    setPlayerUploadPreview(players[index].image || null);
+  };
+
+  const cancelPlayerEdit = () => {
+    setNewPlayer({ name: "", role: "", achievement: "", image: "" });
+    setEditingPlayerIndex(null);
+    setNewPlayerFile(null);
+    setPlayerUploadPreview(null);
+  };
+
   // Game Summaries actions
   const addGame = (e: React.FormEvent) => {
     e.preventDefault();
@@ -220,16 +239,29 @@ export default function AdminSportsPage() {
       alert("Please fill in game title and description.");
       return;
     }
-    const nextGames = [...games, { title: newGame.title, desc: newGame.desc }];
+    const nextGames = editingGameIndex === null
+      ? [...games, { title: newGame.title, desc: newGame.desc }]
+      : games.map((existing, index) => index === editingGameIndex ? { ...existing, title: newGame.title, desc: newGame.desc } : existing);
     setGames(nextGames);
     saveSportsData(complexImages, players, nextGames, stats);
     setNewGame({ title: "", desc: "" });
+    setEditingGameIndex(null);
   };
 
   const deleteGame = (index: number) => {
     const nextGames = games.filter((_, idx) => idx !== index);
     setGames(nextGames);
     saveSportsData(complexImages, players, nextGames, stats);
+  };
+
+  const editGame = (index: number) => {
+    setNewGame(games[index]);
+    setEditingGameIndex(index);
+  };
+
+  const cancelGameEdit = () => {
+    setNewGame({ title: "", desc: "" });
+    setEditingGameIndex(null);
   };
 
   // Stats actions
@@ -375,13 +407,22 @@ export default function AdminSportsPage() {
                 </div>
 
                 <div className="flex justify-end">
+                  {editingPlayerIndex !== null && (
+                    <button
+                      type="button"
+                      onClick={cancelPlayerEdit}
+                      className="mr-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider text-white/70 hover:bg-white/10"
+                    >
+                      Cancel
+                    </button>
+                  )}
                   <button 
                     type="submit" 
                     disabled={uploadingPlayer}
                     className="bg-white hover:bg-white/90 text-primary px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 disabled:opacity-50"
                   >
                     {uploadingPlayer ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
-                    Add Player
+                    {editingPlayerIndex === null ? "Add Player" : "Update Player"}
                   </button>
                 </div>
               </form>
@@ -407,12 +448,22 @@ export default function AdminSportsPage() {
                           <p className="text-[10px] text-accent font-bold uppercase mt-1 tracking-wider">{p.achievement}</p>
                         </div>
                       </div>
-                      <button 
-                        onClick={() => deletePlayer(idx)}
-                        className="p-2 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 rounded-lg transition-colors"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => editPlayer(idx)}
+                          className="p-2 bg-accent/10 hover:bg-accent hover:text-primary text-accent rounded-lg transition-colors"
+                          aria-label={`Edit ${p.name}`}
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button 
+                          onClick={() => deletePlayer(idx)}
+                          className="p-2 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 rounded-lg transition-colors"
+                          aria-label={`Delete ${p.name}`}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}
@@ -449,12 +500,21 @@ export default function AdminSportsPage() {
                   />
                 </div>
                 <div className="flex justify-end">
+                  {editingGameIndex !== null && (
+                    <button
+                      type="button"
+                      onClick={cancelGameEdit}
+                      className="mr-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider text-white/70 hover:bg-white/10"
+                    >
+                      Cancel
+                    </button>
+                  )}
                   <button 
                     type="submit" 
                     className="bg-white hover:bg-white/90 text-primary px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2"
                   >
                     <Plus size={12} />
-                    Add Summary
+                    {editingGameIndex === null ? "Add Summary" : "Update Summary"}
                   </button>
                 </div>
               </form>
@@ -470,12 +530,22 @@ export default function AdminSportsPage() {
                         <h4 className="text-sm font-black text-white uppercase">{g.title}</h4>
                         <p className="text-xs text-white/60 font-semibold leading-relaxed">{g.desc}</p>
                       </div>
-                      <button 
-                        onClick={() => deleteGame(idx)}
-                        className="p-2 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 rounded-lg transition-colors shrink-0"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                      <div className="flex gap-2 shrink-0">
+                        <button
+                          onClick={() => editGame(idx)}
+                          className="p-2 bg-accent/10 hover:bg-accent hover:text-primary text-accent rounded-lg transition-colors"
+                          aria-label={`Edit ${g.title}`}
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button 
+                          onClick={() => deleteGame(idx)}
+                          className="p-2 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 rounded-lg transition-colors"
+                          aria-label={`Delete ${g.title}`}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}

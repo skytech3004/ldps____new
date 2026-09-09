@@ -56,7 +56,7 @@ export default function Navbar() {
         { label: "Scholastic", href: "/scholastic" },
         { label: "Co-Scholastic", href: "/co-scholastic" },
         { label: "Sports", href: "/sports" },
-        { label: "NSS", href: "/academics/nss" },
+        { label: "Guide & Bulbul ", href: "/academics/nss" },
         { label: "NCC", href: "/academics/ncc" },
         {
           label: "Result",

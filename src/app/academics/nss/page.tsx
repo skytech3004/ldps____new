@@ -21,9 +21,9 @@ const fallbackGalleryItems: MediaItem[] = Array.from({ length: 7 }, (_, index) =
   const photoNumber = index + 1;
   return {
     _id: `nss-fallback-${photoNumber}`,
-    title: `NSS Activity Photo ${photoNumber}`,
+    title: `Guide & Bulbul Activity Photo ${photoNumber}`,
     src: `/uploads/gallery/nss-img-${photoNumber}.jpg`,
-    alt: `NSS activity photo ${photoNumber}`,
+    alt: `Guide & Bulbul activity photo ${photoNumber}`,
     type: "nss-photo",
   };
 });
@@ -47,7 +47,7 @@ export default function NSSPage() {
           setGalleryItems(fallbackGalleryItems);
         }
       } catch (error) {
-        console.error("Failed to fetch NSS photos:", error);
+        console.error("Failed to fetch Guide & Bulbul photos:", error);
         setGalleryItems(fallbackGalleryItems);
       }
     };
@@ -62,7 +62,7 @@ export default function NSSPage() {
           }
         }
       } catch (error) {
-        console.error("Failed to fetch NSS featured image:", error);
+        console.error("Failed to fetch Guide & Bulbul featured image:", error);
       }
     };
 
@@ -123,7 +123,7 @@ export default function NSSPage() {
             <span className="text-white/80">NSS</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-black font-montserrat uppercase tracking-tight text-white">
-            National Service Scheme <span className="text-[#F7B801]">(NSS)</span>
+            National Service Scheme <span className="text-[#F7B801]">(Guide & Bulbul  Mission)</span>
           </h1>
           <p className="text-white/70 font-medium text-xs md:text-base max-w-2xl leading-relaxed">
             Developing personality and character of students through voluntary community service. &quot;Not Me But You&quot;.
@@ -137,21 +137,23 @@ export default function NSSPage() {
           <div className="space-y-4">
             <span className="text-[#F7B801] font-black uppercase tracking-[0.35em] text-xs block">Community Service</span>
             <h2 className="text-3xl md:text-4xl font-black text-[#3D348B] uppercase font-montserrat tracking-tight">
-              Philosophy & NSS Mission
+              Philosophy & Guide & Bulbul Mission
             </h2>
             <div className="h-1.5 w-24 bg-[#F7B801] rounded-full" />
           </div>
 
           <p className="text-gray-600 font-medium text-sm md:text-base leading-relaxed">
-            The National Service Scheme (NSS) at Leeladevi Parasmal Sancheti English Medium School is a flagship student program designed to cultivate civic responsibility, social empathy, and democratic values. Guided by the motto <strong>&quot;Not Me But You&quot;</strong>, our volunteers participate in various community engagement activities including health camps, environment drives, educational workshops, and sanitation campaigns.
-          </p>
+          The Guide & Bulbul  programme at Leela Devi Parasmal Sancheti English Medium School, Vidyawadi nurtures discipline, leadership, teamwork, confidence and a spirit of service among students. Through camps, activities, skill development and community-oriented experiences, students learn important life skills beyond the classroom and grow into responsible, compassionate and confident individuals.
+
+           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
-              { icon: Heart, text: "Selfless Social Service" },
-              { icon: Users, text: "Teamwork & Co-operation" },
-              { icon: BookOpen, text: "Community Awareness" },
-              { icon: ShieldCheck, text: "Character Building" }
+              { icon: BookOpen, text: "Learn" },
+              { icon: Users, text: "Lead" },
+
+{ icon: Heart, text: "Serve" },
+              { icon: ShieldCheck, text: "Grow" }
             ].map((feature, fIdx) => (
               <div key={fIdx} className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-[#3D348B]/10 flex items-center justify-center text-[#3D348B]">
@@ -170,7 +172,7 @@ export default function NSSPage() {
           <div className="relative aspect-[4/3] rounded-[2.5rem] overflow-hidden border-[12px] border-white shadow-2xl">
             <Image
               src={featuredImage}
-              alt="NSS Social Service Activities"
+              alt="Guide & Bulbul Social Service Activities"
               fill
               sizes="(max-width: 768px) 100vw, 40vw"
               className="object-cover"
@@ -181,18 +183,18 @@ export default function NSSPage() {
         </div>
       </section>
 
-      {/* NSS Gallery Section */}
+      {/* Guide & Bulbul Gallery Section */}
       <section className="py-20 px-6 bg-white border-t border-slate-100 text-center">
         <div className="max-w-7xl mx-auto space-y-12">
 
           <div className="space-y-4">
             <span className="text-[#3D348B] font-black uppercase tracking-[0.4em] text-xs block">Activity Logs</span>
             <h2 className="text-3xl md:text-5xl font-black text-[#3D348B] uppercase font-montserrat tracking-tight">
-              NSS Gallery
+              Guide & Bulbul  Gallery
             </h2>
             <div className="h-1.5 w-24 bg-[#F7B801] mx-auto rounded-full" />
             <p className="text-gray-500 font-medium text-xs md:text-sm max-w-xl mx-auto pt-2">
-              Explore the visual catalog of our NSS volunteers contributing to social, medical, and environmental causes.
+              Explore the visual catalog of our Guide & Bulbul  volunteers contributing to social, medical, and environmental causes.
             </p>
           </div>
 
@@ -205,7 +207,7 @@ export default function NSSPage() {
             <div className="bg-slate-50 border border-dashed border-slate-200 rounded-3xl p-16 text-center max-w-md mx-auto">
               <ImageIcon size={48} className="mx-auto mb-4 opacity-40 text-[#3D348B]" />
               <p className="font-bold text-lg text-[#3D348B]">No Photos Yet</p>
-              <p className="text-sm text-slate-500 mt-1">Photos of NSS activities will appear here once uploaded in the Admin portal.</p>
+              <p className="text-sm text-slate-500 mt-1">Photos of Guide & Bulbul activities will appear here once uploaded in the Admin portal.</p>
             </div>
           ) : (
             <div className="columns-1 sm:columns-2 lg:columns-3 gap-8 [column-fill:_balance] pt-4">
@@ -217,7 +219,7 @@ export default function NSSPage() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: (idx % 3) * 0.1 }}
                   onClick={() => setActivePhoto(idx)}
-                  className="break-inside-avoid mb-8 bg-white rounded-2xl border border-slate-100 shadow-ncc-nss overflow-hidden p-4 flex flex-col cursor-pointer transition-all duration-300 hover:shadow-ncc-nss-hover hover:-translate-y-1.5 group w-full"
+                  className="break-inside-avoid mb-8 bg-white rounded-2xl border border-slate-100 shadow-ncc-Guide & Bulbul overflow-hidden p-4 flex flex-col cursor-pointer transition-all duration-300 hover:shadow-ncc-nss-hover hover:-translate-y-1.5 group w-full"
                 >
                   <div className="relative rounded-xl overflow-hidden bg-slate-50 border border-slate-100">
                     <img
@@ -236,9 +238,9 @@ export default function NSSPage() {
                       </span>
                     </div>
                   </div>
-                  <h3 className="text-[#3D348B] text-sm md:text-base font-extrabold line-clamp-1 text-left mt-4 group-hover:text-[#7678ED] transition-colors leading-snug">
+                  {/* <h3 className="text-[#3D348B] text-sm md:text-base font-extrabold line-clamp-1 text-left mt-4 group-hover:text-[#7678ED] transition-colors leading-snug">
                     {item.title}
-                  </h3>
+                  </h3> */}
                 </motion.div>
               ))}
             </div>
@@ -260,7 +262,7 @@ export default function NSSPage() {
             {/* Top Bar */}
             <div className="w-full max-w-6xl flex justify-between items-center text-white px-2">
               <span className="text-xs md:text-sm font-bold tracking-widest text-[#F7B801] uppercase">
-                LPS NSS Service Portal
+                LPS Guide & Bulbul Service Portal
               </span>
               <button
                 onClick={() => setActivePhoto(null)}

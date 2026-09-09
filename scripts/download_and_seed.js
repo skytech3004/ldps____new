@@ -200,8 +200,8 @@ async function main() {
     }
   }
 
-  // 4. Download and insert NSS Photos
-  console.log("\nProcessing NSS images...");
+  // 4. Download and insert Guide & BulbulPhotos
+  console.log("\nProcessing Guide & Bulbulimages...");
   for (let i = 0; i < nssUrls.length; i++) {
     const filename = `nss-img-${i + 1}.jpg`;
     const dest = path.join(targetDir, filename);
@@ -212,7 +212,7 @@ async function main() {
       await downloadImage(nssUrls[i], dest);
 
       // Save in MediaItem
-      const title = `NSS Social Services - Volunteer Camp ${i + 1}`;
+      const title = `Guide & BulbulSocial Services - Volunteer Camp ${i + 1}`;
       const existing = await MediaItemModel.findOne({ src: srcPath });
       if (!existing) {
         await MediaItemModel.create({
@@ -222,12 +222,12 @@ async function main() {
           type: "nss-photo",
           category: "Others"
         });
-        console.log(`Saved NSS database record for ${filename}`);
+        console.log(`Saved Guide & Bulbuldatabase record for ${filename}`);
       } else {
-        console.log(`NSS record for ${filename} already exists`);
+        console.log(`Guide & Bulbulrecord for ${filename} already exists`);
       }
     } catch (e) {
-      console.error(`Failed to process NSS image ${i + 1}:`, e.message);
+      console.error(`Failed to process Guide & Bulbulimage ${i + 1}:`, e.message);
     }
   }
 

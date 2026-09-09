@@ -46,11 +46,19 @@ const NoticeSchema = new Schema(
       default: "",
       trim: true,
     },
+    // Only News & Circulars receive this value. MongoDB's TTL index removes
+    // them automatically once the displayed date is one week old.
+    expiresAt: {
+      type: Date,
+      default: undefined,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+NoticeSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0, sparse: true });
 
 export type NoticeDocument = InferSchemaType<typeof NoticeSchema> & { _id: string };
 
