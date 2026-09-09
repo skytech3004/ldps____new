@@ -70,7 +70,91 @@ export default function ContactPage() {
           <div className="h-2 w-32 bg-mint mx-auto rounded-full mt-6" />
         </div>
       </section>
+      <section className="px-6 pb-32 max-w-7xl mx-auto">
+        <div className="text-center mb-10 space-y-2">
+          <div className="inline-flex items-center gap-2 text-green-primary font-black uppercase tracking-[0.3em] text-xs">
+            <Building2 size={14} />
+            <span>Important Contacts</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-black text-navy uppercase">
+            Direct Lines to Our Departments
+          </h2>
+          <p className="text-gray-500 font-medium">
+            Direct lines to our departments and administration
+          </p>
+        </div>
 
+        {loadingContacts ? (
+          <p className="text-center text-gray-400 font-semibold">Loading contacts...</p>
+        ) : contacts.length === 0 ? (
+          <p className="text-center text-gray-400 font-semibold">No contacts available at the moment.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {contacts.map((contact) => (
+              <article
+                key={contact._id}
+                className="bg-white border border-primary/10 rounded-[2rem] p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                    <User size={22} />
+                  </div>
+                  <div className="min-w-0 flex-1 space-y-3">
+                    <div>
+                      <h3 className="text-xl font-black text-navy">{contact.department}</h3>
+                      {contact.contactName ? (
+                        <p className="text-sm font-bold text-primary mt-1">{contact.contactName}</p>
+                      ) : null}
+                      {contact.designation ? (
+                        <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-1">
+                          {contact.designation}
+                        </p>
+                      ) : null}
+                    </div>
+                    <div className="space-y-2">
+                      {contact.phone ? (
+                        <a
+                          href={`tel:${contact.phone.replace(/\s/g, "")}`}
+                          className="flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-primary transition-colors"
+                        >
+                          <Phone size={14} className="text-accent shrink-0" />
+                          {contact.phone}
+                        </a>
+                      ) : null}
+                      {contact.email ? (
+                        <a
+                          href={`mailto:${contact.email}`}
+                          className="flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-primary transition-colors break-all"
+                        >
+                          <Mail size={14} className="text-accent shrink-0" />
+                          {contact.email}
+                        </a>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { title: "Office Hours", detail: "Office enquiry: 11:00 AM to 3:00 PM", icon: Clock },
+            { title: "Campus", detail: "Vidyawadi, Khimel, Station - Rani, Pali", icon: MapPin },
+            { title: "LPS Phone", detail: "02934-220935 / 220936", icon: Phone },
+            { title: "LPS Email", detail: "lpsvidhyawadi@gmail.com", icon: Mail },
+          ].map((item) => (
+            <div key={item.title} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+              <div className="w-10 h-10 bg-mint/20 rounded-xl flex items-center justify-center mb-4 text-navy">
+                <item.icon size={18} />
+              </div>
+              <h4 className="font-black text-navy uppercase text-[10px] tracking-widest mb-1">{item.title}</h4>
+              <p className="text-gray-600 font-bold text-sm">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </section>
       <section className="px-6 pb-16 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           <div className="bg-white rounded-[2rem] border border-primary/10 p-8 shadow-xl space-y-6">
@@ -248,91 +332,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="px-6 pb-32 max-w-7xl mx-auto">
-        <div className="text-center mb-10 space-y-2">
-          <div className="inline-flex items-center gap-2 text-green-primary font-black uppercase tracking-[0.3em] text-xs">
-            <Building2 size={14} />
-            <span>Important Contacts</span>
-          </div>
-          <h2 className="text-3xl md:text-4xl font-black text-navy uppercase">
-            Direct Lines to Our Departments
-          </h2>
-          <p className="text-gray-500 font-medium">
-            Direct lines to our departments and administration
-          </p>
-        </div>
 
-        {loadingContacts ? (
-          <p className="text-center text-gray-400 font-semibold">Loading contacts...</p>
-        ) : contacts.length === 0 ? (
-          <p className="text-center text-gray-400 font-semibold">No contacts available at the moment.</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {contacts.map((contact) => (
-              <article
-                key={contact._id}
-                className="bg-white border border-primary/10 rounded-[2rem] p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                    <User size={22} />
-                  </div>
-                  <div className="min-w-0 flex-1 space-y-3">
-                    <div>
-                      <h3 className="text-xl font-black text-navy">{contact.department}</h3>
-                      {contact.contactName ? (
-                        <p className="text-sm font-bold text-primary mt-1">{contact.contactName}</p>
-                      ) : null}
-                      {contact.designation ? (
-                        <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-1">
-                          {contact.designation}
-                        </p>
-                      ) : null}
-                    </div>
-                    <div className="space-y-2">
-                      {contact.phone ? (
-                        <a
-                          href={`tel:${contact.phone.replace(/\s/g, "")}`}
-                          className="flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-primary transition-colors"
-                        >
-                          <Phone size={14} className="text-accent shrink-0" />
-                          {contact.phone}
-                        </a>
-                      ) : null}
-                      {contact.email ? (
-                        <a
-                          href={`mailto:${contact.email}`}
-                          className="flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-primary transition-colors break-all"
-                        >
-                          <Mail size={14} className="text-accent shrink-0" />
-                          {contact.email}
-                        </a>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { title: "Office Hours", detail: "Office enquiry: 11:00 AM to 3:00 PM", icon: Clock },
-            { title: "Campus", detail: "Vidyawadi, Khimel, Station - Rani, Pali", icon: MapPin },
-            { title: "LPS Phone", detail: "02934-220935 / 220936", icon: Phone },
-            { title: "LPS Email", detail: "lpsvidhyawadi@gmail.com", icon: Mail },
-          ].map((item) => (
-            <div key={item.title} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <div className="w-10 h-10 bg-mint/20 rounded-xl flex items-center justify-center mb-4 text-navy">
-                <item.icon size={18} />
-              </div>
-              <h4 className="font-black text-navy uppercase text-[10px] tracking-widest mb-1">{item.title}</h4>
-              <p className="text-gray-600 font-bold text-sm">{item.detail}</p>
-            </div>
-          ))}
-        </div>
-      </section>
 
       <Footer />
     </main>
