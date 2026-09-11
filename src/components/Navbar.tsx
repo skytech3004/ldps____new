@@ -56,7 +56,7 @@ export default function Navbar() {
         { label: "Scholastic", href: "/scholastic" },
         { label: "Co-Scholastic", href: "/co-scholastic" },
         { label: "Sports", href: "/sports" },
-        { label: "Guide & Bulbul ", href: "/academics/nss" },
+        { label: "Guide & Bulbul ", href: "/academics/guide-bulbul" },
         { label: "NCC", href: "/academics/ncc" },
         {
           label: "Result",
@@ -75,7 +75,7 @@ export default function Navbar() {
         { label: "Fee Policy", href: "/fee-policy" },
         { label: "Apply For Admission", href: "/apply-for-admission" },
         { label: "Downloads", href: "/downloads" },
-        { label: "Download TC", href: "/download-tc" },
+        // { label: "Download TC", href: "/download-tc" },
       ],
     },
     {
@@ -109,7 +109,7 @@ export default function Navbar() {
         { label: "Magazine", href: "/magazine" },
         { label: "News", href: "/news" },
         { label: "Transport", href: "/transport" },
-        { label: "Public Disclosures", href: "/public-disclosures-cbse" },
+        //  { label: "Public Disclosures", href: "/public-disclosures-cbse" },
         { label: "G.R. Mechanism", href: "/g-r-mechanism" },
         { label: "Holiday List", href: "/holiday-list" },
         { label: "Announcements", href: "/announcements" },
@@ -119,7 +119,7 @@ export default function Navbar() {
     { name: "Blog", href: "/blog" },
     { name: "Careers", href: "/career" },
     { name: "Contact", href: "/contact" },
-    
+
   ];
 
   const toggleMobileDropdown = (name: string) => {

@@ -23,7 +23,7 @@ export const gisMenuItems: GisMenuItem[] = [
   { title: "Fee Structure", slug: "fee-structure", group: "Academics", sourceUrl: "https://www.gangainternationalschool.com/fee-structure/" },
   { title: "Fee Policy", slug: "fee-policy", group: "Academics", sourceUrl: "https://www.gangainternationalschool.com/fee-policy/" },
   { title: "Apply For Admission", slug: "apply-for-admission", group: "Academics", sourceUrl: "https://www.gangainternationalschool.com/apply-for-admission/" },
-  { title: "Downloads", slug: "downloads", group: "Academics", sourceUrl: "https://www.gangainternationalschool.com/downloads/" },
+  // { title: "Downloads", slug: "downloads", group: "Academics", sourceUrl: "https://www.gangainternationalschool.com/downloads/" },
   { title: "Download TC", slug: "download-tc", group: "Academics", sourceUrl: "https://www.gangainternationalschool.com/download-tc/" },
   { title: "Pre-Primary", slug: "pre-primary", group: "Schooling", sourceUrl: "https://www.gangainternationalschool.com/pre-primary/" },
   { title: "Day Schooling", slug: "day-schooling", group: "Schooling", sourceUrl: "https://www.gangainternationalschool.com/day-schooling/" },

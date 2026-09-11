@@ -8,7 +8,7 @@ export const trustInstitutions = [
 
 export const trustStats = [
   { label: "Acres Campus", value: "65+" },
-  { label: "Students", value: "2500+" },
+  { label: "Students", value: "5000+" },
   { label: "Years Legacy", value: "70+" },
   { label: "Safety Record", value: "100%" },
 ];

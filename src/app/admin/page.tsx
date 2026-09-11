@@ -16,6 +16,13 @@ const modules = [
     badge: "Live Rates"
   },
   {
+    title: "Bus Fee Structure",
+    description: "Manage destination bus transport fees for 90+ locations shown on the public fee page.",
+    href: "/admin/bus-fees",
+    icon: Bus,
+    badge: "90+ Places"
+  },
+  {
     title: "Hostel Fee Structure",
     description: "Add, edit, and order the live AC and Non-AC hostel fee table.",
     href: "/admin/hostel?tab=fees",

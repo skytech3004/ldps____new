@@ -13,6 +13,7 @@ const navItems = [
   { href: "/admin/filters", label: "Filter Tags Manager", icon: LayoutGrid },
   { href: "/admin/hostel", label: "Hostel & Residence", icon: Home },
   { href: "/admin/school-fees", label: "School Fee Structure", icon: CreditCard },
+  { href: "/admin/bus-fees", label: "Bus Fee Structure", icon: Bus },
   { href: "/admin/blog", label: "Blog Posts", icon: BookOpen },
   { href: "/admin/pre-primary", label: "Pre-Primary Showcase", icon: Images },
   { href: "/admin/career", label: "Career Listings", icon: Briefcase },
