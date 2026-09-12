@@ -1,296 +1,179 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { 
-  Bell, CalendarDays, ChevronRight, FileText, Images, PlusCircle, ClipboardList, 
-  LayoutGrid, ShieldCheck, BookOpen, Bus, Calendar, Download, Award, 
-  GraduationCap, Trophy, Home, Briefcase, Sparkles, Terminal, Activity, Users, MessageSquare, Phone, CreditCard
+  Bell, ChevronRight, FileText, Images, 
+  ClipboardList, BookOpen, Bus, Calendar, Download, Award, 
+  GraduationCap, Trophy, Home, Briefcase, Sparkles, Users, 
+  MessageSquare, Phone, CreditCard, School, ShieldCheck, UserCheck
 } from "lucide-react";
-
-const modules = [
-  {
-    title: "School Fee Structure",
-    description: "Manage the Academic Session Annual Fee Details shown on the public fee page.",
-    href: "/admin/school-fees",
-    icon: CreditCard,
-    badge: "Live Rates"
-  },
-  {
-    title: "Bus Fee Structure",
-    description: "Manage destination bus transport fees for 90+ locations shown on the public fee page.",
-    href: "/admin/bus-fees",
-    icon: Bus,
-    badge: "90+ Places"
-  },
-  {
-    title: "Hostel Fee Structure",
-    description: "Add, edit, and order the live AC and Non-AC hostel fee table.",
-    href: "/admin/hostel?tab=fees",
-    icon: CreditCard,
-    badge: "Live Rates"
-  },
-  {
-    title: "Hostel & Residences",
-    description: "Manage residential rooms, facilities grid, guidelines, and session fees table.",
-    href: "/admin/hostel",
-    icon: Home,
-    featured: true, // bento sizing
-    badge: "Database Ready"
-  },
-  {
-    title: "Blog & Insights",
-    description: "Create, edit, draft, and delete news articles, stories, and school blog posts.",
-    href: "/admin/blog",
-    icon: BookOpen,
-    featured: true,
-    badge: "Active Engine"
-  },
-  {
-    title: "Pre-Primary Showcase",
-    description: "Manage photos, titles, and descriptions shown in the preschool showcase tabs.",
-    href: "/admin/pre-primary",
-    icon: Images,
-    badge: "Media Sync"
-  },
-  {
-    title: "Career & Openings",
-    description: "Post job vacancies, review applications, and access submitted CV portfolios.",
-    href: "/admin/career",
-    icon: Briefcase,
-    badge: "Applications"
-  },
-  {
-    title: "Important Contacts",
-    description: "Manage department contacts shown on the Contact page — add, edit, hide, or delete entries.",
-    href: "/admin/contact",
-    icon: Phone,
-    badge: "CRUD"
-  },
-  {
-    title: "Notice Board",
-    description: "Manage news, announcements, circulars, and admission alerts shown on the home page.",
-    href: "/admin/notices",
-    icon: Bell,
-    badge: "Alerts"
-  },
-  {
-    title: "Brand Identity",
-    description: "Manage school logo, favicons, and other brand assets used in Navbar and Footer.",
-    href: "/admin/brand",
-    icon: Images
-  },
-  {
-    title: "About Pages",
-    description: "Edit About Trust and Management Committee intro, office bearers table, and inspiration section.",
-    href: "/admin/about-pages",
-    icon: FileText,
-    badge: "CMS"
-  },
-  {
-    title: "About Messages",
-    description: "Edit President, CEO, Secretary, and Principal messages from the About navbar with portrait upload and rich text.",
-    href: "/admin/about-messages",
-    icon: MessageSquare,
-    badge: "CMS"
-  },
-  {
-    title: "Managing Committee",
-    description: "Manage the Academic Excellence Team names and designations loaded from teacher.txt.",
-    href: "/admin/managing-committee",
-    icon: Users,
-    badge: "Local Roster"
-  },
-  {
-    title: "Investiture Cabinet",
-    description: "Manage Student Cabinet portfolios (Head Girl, Prefects) for the Investiture Ceremony.",
-    href: "/admin/investiture",
-    icon: Award
-  },
-  {
-    title: "Alumni Registrations",
-    description: "Review, filter, and track registrations submitted by school alumni.",
-    href: "/admin/alumni",
-    icon: GraduationCap
-  },
-  {
-    title: "Advanced Facilities",
-    description: "Manage structural elements and images shown in the advanced facilities showcase grid.",
-    href: "/admin/facilities",
-    icon: LayoutGrid
-  },
-  {
-    title: "Board Results Hub",
-    description: "Manage board exam years, stats, student toppers, and marks directories.",
-    href: "/admin/results",
-    icon: Trophy
-  },
-  {
-    title: "Sports & Selections",
-    description: "Manage player listings, game summaries, selectors statistics, and complex carousels.",
-    href: "/admin/sports",
-    icon: Trophy
-  },
-  {
-    title: "More Pages",
-    description: "Edit the content pages behind the More menu items and publish new page sections.",
-    href: "/admin/pages",
-    icon: FileText
-  },
-  {
-    title: "Home Carousel",
-    description: "Manage sliding banners and gallery images used in the main page IntroSection carousel.",
-    href: "/admin/carousel",
-    icon: Images
-  },
-  {
-    title: "Category Grid",
-    description: "Manage the boarding, smart classes, and facility blocks shown on the home page.",
-    href: "/admin/categories",
-    icon: LayoutGrid
-  },
-  {
-    title: "Admission Inquiries",
-    description: "Review, filter, and track parent's admission inquiries and schedule campus follow-ups.",
-    href: "/admin/inquiries",
-    icon: ClipboardList
-  },
-  {
-    title: "Events Management",
-    description: "Create, edit, and delete event records with date and image support.",
-    href: "/admin/events",
-    icon: CalendarDays
-  },
-  {
-    title: "Galleries Management",
-    description: "Manage page-wise albums, categories, and uploaded photos used across the website.",
-    href: "/admin/galleries",
-    icon: Images
-  },
-  {
-    title: "Magazine Management",
-    description: "Manage school magazines, bulletins, and journals with month, year, and PDF uploads.",
-    href: "/admin/magazine",
-    icon: BookOpen
-  },
-  {
-    title: "Transport Management",
-    description: "Manage school bus routes, safety norms, operating timings, and driver details.",
-    href: "/admin/transport",
-    icon: Bus
-  },
-  {
-    title: "CBSE Disclosures",
-    description: "Manage mandatory public disclosures, school certificates, safety documents, and compliance PDFs.",
-    href: "/admin/disclosures",
-    icon: FileText
-  },
-  {
-    title: "Holiday List",
-    description: "Manage academic year school holidays, seasonal breaks, and national festivals.",
-    href: "/admin/holidays",
-    icon: Calendar
-  },
-  {
-    title: "Downloads Manager",
-    description: "Manage official school PDF forms, applications, brochures, and dynamic planners.",
-    href: "/admin/downloads",
-    icon: Download
-  },
-];
+import { useAdminRole } from "@/context/AdminRoleContext";
+import { adminNavGroups } from "@/data/adminNav";
 
 export default function AdminDashboardPage() {
+  const { roleDetails, canAccessRoute } = useAdminRole();
+
   return (
     <section className="space-y-8 text-left text-[#E2E8F0]">
       
-      {/* Notion-style Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl border border-[#1F2937]/50 bg-[#0A0E17] p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#F7B801]/5 via-[#7678ED]/5 to-transparent pointer-events-none"></div>
-        <div className="space-y-2 relative z-10">
-          <div className="flex items-center gap-2">
-            <span className="p-1 bg-[#F7B801]/10 text-[#F7B801] rounded text-[9px] font-mono font-bold uppercase tracking-wider">
-              Control Panel
+      {/* ============================================================ */}
+      {/* WELCOME BANNER FOR SCHOOL STAFF                             */}
+      {/* ============================================================ */}
+      <div className="relative overflow-hidden rounded-2xl border border-[#1F2937]/80 bg-gradient-to-br from-[#0F172A] via-[#090D16] to-[#070A12] p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#F7B801]/10 via-[#3B82F6]/5 to-transparent pointer-events-none" />
+        
+        <div className="space-y-3 relative z-10 max-w-3xl">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-2.5 py-1 bg-[#F7B801]/10 border border-[#F7B801]/30 text-[#F7B801] rounded-lg text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1.5">
+              <School size={12} />
+              School Administration Hub
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            <span className="text-[10px] font-mono text-gray-500">v1.2.0-stable</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="text-[11px] font-semibold text-emerald-400">Academic Session 2025-26</span>
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-white uppercase font-montserrat">Workspace Console</h1>
-          <p className="text-xs text-[#94A3B8] font-semibold">Choose an operations module to publish, manage, or audit live website content.</p>
+
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white uppercase font-montserrat leading-tight">
+            Welcome, School Administrator
+          </h1>
+          <p className="text-xs sm:text-sm text-[#94A3B8] font-medium leading-relaxed">
+            Manage student notices, fee structures, hostel guidelines, admission inquiries, board results, and public website content from this unified portal.
+          </p>
         </div>
-        <div className="flex items-center gap-3 shrink-0 relative z-10">
-          <Link href="/" target="_blank" className="inline-flex items-center gap-2 bg-[#1F2937]/60 hover:bg-[#1F2937] border border-[#374151]/70 px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-white">
-            <Sparkles size={12} className="text-[#F7B801]" />
-            Live Website
+
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 relative z-10">
+          <div className="px-3.5 py-2 rounded-xl bg-[#1E293B] border border-[#334155] text-xs font-semibold text-gray-300 flex items-center gap-2">
+            <ShieldCheck size={14} className="text-[#F7B801]" />
+            <span>Role: <strong className="text-white">{roleDetails.title}</strong></span>
+          </div>
+          <Link 
+            href="/" 
+            target="_blank" 
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#F7B801] to-[#D97706] text-black font-black px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider hover:opacity-90 transition-all shadow-lg"
+          >
+            <Sparkles size={14} />
+            View Live Website
           </Link>
         </div>
       </div>
 
-      {/* Statistics Row / Linear-inspired widgets */}
+      {/* ============================================================ */}
+      {/* QUICK STATUS OVERVIEW FOR SCHOOL STAFF                       */}
+      {/* ============================================================ */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Active Modules", value: modules.length.toString(), desc: "Dynamic and static layouts", icon: LayoutGrid },
-          { label: "Storage Health", value: "Optimal", desc: "98% upload bandwidth", icon: Activity },
-          { label: "CMS Status", value: "Online", desc: "Seed caches active", icon: Terminal },
-          { label: "Framework", value: "NextJS 16", desc: "Turbopack optimization", icon: Sparkles }
+          { 
+            label: "Available Sections", 
+            value: "34 Modules", 
+            desc: "Fee, Hostel, Notices, Media", 
+            icon: School,
+            color: "text-[#F7B801] bg-[#F7B801]/10 border-[#F7B801]/30"
+          },
+          { 
+            label: "Admission Inquiries", 
+            value: "Portal Active", 
+            desc: "Parent inquiries & follow-ups", 
+            icon: ClipboardList,
+            color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30"
+          },
+          { 
+            label: "Notice Board & Alerts", 
+            value: "Live Sync", 
+            desc: "Public circulars & alerts", 
+            icon: Bell,
+            color: "text-blue-400 bg-blue-500/10 border-blue-500/30"
+          },
+          { 
+            label: "Fee Tables & Routes", 
+            value: "90+ Destinations", 
+            desc: "Bus transport & hostel fee rates", 
+            icon: Bus,
+            color: "text-purple-400 bg-purple-500/10 border-purple-500/30"
+          }
         ].map((stat, idx) => {
           const Icon = stat.icon;
           return (
-            <div key={idx} className="bg-[#0A0E17]/60 border border-[#1F2937]/50 p-5 rounded-xl flex items-center justify-between gap-4">
+            <div key={idx} className="bg-[#0A0E17]/80 border border-[#1F2937]/70 p-5 rounded-2xl flex items-center justify-between gap-4 shadow-sm hover:border-[#374151] transition-colors">
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">{stat.label}</p>
-                <p className="text-xl font-black text-white">{stat.value}</p>
-                <p className="text-[10px] font-medium text-gray-500">{stat.desc}</p>
+                <p className="text-lg font-black text-white">{stat.value}</p>
+                <p className="text-[10px] font-semibold text-gray-400">{stat.desc}</p>
               </div>
-              <div className="w-10 h-10 rounded-lg bg-[#1F2937]/30 border border-[#1F2937]/60 flex items-center justify-center text-[#94A3B8]">
-                <Icon size={16} />
+              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 ${stat.color}`}>
+                <Icon size={18} />
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Bento Grid layout of modules */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {modules.map((module) => {
-          const Icon = module.icon;
-          const isFeatured = module.featured;
+      {/* ============================================================ */}
+      {/* QUICK ACCESS HIGHLIGHT CARDS                                 */}
+      {/* ============================================================ */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between border-b border-[#1F2937]/70 pb-3">
+          <div>
+            <h2 className="text-lg font-black text-white uppercase tracking-tight font-montserrat flex items-center gap-2">
+              <School size={18} className="text-[#F7B801]" />
+              School Administration Sections
+            </h2>
+            <p className="text-xs text-[#94A3B8] font-medium">Click on any section to manage its entries and content.</p>
+          </div>
+        </div>
+
+        {adminNavGroups.map((group) => {
+          // Filter items user can access
+          const accessibleItems = group.items.filter((item) => canAccessRoute(item.href));
+          if (accessibleItems.length === 0) return null;
+
           return (
-            <Link
-              key={module.href}
-              href={module.href}
-              className={`group flex flex-col justify-between bg-[#0A0E17]/60 border border-[#1F2937]/50 p-6 rounded-xl hover:bg-[#111827]/40 hover:border-[#374151] transition-all duration-300 relative overflow-hidden ${
-                isFeatured ? "md:col-span-2" : ""
-              }`}
-            >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="w-9 h-9 rounded-lg bg-[#1F2937]/40 border border-[#1F2937]/60 flex items-center justify-center text-[#94A3B8] group-hover:text-white transition-colors">
-                    <Icon size={16} />
-                  </div>
-                  {module.badge && (
-                    <span className="px-2 py-0.5 bg-[#F7B801]/10 border border-[#F7B801]/25 text-[#F7B801] rounded text-[8px] font-mono font-bold uppercase tracking-wider">
-                      {module.badge}
-                    </span>
-                  )}
-                </div>
-                
-                <div className="space-y-1.5">
-                  <h2 className="text-lg font-black text-white uppercase tracking-tight group-hover:text-[#F7B801] transition-colors">
-                    {module.title}
-                  </h2>
-                  <p className="text-xs text-[#94A3B8] font-medium leading-relaxed">
-                    {module.description}
-                  </p>
-                </div>
+            <div key={group.id} className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#F7B801]" />
+                <h3 className="text-xs font-mono font-black text-[#F7B801] uppercase tracking-widest">
+                  {group.title}
+                </h3>
               </div>
 
-              <div className="mt-6 flex items-center gap-1.5 text-[10px] font-mono text-gray-500 group-hover:text-white transition-colors">
-                <span>Configure workspace</span>
-                <ChevronRight size={10} className="transform group-hover:translate-x-0.5 transition-transform" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {accessibleItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="group flex flex-col justify-between bg-[#0A0E17]/80 border border-[#1F2937]/60 p-5 rounded-xl hover:bg-[#111827] hover:border-[#F7B801]/40 transition-all duration-200 relative overflow-hidden shadow-sm"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="w-10 h-10 rounded-xl bg-[#1E293B]/60 border border-[#334155]/60 flex items-center justify-center text-[#94A3B8] group-hover:text-[#F7B801] group-hover:border-[#F7B801]/40 transition-colors">
+                            <Icon size={18} />
+                          </div>
+                          <span className="text-[10px] font-bold text-gray-500 group-hover:text-[#F7B801] transition-colors flex items-center gap-1">
+                            Open <ChevronRight size={10} />
+                          </span>
+                        </div>
+
+                        <div className="space-y-1">
+                          <h4 className="text-sm font-extrabold text-white uppercase tracking-tight group-hover:text-[#F7B801] transition-colors">
+                            {item.label}
+                          </h4>
+                          {item.description && (
+                            <p className="text-xs text-[#94A3B8] font-medium leading-relaxed line-clamp-2">
+                              {item.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
-            </Link>
+            </div>
           );
         })}
       </div>
+
     </section>
   );
 }

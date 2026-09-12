@@ -1,0 +1,337 @@
+import { 
+  LayoutDashboard, Home, CreditCard, Bus, Calendar, FileText, 
+  GraduationCap, Trophy, ClipboardList, Bell, Phone, MessageSquare, 
+  Users, Award, LayoutGrid, Images, BookOpen, Database, 
+  Briefcase, Sparkles, UserCheck, Shield, Newspaper, ShieldAlert
+} from "lucide-react";
+import { NavGroup, NavItem } from "@/types/adminNav";
+
+export const topLevelNav: NavItem = {
+  href: "/admin",
+  label: "Dashboard",
+  icon: LayoutDashboard,
+  description: "Overview & quick access to all school management sections",
+};
+
+export const adminNavGroups: NavGroup[] = [
+  {
+    id: "school-management",
+    title: "School Management",
+    icon: Home,
+    items: [
+      {
+        href: "/admin/notices?category=School%20Rules",
+        label: "School Rules",
+        icon: ShieldAlert,
+        description: "Manage campus discipline guidelines, code of conduct, and school rules.",
+        roles: ["super_admin", "admin", "staff"],
+      },
+      {
+        href: "/admin/hostel",
+        label: "Hostel & Residence",
+        icon: Home,
+        description: "Residential rooms, hostel fee structures, guidelines and facilities.",
+        roles: ["super_admin", "admin", "accountant", "admission"],
+      },
+      {
+        href: "/admin/school-fees",
+        label: "School Fee Structure",
+        icon: CreditCard,
+        description: "Manage annual academic fee slabs and public fee tables.",
+        roles: ["super_admin", "admin", "accountant"],
+      },
+      {
+        href: "/admin/bus-fees",
+        label: "Bus Fee Structure",
+        icon: Bus,
+        description: "Manage destination transport fees across all routes.",
+        roles: ["super_admin", "admin", "accountant"],
+      },
+      {
+        href: "/admin/transport",
+        label: "Bus Routes",
+        icon: Bus,
+        description: "Manage school bus routes, safety norms, and timings.",
+        roles: ["super_admin", "admin", "accountant"],
+      },
+      {
+        href: "/admin/holidays",
+        label: "Holiday List",
+        icon: Calendar,
+        description: "Academic year holidays, seasonal breaks, and national festivals.",
+        roles: ["super_admin", "admin", "staff"],
+      },
+      {
+        href: "/admin/disclosures",
+        label: "CBSE Disclosures",
+        icon: FileText,
+        description: "Mandatory public disclosures, safety certificates, and compliance PDFs.",
+        roles: ["super_admin", "admin", "accountant"],
+      },
+    ],
+  },
+  {
+    id: "students-community",
+    title: "Students & Community",
+    icon: GraduationCap,
+    items: [
+      {
+        href: "/admin/notices?category=Admission",
+        label: "Admission Notices",
+        icon: GraduationCap,
+        description: "Admission criteria, dates, notifications, and public alerts.",
+        roles: ["super_admin", "admin", "admission"],
+      },
+      {
+        href: "/admin/inquiries",
+        label: "Admission Inquiries",
+        icon: ClipboardList,
+        description: "Track parent admission inquiries and schedule campus visits.",
+        roles: ["super_admin", "admin", "admission"],
+      },
+      {
+        href: "/admin/alumni",
+        label: "Alumni Registrations",
+        icon: GraduationCap,
+        description: "Review and manage alumni directory registrations.",
+        roles: ["super_admin", "admin", "admission"],
+      },
+      {
+        href: "/admin/results",
+        label: "Board Results",
+        icon: Trophy,
+        description: "Board examination toppers, academic stats, and mark sheets.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/sports",
+        label: "Sports Selections",
+        icon: Trophy,
+        description: "Sports team rosters, achievements, and player profiles.",
+        roles: ["super_admin", "admin"],
+      },
+    ],
+  },
+  {
+    id: "communication",
+    title: "Communication",
+    icon: Bell,
+    items: [
+      {
+        href: "/admin/notices?category=News%20%26%20Circulars",
+        label: "News & Circulars",
+        icon: Newspaper,
+        description: "Official school news, principal circulars, and notifications.",
+        roles: ["super_admin", "admin", "staff"],
+      },
+      {
+        href: "/admin/notices?category=Announcements",
+        label: "Announcements",
+        icon: Bell,
+        description: "Urgent announcements, event notices, and school updates.",
+        roles: ["super_admin", "admin", "staff"],
+      },
+      {
+        href: "/admin/notices",
+        label: "Notice Board (All)",
+        icon: Bell,
+        description: "Publish circulars, announcements, and urgent school alerts.",
+        roles: ["super_admin", "admin", "staff"],
+      },
+      {
+        href: "/admin/contact",
+        label: "Important Contacts",
+        icon: Phone,
+        description: "Office telephone numbers, emergency contacts, and department emails.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/about-messages",
+        label: "About Messages",
+        icon: MessageSquare,
+        description: "President, Principal, Director & Secretary desk messages.",
+        roles: ["super_admin", "admin"],
+      },
+    ],
+  },
+  {
+    id: "school-info",
+    title: "School Information",
+    icon: Users,
+    items: [
+      {
+        href: "/admin/about-pages",
+        label: "About Pages",
+        icon: FileText,
+        description: "School trust history, vision, mission, and institutional profile.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/managing-committee",
+        label: "Managing Committee",
+        icon: Users,
+        description: "School managing committee members and office bearers roster.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/leadership",
+        label: "Leadership Team",
+        icon: UserCheck,
+        description: "School academic leadership and committee intro section.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/investiture",
+        label: "Investiture Cabinet",
+        icon: Award,
+        description: "Student Cabinet portfolios (Head Girl, Prefects, House Captains).",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/investiture-ceremony",
+        label: "Investiture Ceremony",
+        icon: Award,
+        description: "Annual Investiture ceremony highlights and cabinet photo showcase.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/facilities",
+        label: "Advanced Facilities",
+        icon: LayoutGrid,
+        description: "Campus infrastructure, smart labs, library, and facilities grid.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/pre-primary",
+        label: "Pre-Primary Showcase",
+        icon: Images,
+        description: "Pre-primary activities, photo showcase, and curriculum highlights.",
+        roles: ["super_admin", "admin"],
+      },
+    ],
+  },
+  {
+    id: "website-content",
+    title: "Website Content",
+    icon: BookOpen,
+    items: [
+      {
+        href: "/admin/blog",
+        label: "Blog Posts",
+        icon: BookOpen,
+        description: "Publish school news, articles, achievements, and educational blogs.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/pages",
+        label: "More Pages",
+        icon: FileText,
+        description: "Manage dynamic web page content and custom static sections.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/carousel",
+        label: "Home Carousel",
+        icon: Images,
+        description: "Sliding banners on the website homepage intro section.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/hero",
+        label: "Hero Carousel",
+        icon: Images,
+        description: "Top hero banners and main splash image carousels.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/categories",
+        label: "Category Grid",
+        icon: LayoutGrid,
+        description: "Boarding, smart classes, and institutional highlight cards.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/galleries",
+        label: "Media Gallery",
+        icon: Images,
+        description: "Photo albums, campus event galleries, and image categories.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/videos",
+        label: "Video Highlights",
+        icon: Images,
+        description: "School YouTube videos, virtual tours, and event recordings.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/magazine",
+        label: "Magazine",
+        icon: BookOpen,
+        description: "School annual magazines, journals, and PDF editions.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/downloads",
+        label: "Downloads",
+        icon: FileText,
+        description: "Official downloadable PDF forms, prospectuses, and handbooks.",
+        roles: ["super_admin", "admin", "admission", "accountant"],
+      },
+      {
+        href: "/admin/brand",
+        label: "Brand Assets",
+        icon: Images,
+        description: "School emblem, logo variations, and header/footer brand assets.",
+        roles: ["super_admin", "admin"],
+      },
+    ],
+  },
+  {
+    id: "events-activities",
+    title: "Events & Activities",
+    icon: Database,
+    items: [
+      {
+        href: "/admin/events",
+        label: "Events",
+        icon: Database,
+        description: "School calendar events, celebrations, and annual functions.",
+        roles: ["super_admin", "admin", "staff"],
+      },
+    ],
+  },
+  {
+    id: "career",
+    title: "Career",
+    icon: Briefcase,
+    items: [
+      {
+        href: "/admin/career",
+        label: "Career Listings",
+        icon: Briefcase,
+        description: "Faculty & staff job openings, vacancies, and submitted CVs.",
+        roles: ["super_admin", "admin"],
+      },
+    ],
+  },
+  {
+    id: "settings",
+    title: "Administration & Settings",
+    icon: Shield,
+    items: [
+      {
+        href: "/admin/filters",
+        label: "Content Categories",
+        icon: LayoutGrid,
+        description: "Manage filter tags and content classification across modules.",
+        roles: ["super_admin", "admin"],
+      },
+    ],
+  },
+];
+
+export const allNavItems: NavItem[] = [
+  topLevelNav,
+  ...adminNavGroups.flatMap((group) => group.items),
+];
