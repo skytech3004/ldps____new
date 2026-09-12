@@ -142,7 +142,7 @@ export default function ContactPage() {
           {[
             { title: "Office Hours", detail: "Office enquiry: 11:00 AM to 3:00 PM", icon: Clock },
             { title: "Campus", detail: "Vidyawadi, Khimel, Station - Rani, Pali", icon: MapPin },
-            { title: "LPS Phone", detail: "02934-220935 / 220936", icon: Phone },
+            { title: "LPS Phone", detail: "9529891956 / 6377204212", icon: Phone },
             { title: "LPS Email", detail: "lpsvidhyawadi@gmail.com", icon: Mail },
           ].map((item) => (
             <div key={item.title} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">

@@ -49,11 +49,10 @@ export default function PublicDisclosuresView() {
       <div className="flex flex-wrap border-b border-slate-100 pb-px gap-2">
         <button
           onClick={() => setActiveSection("general")}
-          className={`pb-4 px-6 font-black text-sm uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
-            activeSection === "general"
-              ? "border-[#3D348B] text-[#3D348B]"
-              : "border-transparent text-slate-400 hover:text-slate-600"
-          }`}
+          className={`pb-4 px-6 font-black text-sm uppercase tracking-wider border-b-2 transition-all cursor-pointer ${activeSection === "general"
+            ? "border-[#3D348B] text-[#3D348B]"
+            : "border-transparent text-slate-400 hover:text-slate-600"
+            }`}
         >
           <span className="flex items-center gap-2">
             <School size={16} />
@@ -62,11 +61,10 @@ export default function PublicDisclosuresView() {
         </button>
         <button
           onClick={() => setActiveSection("documents")}
-          className={`pb-4 px-6 font-black text-sm uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
-            activeSection === "documents"
-              ? "border-[#3D348B] text-[#3D348B]"
-              : "border-transparent text-slate-400 hover:text-slate-600"
-          }`}
+          className={`pb-4 px-6 font-black text-sm uppercase tracking-wider border-b-2 transition-all cursor-pointer ${activeSection === "documents"
+            ? "border-[#3D348B] text-[#3D348B]"
+            : "border-transparent text-slate-400 hover:text-slate-600"
+            }`}
         >
           <span className="flex items-center gap-2">
             <FileText size={16} />
@@ -75,11 +73,10 @@ export default function PublicDisclosuresView() {
         </button>
         <button
           onClick={() => setActiveSection("staff")}
-          className={`pb-4 px-6 font-black text-sm uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
-            activeSection === "staff"
-              ? "border-[#3D348B] text-[#3D348B]"
-              : "border-transparent text-slate-400 hover:text-slate-600"
-          }`}
+          className={`pb-4 px-6 font-black text-sm uppercase tracking-wider border-b-2 transition-all cursor-pointer ${activeSection === "staff"
+            ? "border-[#3D348B] text-[#3D348B]"
+            : "border-transparent text-slate-400 hover:text-slate-600"
+            }`}
         >
           <span className="flex items-center gap-2">
             <Users size={16} />
@@ -121,7 +118,7 @@ export default function PublicDisclosuresView() {
               </div>
               <div>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Contact Number</p>
-                <p className="text-sm font-extrabold text-primary">02933-240005, 94141 48005</p>
+                <p className="text-sm font-extrabold text-primary"> 9529891956 / 6377204212</p>
               </div>
             </div>
           </div>

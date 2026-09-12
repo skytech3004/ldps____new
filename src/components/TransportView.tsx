@@ -119,7 +119,7 @@ export default function TransportView() {
             </div>
             <div>
               <p className="text-xs font-black text-[#3D348B] uppercase">Transport Office</p>
-              <p className="text-xs text-slate-500 font-bold mt-0.5">+91 94141 48005 (Ext. 4)</p>
+              <p className="text-xs text-slate-500 font-bold mt-0.5">+91 9529891956 / 6377204212 (Ext. 4)</p>
             </div>
           </div>
         </div>

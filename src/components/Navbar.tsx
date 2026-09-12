@@ -169,7 +169,7 @@ export default function Navbar() {
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
               <Phone size={14} className="text-accent" />
-              <span className="font-medium">94141 48005</span>
+              <span className="font-medium">9529891956 / 6377204212</span>
             </div>
             <div className="flex items-center gap-2">
               <Mail size={14} className="text-accent" />
