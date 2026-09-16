@@ -20,15 +20,15 @@ interface MediaItem {
 const fallbackGalleryItems: MediaItem[] = Array.from({ length: 7 }, (_, index) => {
   const photoNumber = index + 1;
   return {
-    _id: `guide-bulbul-fallback-${photoNumber}`,
+    _id: `nss-fallback-${photoNumber}`,
     title: `Guide & Bulbul Activity Photo ${photoNumber}`,
-    src: `/uploads/gallery/guide-bulbul-img-${photoNumber}.jpg`,
-    alt: `Guide & Bulbul activity photo ${photoNumber}`,
-    type: "guide-bulbul-photo",
+    src: `/uploads/gallery/nss-img-${photoNumber}.jpg`,
+    alt: `Nss activity photo ${photoNumber}`,
+    type: "nss-photo",
   };
 });
 
-const fallbackFeaturedImage = "/uploads/gallery/guide-bulbul-img-5.jpg";
+const fallbackFeaturedImage = "/uploads/gallery/nss-img-5.jpg";
 
 export default function GuideBulbulPage() {
   const [galleryItems, setGalleryItems] = useState<MediaItem[]>([]);
