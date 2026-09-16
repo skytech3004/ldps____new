@@ -20,17 +20,17 @@ interface MediaItem {
 const fallbackGalleryItems: MediaItem[] = Array.from({ length: 7 }, (_, index) => {
   const photoNumber = index + 1;
   return {
-    _id: `nss-fallback-${photoNumber}`,
+    _id: `guide-bulbul-fallback-${photoNumber}`,
     title: `Guide & Bulbul Activity Photo ${photoNumber}`,
-    src: `/uploads/gallery/nss-img-${photoNumber}.jpg`,
+    src: `/uploads/gallery/guide-bulbul-img-${photoNumber}.jpg`,
     alt: `Guide & Bulbul activity photo ${photoNumber}`,
-    type: "nss-photo",
+    type: "guide-bulbul-photo",
   };
 });
 
-const fallbackFeaturedImage = "/uploads/gallery/nss-img-5.jpg";
+const fallbackFeaturedImage = "/uploads/gallery/guide-bulbul-img-5.jpg";
 
-export default function NSSPage() {
+export default function GuideBulbulPage() {
   const [galleryItems, setGalleryItems] = useState<MediaItem[]>([]);
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,7 +39,7 @@ export default function NSSPage() {
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
-        const res = await fetch("/api/admin/media-items?type=nss-photo");
+        const res = await fetch("/api/admin/media-items?type=guide-bulbul-photo");
         if (res.ok) {
           const data = await res.json();
           setGalleryItems(Array.isArray(data) && data.length > 0 ? data : fallbackGalleryItems);
@@ -54,7 +54,7 @@ export default function NSSPage() {
 
     const fetchFeatured = async () => {
       try {
-        const res = await fetch("/api/admin/media-items?type=nss-featured");
+        const res = await fetch("/api/admin/media-items?type=guide-bulbul-featured");
         if (res.ok) {
           const data = await res.json();
           if (data && data.length > 0) {
@@ -120,7 +120,7 @@ export default function NSSPage() {
             <span>/</span>
             <span>Academics</span>
             <span>/</span>
-            <span className="text-white/80">NSS</span>
+            <span className="text-white/80">guide-bulbul</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-black font-montserrat uppercase tracking-tight text-white">
             National Service Scheme <span className="text-[#F7B801]">(Guide & Bulbul  Mission)</span>
@@ -143,16 +143,16 @@ export default function NSSPage() {
           </div>
 
           <p className="text-gray-600 font-medium text-sm md:text-base leading-relaxed">
-          The Guide & Bulbul  programme at Leela Devi Parasmal Sancheti English Medium School, Vidyawadi nurtures discipline, leadership, teamwork, confidence and a spirit of service among students. Through camps, activities, skill development and community-oriented experiences, students learn important life skills beyond the classroom and grow into responsible, compassionate and confident individuals.
+            The Guide & Bulbul  programme at Leela Devi Parasmal Sancheti English Medium School, Vidyawadi nurtures discipline, leadership, teamwork, confidence and a spirit of service among students. Through camps, activities, skill development and community-oriented experiences, students learn important life skills beyond the classroom and grow into responsible, compassionate and confident individuals.
 
-           </p>
+          </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
               { icon: BookOpen, text: "Learn" },
               { icon: Users, text: "Lead" },
 
-{ icon: Heart, text: "Serve" },
+              { icon: Heart, text: "Serve" },
               { icon: ShieldCheck, text: "Grow" }
             ].map((feature, fIdx) => (
               <div key={fIdx} className="flex items-center gap-3">
@@ -219,7 +219,7 @@ export default function NSSPage() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: (idx % 3) * 0.1 }}
                   onClick={() => setActivePhoto(idx)}
-                  className="break-inside-avoid mb-8 bg-white rounded-2xl border border-slate-100 shadow-ncc-Guide & Bulbul overflow-hidden p-4 flex flex-col cursor-pointer transition-all duration-300 hover:shadow-ncc-nss-hover hover:-translate-y-1.5 group w-full"
+                  className="break-inside-avoid mb-8 bg-white rounded-2xl border border-slate-100 shadow-ncc-Guide & Bulbul overflow-hidden p-4 flex flex-col cursor-pointer transition-all duration-300 hover:shadow-ncc-guide-bulbul-hover hover:-translate-y-1.5 group w-full"
                 >
                   <div className="relative rounded-xl overflow-hidden bg-slate-50 border border-slate-100">
                     <img

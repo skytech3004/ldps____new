@@ -17,11 +17,11 @@ export default function AdminMediaGallery() {
   const [photoItems, setPhotoItems] = useState<MediaItem[]>([]);
   const [eventItems, setEventItems] = useState<MediaItem[]>([]);
   const [videoItems, setVideoItems] = useState<MediaItem[]>([]);
-  const [nssItems, setNssItems] = useState<MediaItem[]>([]);
+  const [guideBulbulItems, setGuideBulbulItems] = useState<MediaItem[]>([]);
   const [nccItems, setNccItems] = useState<MediaItem[]>([]);
   const [nccFeatured, setNccFeatured] = useState<MediaItem | null>(null);
-  const [nssFeatured, setNssFeatured] = useState<MediaItem | null>(null);
-  const [activeTab, setActiveTab] = useState<"photo" | "event-photo" | "video" | "nss-photo" | "ncc-photo">("photo");
+  const [guideBulbulFeatured, setGuideBulbulFeatured] = useState<MediaItem | null>(null);
+  const [activeTab, setActiveTab] = useState<"photo" | "event-photo" | "video" | "guide-bulbul-photo" | "ncc-photo">("photo");
   const [adminFilter, setAdminFilter] = useState<string>("All");
   const [activePreview, setActivePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,7 +49,7 @@ export default function AdminMediaGallery() {
   let rawItems = photoItems;
   if (activeTab === "event-photo") rawItems = eventItems;
   else if (activeTab === "video") rawItems = videoItems;
-  else if (activeTab === "nss-photo") rawItems = nssItems;
+  else if (activeTab === "guide-bulbul-photo") rawItems = guideBulbulItems;
   else if (activeTab === "ncc-photo") rawItems = nccItems;
 
   const currentItems = adminFilter === "All"
@@ -111,19 +111,19 @@ export default function AdminMediaGallery() {
           photosRes,
           eventsRes,
           videosRes,
-          nssRes,
+          guideBulbulRes,
           nccRes,
           nccFeaturedRes,
-          nssFeaturedRes,
+          guideBulbulFeaturedRes,
           filtersRes,
         ] = await Promise.all([
           fetch("/api/admin/media-items?type=photo"),
           fetch("/api/admin/media-items?type=event-photo"),
           fetch("/api/admin/media-items?type=video"),
-          fetch("/api/admin/media-items?type=nss-photo"),
+          fetch("/api/admin/media-items?type=guide-bulbul-photo"),
           fetch("/api/admin/media-items?type=ncc-photo"),
           fetch("/api/admin/media-items?type=ncc-featured"),
-          fetch("/api/admin/media-items?type=nss-featured"),
+          fetch("/api/admin/media-items?type=guide-bulbul-featured"),
           fetch("/api/admin/filters?type=gallery"),
         ]);
 
@@ -144,9 +144,9 @@ export default function AdminMediaGallery() {
           setVideoItems(videos);
         }
 
-        if (nssRes.ok) {
-          const nss = await nssRes.json();
-          setNssItems(nss);
+        if (guideBulbulRes.ok) {
+          const guideBulbul = await guideBulbulRes.json();
+          setGuideBulbulItems(guideBulbul);
         }
 
         if (nccRes.ok) {
@@ -159,9 +159,9 @@ export default function AdminMediaGallery() {
           setNccFeatured(items && items.length > 0 ? items[0] : null);
         }
 
-        if (nssFeaturedRes.ok) {
-          const items = await nssFeaturedRes.json();
-          setNssFeatured(items && items.length > 0 ? items[0] : null);
+        if (guideBulbulFeaturedRes.ok) {
+          const items = await guideBulbulFeaturedRes.json();
+          setGuideBulbulFeatured(items && items.length > 0 ? items[0] : null);
         }
 
         if (filtersRes.ok) {
@@ -258,7 +258,7 @@ export default function AdminMediaGallery() {
 
       if (!res.ok) throw new Error("Upload failed");
       const data = await res.json();
-      
+
       setFormData((prev) => ({ ...prev, src: data.upload.src }));
       setUploading(false);
     } catch (error) {
@@ -277,8 +277,8 @@ export default function AdminMediaGallery() {
       const dataToUpload = new FormData();
       dataToUpload.append("file", file);
       dataToUpload.append("section", "media-items");
-      dataToUpload.append("page", isNcc ? "ncc" : "nss");
-      dataToUpload.append("title", `${isNcc ? "NCC" : "NSS"} Featured Banner`);
+      dataToUpload.append("page", isNcc ? "ncc" : "guide-bulbul");
+      dataToUpload.append("title", `${isNcc ? "NCC" : "guide-bulbul"} Featured Banner`);
 
       const res = await fetch("/api/admin/upload", {
         method: "POST",
@@ -287,16 +287,16 @@ export default function AdminMediaGallery() {
 
       if (!res.ok) throw new Error("Upload failed");
       const data = await res.json();
-      
+
       const payload = {
-        title: `${isNcc ? "NCC" : "NSS"} Featured Banner`,
+        title: `${isNcc ? "NCC" : "guide-bulbul"} Featured Banner`,
         src: data.upload.src,
-        alt: `${isNcc ? "NCC" : "NSS"} Featured Banner Image`,
-        type: isNcc ? "ncc-featured" : "nss-featured",
+        alt: `${isNcc ? "NCC" : "guide-bulbul"} Featured Banner Image`,
+        type: isNcc ? "ncc-featured" : "guide-bulbul-featured",
       };
 
-      const existingId = isNcc ? nccFeatured?._id : nssFeatured?._id;
-      
+      const existingId = isNcc ? nccFeatured?._id : guideBulbulFeatured?._id;
+
       const saveRes = await fetch("/api/admin/media-items", {
         method: existingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
@@ -309,7 +309,7 @@ export default function AdminMediaGallery() {
       if (isNcc) {
         setNccFeatured(savedItem);
       } else {
-        setNssFeatured(savedItem);
+        setGuideBulbulFeatured(savedItem);
       }
       alert("Featured image updated successfully!");
     } catch (error) {
@@ -321,7 +321,7 @@ export default function AdminMediaGallery() {
   };
 
   const handleDeleteFeatured = async (isNcc: boolean) => {
-    const item = isNcc ? nccFeatured : nssFeatured;
+    const item = isNcc ? nccFeatured : guideBulbulFeatured;
     if (!item?._id) return;
     const confirmed = window.confirm("Are you sure you want to reset the featured image to its default banner?");
     if (!confirmed) return;
@@ -331,11 +331,11 @@ export default function AdminMediaGallery() {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Delete failed");
-      
+
       if (isNcc) {
         setNccFeatured(null);
       } else {
-        setNssFeatured(null);
+        setGuideBulbulFeatured(null);
       }
       alert("Featured image reset to default.");
     } catch (error) {
@@ -377,8 +377,8 @@ export default function AdminMediaGallery() {
         setEventItems([...eventItems, savedItem]);
       } else if (itemType === "video") {
         setVideoItems([...videoItems, savedItem]);
-      } else if (itemType === "nss-photo") {
-        setNssItems([...nssItems, savedItem]);
+      } else if (itemType === "guide-bulbul-photo") {
+        setGuideBulbulItems([...guideBulbulItems, savedItem]);
       } else if (itemType === "ncc-photo") {
         setNccItems([...nccItems, savedItem]);
       }
@@ -412,8 +412,8 @@ export default function AdminMediaGallery() {
         setEventItems(eventItems.filter((item) => item._id !== id));
       } else if (activeTab === "video") {
         setVideoItems(videoItems.filter((item) => item._id !== id));
-      } else if (activeTab === "nss-photo") {
-        setNssItems(nssItems.filter((item) => item._id !== id));
+      } else if (activeTab === "guide-bulbul-photo") {
+        setGuideBulbulItems(guideBulbulItems.filter((item) => item._id !== id));
       } else if (activeTab === "ncc-photo") {
         setNccItems(nccItems.filter((item) => item._id !== id));
       }
@@ -435,55 +435,50 @@ export default function AdminMediaGallery() {
       <div className="flex gap-4 mb-8 border-b border-slate-200 flex-wrap">
         <button
           onClick={() => handleTabChange("photo")}
-          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${
-            activeTab === "photo"
+          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${activeTab === "photo"
               ? "text-white border-b-2 border-accent font-bold"
               : "text-white/60 hover:text-white"
-          }`}
+            }`}
         >
           <ImageIcon size={20} />
           Photos ({photoItems.length})
         </button>
         <button
           onClick={() => handleTabChange("event-photo")}
-          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${
-            activeTab === "event-photo"
+          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${activeTab === "event-photo"
               ? "text-white border-b-2 border-accent font-bold"
               : "text-white/60 hover:text-white"
-          }`}
+            }`}
         >
           <ImageIcon size={20} />
           Event Photos ({eventItems.length})
         </button>
         <button
           onClick={() => handleTabChange("video")}
-          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${
-            activeTab === "video"
+          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${activeTab === "video"
               ? "text-white border-b-2 border-accent font-bold"
               : "text-white/60 hover:text-white"
-          }`}
+            }`}
         >
           <Film size={20} />
           Videos ({videoItems.length})
         </button>
         <button
-          onClick={() => handleTabChange("nss-photo")}
-          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${
-            activeTab === "nss-photo"
+          onClick={() => handleTabChange("guide-bulbul-photo")}
+          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${activeTab === "guide-bulbul-photo"
               ? "text-white border-b-2 border-accent font-bold"
               : "text-white/60 hover:text-white"
-          }`}
+            }`}
         >
           <ImageIcon size={20} />
-          Guide & Bulbul Photos ({nssItems.length})
+          Guide & Bulbul Photos ({guideBulbulItems.length})
         </button>
         <button
           onClick={() => handleTabChange("ncc-photo")}
-          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${
-            activeTab === "ncc-photo"
+          className={`px-6 py-3 font-semibold transition-all flex items-center gap-2 cursor-pointer ${activeTab === "ncc-photo"
               ? "text-white border-b-2 border-accent font-bold"
               : "text-white/60 hover:text-white"
-          }`}
+            }`}
         >
           <ImageIcon size={20} />
           NCC Photos ({nccItems.length})
@@ -494,26 +489,26 @@ export default function AdminMediaGallery() {
       <div className="mb-8 flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white bg-[#3D348B] border border-white/10 px-4 py-2 rounded-lg inline-block">
-            {activeTab === "photo" 
-              ? "Manage General Photos" 
+            {activeTab === "photo"
+              ? "Manage General Photos"
               : activeTab === "event-photo"
-              ? "Manage Event Photos"
-              : activeTab === "video"
-              ? "Manage General Videos"
-              : activeTab === "nss-photo"
-              ? "Manage Guide & Bulbul Photos"
-              : "Manage NCC Photos"}
+                ? "Manage Event Photos"
+                : activeTab === "video"
+                  ? "Manage General Videos"
+                  : activeTab === "guide-bulbul-photo"
+                    ? "Manage Guide & Bulbul Photos"
+                    : "Manage NCC Photos"}
           </h2>
           <p className="text-white/60 text-xs mt-2">
-            {activeTab === "photo" 
-              ? "Upload and manage photos for the general school image gallery." 
+            {activeTab === "photo"
+              ? "Upload and manage photos for the general school image gallery."
               : activeTab === "event-photo"
-              ? "Upload and manage photos for the event gallery feed."
-              : activeTab === "video"
-              ? "Upload and manage videos for the general school video gallery."
-              : activeTab === "nss-photo"
-              ? "Upload and manage photos for the Guide & Bulbul academic gallery."
-              : "Upload and manage photos for the NCC academic gallery."}
+                ? "Upload and manage photos for the event gallery feed."
+                : activeTab === "video"
+                  ? "Upload and manage videos for the general school video gallery."
+                  : activeTab === "guide-bulbul-photo"
+                    ? "Upload and manage photos for the Guide & Bulbul academic gallery."
+                    : "Upload and manage photos for the NCC academic gallery."}
           </p>
         </div>
         <button
@@ -527,17 +522,17 @@ export default function AdminMediaGallery() {
       </div>
 
       {/* Featured Banner Image Manager for Guide & Bulbul / NCC */}
-      {(activeTab === "nss-photo" || activeTab === "ncc-photo") && !loading && (
+      {(activeTab === "guide-bulbul-photo" || activeTab === "ncc-photo") && !loading && (
         <div className="bg-[#111c38]/40 border border-white/5 p-6 rounded-2xl mb-8 flex flex-col md:flex-row gap-6 items-center text-left">
           <div className="flex-1 space-y-2">
             <span className="px-2 py-0.5 bg-[#F7B801]/10 border border-[#F7B801]/25 text-[#F7B801] rounded text-[8px] font-mono font-bold uppercase tracking-wider">
               Featured Banner Section
             </span>
             <h3 className="text-lg font-black uppercase text-white font-montserrat tracking-tight">
-              {activeTab === "ncc-photo" ? "NCC" : "NSS"} Main Page Banner Photo
+              {activeTab === "ncc-photo" ? "NCC" : "guide-bulbul"} Main Page Banner Photo
             </h3>
             <p className="text-xs text-white/50 leading-relaxed font-semibold max-w-xl">
-              This photo is displayed in the main introduction banner on the public {activeTab === "ncc-photo" ? "NCC" : "NSS"} page. Upload a horizontal high-resolution image to customize it.
+              This photo is displayed in the main introduction banner on the public {activeTab === "ncc-photo" ? "NCC" : "guide-bulbul"} page. Upload a horizontal high-resolution image to customize it.
             </p>
           </div>
           <div className="w-full md:w-auto flex flex-col sm:flex-row gap-4 items-center shrink-0">
@@ -547,7 +542,7 @@ export default function AdminMediaGallery() {
                 src={
                   activeTab === "ncc-photo"
                     ? nccFeatured?.src || "/uploads/gallery/ncc-img-2.jpg"
-                    : nssFeatured?.src || "/uploads/gallery/nss-img-5.jpg"
+                    : guideBulbulFeatured?.src || "/uploads/gallery/guide-bulbul-img-5.jpg"
                 }
                 alt="Featured Banner Preview"
                 className="w-full h-full object-cover"
@@ -555,7 +550,7 @@ export default function AdminMediaGallery() {
               <span className="absolute bottom-1 right-1 bg-black/65 px-1.5 py-0.5 rounded text-[8px] font-mono text-white/70">
                 {activeTab === "ncc-photo"
                   ? nccFeatured ? "Custom" : "Default"
-                  : nssFeatured ? "Custom" : "Default"}
+                  : guideBulbulFeatured ? "Custom" : "Default"}
               </span>
             </div>
 
@@ -571,7 +566,7 @@ export default function AdminMediaGallery() {
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                 />
               </div>
-              {(activeTab === "ncc-photo" ? nccFeatured : nssFeatured) && (
+              {(activeTab === "ncc-photo" ? nccFeatured : guideBulbulFeatured) && (
                 <button
                   onClick={() => handleDeleteFeatured(activeTab === "ncc-photo")}
                   disabled={uploading}
@@ -602,11 +597,10 @@ export default function AdminMediaGallery() {
               <button
                 key={filter}
                 onClick={() => setAdminFilter(filter)}
-                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  adminFilter === filter
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${adminFilter === filter
                     ? "bg-[#F7B801] text-[#3D348B]"
                     : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
-                }`}
+                  }`}
               >
                 {filter}
               </button>
@@ -619,21 +613,19 @@ export default function AdminMediaGallery() {
               <div className="mb-4 flex gap-2">
                 <button
                   onClick={() => setInputMode("url")}
-                  className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                    inputMode === "url"
+                  className={`px-4 py-2 rounded-lg font-semibold transition-all ${inputMode === "url"
                       ? "bg-[#3D348B] text-white"
                       : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
-                  }`}
+                    }`}
                 >
                   URL
                 </button>
                 <button
                   onClick={() => setInputMode("upload")}
-                  className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
-                    inputMode === "upload"
+                  className={`px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${inputMode === "upload"
                       ? "bg-[#3D348B] text-white"
                       : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
-                  }`}
+                    }`}
                 >
                   <Upload size={16} />
                   Upload
@@ -672,7 +664,7 @@ export default function AdminMediaGallery() {
                     <Plus size={16} />
                   </button>
                 </div>
-                
+
                 <div className="md:col-span-4">
                   {inputMode === "url" ? (
                     <input

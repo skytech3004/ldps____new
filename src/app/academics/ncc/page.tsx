@@ -217,7 +217,7 @@ export default function NCCPage() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: (idx % 3) * 0.1 }}
                   onClick={() => setActivePhoto(idx)}
-                  className="break-inside-avoid mb-8 bg-white rounded-2xl border border-slate-100 shadow-ncc-Guide & Bulbul overflow-hidden p-4 flex flex-col cursor-pointer transition-all duration-300 hover:shadow-ncc-nss-hover hover:-translate-y-1.5 group w-full"
+                  className="break-inside-avoid mb-8 bg-white rounded-2xl border border-slate-100 shadow-ncc-Guide & Bulbul overflow-hidden p-4 flex flex-col cursor-pointer transition-all duration-300 hover:shadow-ncc-guide-bulbul-hover hover:-translate-y-1.5 group w-full"
                 >
                   <div className="relative rounded-xl overflow-hidden bg-slate-50 border border-slate-100">
                     <img

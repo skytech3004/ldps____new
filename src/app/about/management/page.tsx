@@ -34,12 +34,12 @@ export default function AboutManagementPage() {
         if (response.ok) {
           const data = await response.json();
           setPageData({
-            pageTitle: data.pageTitle || aboutPageDefaults.management.pageTitle,
-            content: data.content || aboutPageDefaults.management.content,
+            pageTitle: data.pageTitle,
+            content: data.content,
             members:
               Array.isArray(data.members) && data.members.length > 0
                 ? data.members
-                : defaultManagementMembers,
+                : [],
           });
         }
       } catch (error) {

@@ -10,7 +10,7 @@ import Reveal from "@/components/ui/Reveal";
 export default function LifeAtVidyawadi() {
   const [moments, setMoments] = useState<any[]>([]);
   const [activeFilter, setActiveFilter] = useState("Overview");
-  const [filters, setFilters] = useState<string[]>(["Overview", "Events", "Sports", "NCC", "NSS", "Hostel", "Infrastructure", "Laboratories"]);
+  const [filters, setFilters] = useState<string[]>(["Overview", "Events", "Sports", "NCC", "guide-bulbul", "Hostel", "Infrastructure", "Laboratories"]);
 
   const defaultMoments = [
     { src: "/lps-vidhyawadi/gallery-01.jpg", title: "Residential Comforts", category: "Hostel" },
@@ -28,7 +28,7 @@ export default function LifeAtVidyawadi() {
     // Custom fallbacks for new categories
     { src: "/uploads/gallery/sports-img-1.jpg", title: "Athletics Practice", category: "Sports" },
     { src: "/uploads/gallery/ncc-img-1.jpg", title: "Cadet Parade Guard", category: "NCC" },
-    { src: "/uploads/gallery/nss-img-1.jpg", title: "Community Service Drive", category: "NSS" }
+    { src: "/uploads/gallery/guide-bulbul-img-1.jpg", title: "Community Service Drive", category: "guide-bulbul" }
   ];
 
   React.useEffect(() => {
@@ -41,7 +41,7 @@ export default function LifeAtVidyawadi() {
             let category = item.category || "Events";
             if (item.type === "sports-photo") category = "Sports";
             else if (item.type === "ncc-photo") category = "NCC";
-            else if (item.type === "nss-photo") category = "NSS";
+            else if (item.type === "guide-bulbul-photo") category = "guide-bulbul";
             else if (item.type === "hostel-photo") category = "Hostel";
             return {
               ...item,
@@ -57,7 +57,7 @@ export default function LifeAtVidyawadi() {
           ];
           const uniqueCats = Array.from(new Set(allCategories));
 
-          const preferredOrder = ["Overview", "Events", "Sports", "NCC", "NSS", "Hostel"];
+          const preferredOrder = ["Overview", "Events", "Sports", "NCC", "guide-bulbul", "Hostel"];
           const orderedFilters = ["Overview"];
 
           preferredOrder.slice(1).forEach(cat => {
@@ -104,7 +104,7 @@ export default function LifeAtVidyawadi() {
   const getCategoryLink = (category: string) => {
     if (category === "Sports") return "/sports";
     if (category === "NCC") return "/academics/ncc";
-    if (category === "NSS") return "/academics/nss";
+    if (category === "guide-bulbul") return "/academics/guide-bulbul";
     if (category === "Hostel") return "/hostel";
     return `/gallery?category=${category}`;
   };
@@ -133,8 +133,8 @@ export default function LifeAtVidyawadi() {
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
                 className={`px-5 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-300 ${activeFilter === filter
-                    ? "bg-[#3D348B] text-white shadow-filter-shadow"
-                    : "bg-white text-[#3D348B] border border-slate-100 hover:bg-[#F1F2F6]"
+                  ? "bg-[#3D348B] text-white shadow-filter-shadow"
+                  : "bg-white text-[#3D348B] border border-slate-100 hover:bg-[#F1F2F6]"
                   }`}
               >
                 {filter}

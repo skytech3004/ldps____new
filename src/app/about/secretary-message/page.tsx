@@ -18,15 +18,15 @@ export default function SecretaryMessagePage() {
           const data = await response.json();
           setPageData({
             slug: "secretary-message",
-            pageTitle: data.pageTitle || defaults.pageTitle,
-            pageSubtitle: data.pageSubtitle || defaults.pageSubtitle,
-            bannerImage: data.bannerImage || defaults.bannerImage,
-            portraitImage: data.portraitImage || defaults.portraitImage,
-            personName: data.personName || defaults.personName,
-            personDesignation: data.personDesignation || defaults.personDesignation,
-            content: data.content || defaults.content,
-            inspirationContent: data.inspirationContent || defaults.inspirationContent,
-            members: Array.isArray(data.members) ? data.members : defaults.members,
+            pageTitle: data.pageTitle,
+            pageSubtitle: data.pageSubtitle,
+            bannerImage: data.bannerImage,
+            portraitImage: data.portraitImage,
+            personName: data.personName,
+            personDesignation: data.personDesignation,
+            content: data.content,
+            inspirationContent: data.inspirationContent,
+            members: Array.isArray(data.members) ? data.members : [],
           });
         }
       } catch (error) {
