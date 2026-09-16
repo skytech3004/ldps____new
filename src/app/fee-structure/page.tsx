@@ -18,6 +18,13 @@ type SchoolFeeResponse = {
   installment: string;
 };
 
+type AdmissionFeeResponse = {
+  _id?: string;
+  category: string;
+  feeAmount: string;
+  note?: string;
+};
+
 type BusFeeItem = {
   _id?: string;
   sNo: number;
@@ -45,7 +52,13 @@ export default function FeeStructure() {
     { class: "Class XI – XII (Arts)", annualFee: "₹43,600", installment: "₹21,800" }
   ];
 
+  const defaultAdmissionFees: AdmissionFeeResponse[] = [
+    { category: "Nursery to Class V", feeAmount: "₹2,000", note: "Charged only once at the time of new admission into the school." },
+    { category: "Class VI to XII", feeAmount: "₹4,000", note: "Charged only once at the time of new admission into the school." },
+  ];
+
   const [feeList, setFeeList] = useState<FeeListItem[]>(defaultFeeList);
+  const [admissionFees, setAdmissionFees] = useState<AdmissionFeeResponse[]>(defaultAdmissionFees);
   const [busFees, setBusFees] = useState<BusFeeItem[]>([]);
   const [busSearch, setBusSearch] = useState("");
   const [loadingBusFees, setLoadingBusFees] = useState(true);
@@ -67,6 +80,18 @@ export default function FeeStructure() {
       }
     }
 
+    async function loadAdmissionFees() {
+      try {
+        const response = await fetch("/api/admission-fees", { cache: "no-store" });
+        const data = (await response.json()) as AdmissionFeeResponse[];
+        if (response.ok && Array.isArray(data) && data.length > 0) {
+          setAdmissionFees(data);
+        }
+      } catch (error) {
+        console.error("Failed to load admission fees:", error);
+      }
+    }
+
     async function loadBusFees() {
       try {
         setLoadingBusFees(true);
@@ -83,6 +108,7 @@ export default function FeeStructure() {
     }
 
     loadFeeList();
+    loadAdmissionFees();
     loadBusFees();
   }, []);
 
@@ -184,23 +210,21 @@ export default function FeeStructure() {
             </div>
             
             {/* One-time Admission Fee Note Card */}
-            <div className="mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-              <div className="space-y-1">
+            <div className="mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10 rounded-xl sm:rounded-2xl p-4 sm:p-6 items-center">
+              <div className="md:col-span-5 space-y-1">
                 <span className="text-accent font-black uppercase tracking-wider text-[10px] block">New Admissions Only</span>
                 <h4 className="text-xs sm:text-sm font-black text-primary uppercase">Admission Fee (One-Time)</h4>
                 <p className="text-xs text-gray-500">
-                  Charged only once at the time of new admission into the school.
+                  {admissionFees[0]?.note || "Charged only once at the time of new admission into the school."}
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 divide-x divide-gray-200/60 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100">
-                <div className="pl-0 md:pl-4 space-y-0.5">
-                  <span className="text-[10px] text-gray-400 font-bold uppercase">Nursery to Class V</span>
-                  <p className="text-base sm:text-lg font-black text-primary">₹2,000</p>
-                </div>
-                <div className="pl-3 sm:pl-4 space-y-0.5">
-                  <span className="text-[10px] text-gray-400 font-bold uppercase">Class VI to XII</span>
-                  <p className="text-base sm:text-lg font-black text-primary">₹4,000</p>
-                </div>
+              <div className="md:col-span-7 flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-6 border-t md:border-t-0 border-gray-100 pt-3 md:pt-0">
+                {admissionFees.map((fee, idx) => (
+                  <div key={fee._id || idx} className={`${idx > 0 ? "sm:border-l border-gray-200/60 sm:pl-4" : ""} flex-1 min-w-[120px] space-y-0.5`}>
+                    <span className="text-[10px] text-gray-400 font-bold uppercase block">{fee.category}</span>
+                    <p className="text-base sm:text-lg font-black text-primary">{fee.feeAmount}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
