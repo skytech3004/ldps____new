@@ -8,6 +8,7 @@ const BlogSchema = new Schema(
     content: { type: String, required: true, trim: true },
     image: { type: String, required: true, trim: true },
     author: { type: String, default: "Admin", trim: true },
+    authorImage: { type: String, default: "", trim: true },
     tags: { type: [String], default: [] },
     publishedAt: { type: Date, default: Date.now },
     status: { type: String, enum: ["Draft", "Published"], default: "Published" },

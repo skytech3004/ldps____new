@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { 
-  Plus, Pencil, Trash2, X, Save, Image, 
-  Upload, ArrowUpRight, BookOpen, Calendar, User, Eye 
+  Plus, Pencil, Trash2, X, Save, Image as ImageIcon, 
+  Upload, ArrowUpRight, BookOpen, Calendar, User, Eye, Users 
 } from "lucide-react";
 import TipTapEditor from "@/components/TipTapEditor";
 
@@ -16,13 +16,22 @@ type BlogPost = {
   content: string;
   image: string;
   author: string;
+  authorImage?: string;
   tags: string[];
   status: "Draft" | "Published";
   publishedAt: string;
 };
 
+type Writer = {
+  _id: string;
+  name: string;
+  image: string;
+  designation: string;
+};
+
 export default function AdminBlogPage() {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
+  const [writers, setWriters] = useState<Writer[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -37,10 +46,12 @@ export default function AdminBlogPage() {
   const [formContent, setFormContent] = useState("");
   const [formImage, setFormImage] = useState("");
   const [formAuthor, setFormAuthor] = useState("Admin");
+  const [formAuthorImage, setFormAuthorImage] = useState("");
   const [formTagsText, setFormTagsText] = useState("");
   const [formStatus, setFormStatus] = useState<"Draft" | "Published">("Published");
   const [formPublishedAt, setFormPublishedAt] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [authorUploading, setAuthorUploading] = useState(false);
   const [suggestedTags, setSuggestedTags] = useState<string[]>(["Academic", "Events", "Hostel"]);
 
   async function fetchBlogs() {
@@ -56,6 +67,18 @@ export default function AdminBlogPage() {
       setError(msg);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchWriters() {
+    try {
+      const res = await fetch("/api/admin/writers");
+      if (res.ok) {
+        const data = await res.json();
+        setWriters(data || []);
+      }
+    } catch (e) {
+      console.error("Failed to load writers:", e);
     }
   }
 
@@ -88,7 +111,6 @@ export default function AdminBlogPage() {
         if (!suggestedTags.includes(data.name)) {
           setSuggestedTags([...suggestedTags, data.name]);
         }
-        // Append tag to tags input text
         const tags = formTagsText.split(",").map((t) => t.trim()).filter(Boolean);
         if (!tags.includes(data.name)) {
           setFormTagsText([...tags, data.name].join(", "));
@@ -106,6 +128,7 @@ export default function AdminBlogPage() {
   useEffect(() => {
     fetchBlogs();
     fetchFilters();
+    fetchWriters();
   }, []);
 
   function generateSlug(title: string) {
@@ -123,7 +146,7 @@ export default function AdminBlogPage() {
     }
   }, [formTitle, manualSlug, editingId]);
 
-  // Handle featured image upload
+  // Handle featured cover upload
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -149,6 +172,41 @@ export default function AdminBlogPage() {
     }
   }
 
+  // Handle author profile photo upload
+  async function handleAuthorImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setAuthorUploading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("page", "blog");
+      formData.append("section", "authors");
+      formData.append("title", `Author - ${formAuthor || "Profile"}`);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData
+      });
+      if (!res.ok) throw new Error("Upload failed.");
+      const json = await res.json();
+      setFormAuthorImage(json.upload.src);
+    } catch (err) {
+      alert("Failed to upload author profile picture. Please try again.");
+    } finally {
+      setAuthorUploading(false);
+    }
+  }
+
+  function handleSelectWriter(writerId: string) {
+    if (!writerId) return;
+    const selected = writers.find(w => w._id === writerId);
+    if (selected) {
+      setFormAuthor(selected.name);
+      setFormAuthorImage(selected.image || "");
+    }
+  }
+
   function openCreateModal() {
     setEditingId(null);
     setFormTitle("");
@@ -158,9 +216,10 @@ export default function AdminBlogPage() {
     setFormContent("");
     setFormImage("");
     setFormAuthor("Admin");
+    setFormAuthorImage("");
     setFormTagsText("");
     setFormStatus("Published");
-    setFormPublishedAt(new Date().toISOString().substring(0, 16)); // current datetime-local input string
+    setFormPublishedAt(new Date().toISOString().substring(0, 16));
 
     setModalOpen(true);
   }
@@ -174,6 +233,7 @@ export default function AdminBlogPage() {
     setFormContent(post.content);
     setFormImage(post.image);
     setFormAuthor(post.author);
+    setFormAuthorImage(post.authorImage || "");
     setFormTagsText(post.tags ? post.tags.join(", ") : "");
     setFormStatus(post.status);
     setFormPublishedAt(new Date(post.publishedAt).toISOString().substring(0, 16));
@@ -195,6 +255,7 @@ export default function AdminBlogPage() {
         content: formContent.trim(),
         image: formImage.trim(),
         author: formAuthor.trim() || "Admin",
+        authorImage: formAuthorImage.trim(),
         tags: formTagsText.split(",").map(t => t.trim()).filter(Boolean),
         status: formStatus,
         publishedAt: formPublishedAt ? new Date(formPublishedAt) : new Date(),
@@ -243,12 +304,16 @@ export default function AdminBlogPage() {
         <div>
           <p className="text-xs tracking-[0.4em] text-white/70 font-black uppercase">Administration</p>
           <h1 className="text-4xl font-black mt-2">Blog Manager</h1>
-          <p className="text-white/70 mt-2">Publish posts, draft contents, upload featured covers, and categorize tags.</p>
+          <p className="text-white/70 mt-2">Publish posts, draft contents, assign authors with profile photos, and categorize tags.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
+          <Link href="/admin/writers" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors text-white">
+            <Users size={14} className="text-[#F7B801]" />
+            Manage Writers
+          </Link>
           <Link href="/blog" target="_blank" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors text-white">
             <ArrowUpRight size={14} />
-            View Public Blog
+            Public Blog
           </Link>
           <button onClick={openCreateModal} className="inline-flex items-center gap-2 bg-[#F7B801] hover:bg-[#F18701] text-[#3D348B] px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-colors">
             <Plus size={16} />
@@ -269,7 +334,7 @@ export default function AdminBlogPage() {
         <div className="bg-[#0f234f]/80 border border-white/15 rounded-3xl p-16 text-center text-white/60">
           <BookOpen size={48} className="mx-auto mb-4 opacity-40 text-[#F7B801]" />
           <p className="font-bold text-lg">No blog posts found in database.</p>
-          <p className="text-sm text-white/50 mt-1">Click "Create Post" to write your very first blog article!</p>
+          <p className="text-sm text-white/50 mt-1">Click &quot;Create Post&quot; to write your very first blog article!</p>
         </div>
       ) : (
         <div className="bg-[#0f234f]/80 border border-white/15 rounded-3xl overflow-hidden">
@@ -279,7 +344,7 @@ export default function AdminBlogPage() {
                 <tr className="border-b border-white/15 text-white/60 text-xs font-black uppercase tracking-wider">
                   <th className="py-4 px-6">Cover</th>
                   <th className="py-4 px-6">Post Details</th>
-                  <th className="py-4 px-6">Author & Date</th>
+                  <th className="py-4 px-6">Author / Writer</th>
                   <th className="py-4 px-6">Status</th>
                   <th className="py-4 px-6 text-right">Actions</th>
                 </tr>
@@ -296,9 +361,24 @@ export default function AdminBlogPage() {
                       <h3 className="font-bold text-white leading-snug">{post.title}</h3>
                       <p className="text-xs text-white/60">/{post.slug}</p>
                     </td>
-                    <td className="py-4 px-6 text-xs text-white/70 space-y-1">
-                      <p className="font-semibold flex items-center gap-1"><User size={10} /> {post.author}</p>
-                      <p className="flex items-center gap-1"><Calendar size={10} /> {new Date(post.publishedAt).toLocaleDateString()}</p>
+                    <td className="py-4 px-6 text-xs text-white/70">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-800 border border-[#F7B801]/40 shrink-0">
+                          {post.authorImage ? (
+                            <img src={post.authorImage} alt={post.author} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full bg-[#3D348B] flex items-center justify-center text-white font-bold text-[10px]">
+                              {post.author ? post.author.charAt(0).toUpperCase() : "A"}
+                            </div>
+                          )}
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="font-semibold text-white">{post.author || "Admin"}</p>
+                          <p className="text-[10px] text-white/50 flex items-center gap-1">
+                            <Calendar size={10} /> {new Date(post.publishedAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
                     </td>
                     <td className="py-4 px-6">
                       <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
@@ -418,16 +498,78 @@ export default function AdminBlogPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div>
-                  <label className="text-[10px] font-black uppercase tracking-wider text-white/60 block mb-2">Author Name</label>
-                  <input 
-                    type="text" 
-                    value={formAuthor} 
-                    onChange={(e) => setFormAuthor(e.target.value)}
-                    className="w-full border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-bold bg-[#081a3a] focus:outline-none focus:border-[#F7B801]"
-                  />
+              {/* Author / Writer Section */}
+              <div className="p-5 border border-white/10 rounded-2xl bg-[#081a3a]/60 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black uppercase tracking-wider text-[#F7B801] flex items-center gap-2">
+                    <User size={14} /> Author / Writer Section
+                  </span>
+                  {writers.length > 0 && (
+                    <select
+                      onChange={(e) => handleSelectWriter(e.target.value)}
+                      defaultValue=""
+                      className="text-xs font-bold bg-[#112759] border border-white/15 rounded-lg px-3 py-1.5 text-white/80 focus:outline-none focus:border-[#F7B801]"
+                    >
+                      <option value="" disabled>-- Select from Saved Writers --</option>
+                      {writers.map((w) => (
+                        <option key={w._id} value={w._id}>
+                          {w.name} ({w.designation})
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-wider text-white/60 block mb-1">Writer Name *</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formAuthor} 
+                      onChange={(e) => setFormAuthor(e.target.value)}
+                      placeholder="e.g. Dr. Sunita Sharma"
+                      className="w-full border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white font-bold bg-[#040f26] focus:outline-none focus:border-[#F7B801]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-wider text-white/60 block mb-1">Writer Profile Photo</label>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-900 border border-white/20 shrink-0">
+                        {formAuthorImage ? (
+                          <img src={formAuthorImage} alt={formAuthor} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-[#3D348B] flex items-center justify-center text-white font-bold text-xs">
+                            {formAuthor ? formAuthor.charAt(0).toUpperCase() : "A"}
+                          </div>
+                        )}
+                      </div>
+                      <div className="relative flex-1">
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          onChange={handleAuthorImageUpload}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="border border-white/10 border-dashed rounded-xl px-3 py-2 text-xs text-white/60 font-bold flex items-center justify-center gap-1.5 bg-[#040f26]">
+                          <Upload size={12} className="text-[#F7B801]" />
+                          <span>{authorUploading ? "Uploading..." : "Upload Photo"}</span>
+                        </div>
+                      </div>
+                      <input 
+                        type="text"
+                        value={formAuthorImage}
+                        onChange={(e) => setFormAuthorImage(e.target.value)}
+                        placeholder="Image URL"
+                        className="flex-1 border border-white/10 rounded-xl px-3 py-2 text-xs text-white bg-[#040f26] focus:outline-none focus:border-[#F7B801]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="text-[10px] font-black uppercase tracking-wider text-white/60 block mb-2">Status</label>
                   <select 
@@ -512,7 +654,7 @@ export default function AdminBlogPage() {
                 </button>
                 <button 
                   type="submit" 
-                  disabled={saving || uploading} 
+                  disabled={saving || uploading || authorUploading} 
                   className="px-6 py-3 bg-[#F7B801] hover:bg-[#F18701] text-[#3D348B] rounded-xl font-black text-xs uppercase tracking-wider transition-colors disabled:opacity-70 inline-flex items-center gap-2"
                 >
                   <Save size={14} />

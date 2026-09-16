@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Calendar, User, ArrowLeft, Tag } from "lucide-react";
+import { Calendar, User, ArrowLeft, Tag, Feather } from "lucide-react";
 
 type BlogType = {
   _id: string;
@@ -15,6 +15,7 @@ type BlogType = {
   content: string;
   image: string;
   author: string;
+  authorImage?: string;
   tags: string[];
   status: "Draft" | "Published";
   publishedAt: string;
@@ -73,6 +74,9 @@ export default function BlogPostPage() {
     year: "numeric"
   });
 
+  const authorName = blog.author || "Vidyawadi Editorial Team";
+  const authorImg = blog.authorImage || "";
+
   return (
     <main className="min-h-screen bg-[#F8F9FC] text-gray-800 font-sans">
       <Navbar />
@@ -105,15 +109,29 @@ export default function BlogPostPage() {
           <h1 className="text-3xl md:text-5xl font-black text-[#3D348B] leading-tight uppercase font-montserrat tracking-tight">
             {blog.title}
           </h1>
-          <div className="flex items-center gap-6 text-xs md:text-sm font-bold text-gray-400 border-b border-gray-100 pb-6">
-            <span className="flex items-center gap-2">
+
+          {/* Author Header Info */}
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-6 pt-2">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-[#3D348B]/10 border-2 border-accent shrink-0 shadow-sm">
+                {authorImg ? (
+                  <img src={authorImg} alt={authorName} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-[#3D348B] flex items-center justify-center text-accent font-black text-base">
+                    {authorName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 font-extrabold uppercase tracking-wider">Written By</p>
+                <p className="text-base font-black text-[#3D348B] leading-tight">{authorName}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs md:text-sm font-bold text-gray-400 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
               <Calendar size={14} className="text-accent" />
-              {dateStr}
-            </span>
-            <span className="flex items-center gap-2">
-              <User size={14} className="text-accent" />
-              Published by {blog.author}
-            </span>
+              <span>{dateStr}</span>
+            </div>
           </div>
         </div>
 
@@ -139,6 +157,29 @@ export default function BlogPostPage() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Writer Profile Footer Card */}
+        <div className="mt-12 bg-white border border-slate-100 rounded-[2rem] p-6 md:p-8 shadow-md flex flex-col md:flex-row items-center md:items-start gap-6">
+          <div className="w-20 h-20 rounded-2xl overflow-hidden bg-slate-100 border-2 border-[#F7B801] shrink-0 shadow-sm">
+            {authorImg ? (
+              <img src={authorImg} alt={authorName} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-[#3D348B] flex items-center justify-center text-white font-black text-2xl">
+                {authorName.charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+          <div className="space-y-2 text-center md:text-left flex-grow">
+            <div className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-[#3D348B] bg-[#7678ED]/10 px-3 py-1 rounded-full">
+              <Feather size={12} className="text-accent" />
+              <span>Article Author</span>
+            </div>
+            <h3 className="text-xl font-black text-[#3D348B] uppercase font-montserrat">{authorName}</h3>
+            <p className="text-xs text-gray-500 font-medium leading-relaxed">
+              Educator and contributor to the Vidyawadi Journal, sharing insights on academics, student growth, and institutional excellence.
+            </p>
+          </div>
         </div>
       </article>
       

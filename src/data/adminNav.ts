@@ -167,6 +167,13 @@ export const adminNavGroups: NavGroup[] = [
         roles: ["super_admin", "admin"],
       },
       {
+        href: "/admin/about-trust",
+        label: "Trust Team Cards",
+        icon: Shield,
+        description: "Manage trust people cards, profile images, titles, and names shown on /about/trust.",
+        roles: ["super_admin", "admin"],
+      },
+      {
         href: "/admin/managing-committee",
         label: "Managing Committee",
         icon: Users,
@@ -220,6 +227,13 @@ export const adminNavGroups: NavGroup[] = [
         label: "Blog Posts",
         icon: BookOpen,
         description: "Publish school news, articles, achievements, and educational blogs.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/writers",
+        label: "Blog Writers",
+        icon: Users,
+        description: "Manage blog writers, profile photos, author bios, and designations.",
         roles: ["super_admin", "admin"],
       },
       {

@@ -17,6 +17,7 @@ type BlogPost = {
   content: string;
   image: string;
   author: string;
+  authorImage?: string;
   tags: string[];
   status: "Draft" | "Published";
   publishedAt: string;
@@ -349,9 +350,20 @@ export default function BlogIndexPage() {
                                 </div>
 
                                 <div className="pt-4 border-t border-slate-50 flex items-center justify-between mt-auto">
-                                  <div className="text-left text-[10px] text-gray-400 font-bold space-y-0.5">
-                                    <p className="flex items-center gap-1.5"><User size={10} /> {post.author}</p>
-                                    <p className="flex items-center gap-1.5"><Calendar size={10} /> {new Date(post.publishedAt).toLocaleDateString()}</p>
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-6 h-6 rounded-full overflow-hidden bg-[#3D348B]/10 border border-accent shrink-0">
+                                      {post.authorImage ? (
+                                        <img src={post.authorImage} alt={post.author} className="w-full h-full object-cover" />
+                                      ) : (
+                                        <div className="w-full h-full bg-[#3D348B] flex items-center justify-center text-white font-bold text-[9px]">
+                                          {post.author ? post.author.charAt(0).toUpperCase() : "A"}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="text-left text-[10px] text-gray-400 font-bold space-y-0.5">
+                                      <p className="font-bold text-[#3D348B] leading-none">{post.author}</p>
+                                      <p className="flex items-center gap-1 text-[9px] text-gray-400"><Calendar size={9} /> {new Date(post.publishedAt).toLocaleDateString()}</p>
+                                    </div>
                                   </div>
 
                                   <Link 
