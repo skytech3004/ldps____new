@@ -81,7 +81,10 @@ const aboutTrustContent = `
 `.trim();
 
 const inspirationContent = `
-<p>Smt. Subhadraji Jain was one amongst the founders of Vidyawadi. A strong and dedicated lady who worked for the betterment of the institution all through her life. She was awarded with many awards at district, state and national level several times. She worked as a Teacher, as a Principal and as an Administrator with a sole objective of growth of Vidyawadi.</p>
+<p>Smt. Subhadraji Jain was the first Vyasthapika &amp; teacher of Vidyawadi and a remarkable pillar in the institution’s growth journey. With unwavering dedication, commitment, and selfless service, she devoted her entire life to the development and progress of Vidyawadi.</p>
+<p>Beginning her journey as a teacher, she went on to serve the institution as a Principal and Administrator, carrying every responsibility with sincerity and determination. Her vision, leadership, and tireless efforts played an important role in nurturing Vidyawadi and strengthening its educational foundation.</p>
+<p>Her lifelong association with Vidyawadi reflects a deep commitment to education, investiture, and the empowerment of girls. In recognition of her distinguished contribution and dedicated service, she was honoured with numerous awards and accolades at the district, state, and national levels.</p>
+<p>Her life and legacy continue to inspire generations and remain an integral part of the Vidyawadi journey.</p>
 `.trim();
 
 const principalsMessage = `
