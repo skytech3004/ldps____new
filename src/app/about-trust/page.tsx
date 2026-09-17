@@ -112,7 +112,7 @@ export default function AboutTrustPage() {
             <span>Trust Leadership &amp; Team</span>
           </div>
           <h2 className="text-3xl md:text-4xl font-black text-primary uppercase font-montserrat tracking-tight">
-            Our Founder Pillers
+            Our Founder Pillars
           </h2>
           <p className="text-sm md:text-base text-gray-500 font-medium">
             Dedicated patrons and office bearers guiding Marudhar Mahila Shikshan Sangh with commitment &amp; wisdom.
