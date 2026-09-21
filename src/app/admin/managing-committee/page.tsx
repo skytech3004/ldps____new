@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { 
-  Plus, Pencil, Trash2, X, MoveUp, MoveDown, Save, 
+import {
+  Plus, Pencil, Trash2, X, MoveUp, MoveDown, Save,
   Search, Users, RefreshCw, AlertCircle, CheckCircle2,
   Upload, Image as ImageIcon, User, Loader2
 } from "lucide-react";
@@ -25,7 +25,7 @@ export default function AdminManagingCommitteePage() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  
+
   // Modal states
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
@@ -160,7 +160,7 @@ export default function AdminManagingCommitteePage() {
 
     const swapWithIndex = direction === "up" ? index - 1 : index + 1;
     const newTeachers = [...teachers];
-    
+
     const temp = newTeachers[index];
     newTeachers[index] = newTeachers[swapWithIndex];
     newTeachers[swapWithIndex] = temp;
@@ -252,22 +252,22 @@ export default function AdminManagingCommitteePage() {
             <span className="text-[10px] font-mono text-gray-500">Live MongoDB Roster</span>
           </div>
           <h1 className="text-2xl font-black tracking-tight text-white uppercase font-montserrat">
-            Managing Committee Roster
+            Staff
           </h1>
           <p className="text-xs text-[#94A3B8] font-semibold">
             Add staff members and upload profile photos directly to MongoDB database.
           </p>
         </div>
-        
+
         <div className="flex items-center gap-3 shrink-0 relative z-10">
-          <button 
+          <button
             onClick={fetchTeachers}
             className="p-2.5 bg-[#1F2937]/50 hover:bg-[#1F2937] border border-[#374151]/50 rounded-xl transition-all text-[#94A3B8] hover:text-white"
             title="Reload from database"
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
           </button>
-          <button 
+          <button
             onClick={openAddModal}
             className="inline-flex items-center gap-2 bg-[#F7B801] hover:bg-[#E5AA00] text-[#0A0E17] px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all"
           >
@@ -421,14 +421,14 @@ export default function AdminManagingCommitteePage() {
               <h3 className="font-montserrat uppercase font-black text-sm tracking-wide text-white">
                 {editingTeacher ? "Edit Roster Entry" : "Add Roster Entry"}
               </h3>
-              <button 
+              <button
                 onClick={() => setModalOpen(false)}
                 className="text-gray-400 hover:text-white transition-all cursor-pointer"
               >
                 <X size={16} />
               </button>
             </div>
-            
+
             <form onSubmit={handleSaveModal} className="p-6 space-y-4 text-left">
               {error && (
                 <div className="bg-red-500/10 border border-red-500/30 text-red-300 p-3 rounded-lg flex gap-2 items-center text-xs">
@@ -466,7 +466,7 @@ export default function AdminManagingCommitteePage() {
                 <label className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider block">
                   Staff Photo
                 </label>
-                
+
                 <div className="flex gap-4 items-center bg-[#111827]/40 border border-[#1F2937] p-3.5 rounded-xl">
                   <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#0A0E17] border border-[#374151]/50 flex items-center justify-center shrink-0 relative">
                     <OptimizedMemberImage
@@ -482,11 +482,11 @@ export default function AdminManagingCommitteePage() {
                     <label className="inline-flex items-center gap-2 bg-[#1F2937] hover:bg-[#374151] text-white px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-all border border-[#374151]/60">
                       <Upload size={14} />
                       <span>{selectedFile ? selectedFile.name : "Upload Photo"}</span>
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleFileChange} 
-                        className="hidden" 
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="hidden"
                       />
                     </label>
 

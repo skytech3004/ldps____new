@@ -1,7 +1,7 @@
-import { 
-  LayoutDashboard, Home, CreditCard, Bus, Calendar, FileText, 
-  GraduationCap, Trophy, ClipboardList, Bell, Phone, MessageSquare, 
-  Users, Award, LayoutGrid, Images, BookOpen, Database, 
+import {
+  LayoutDashboard, Home, CreditCard, Bus, Calendar, FileText,
+  GraduationCap, Trophy, ClipboardList, Bell, Phone, MessageSquare,
+  Users, Award, LayoutGrid, Images, BookOpen, Database,
   Briefcase, Sparkles, UserCheck, Shield, Newspaper, ShieldAlert
 } from "lucide-react";
 import { NavGroup, NavItem } from "@/types/adminNav";
@@ -175,7 +175,7 @@ export const adminNavGroups: NavGroup[] = [
       },
       {
         href: "/admin/managing-committee",
-        label: "Managing Committee",
+        label: "Staff",
         icon: Users,
         description: "School managing committee members and office bearers roster.",
         roles: ["super_admin", "admin"],
