@@ -15,7 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/about/ceo-message",
     "/about/secretary-message",
     "/principals-desk",
-    "/managing-committee",
+    "/staff",
     "/investiture-ceremony",
     "/scholastic",
     "/co-scholastic",

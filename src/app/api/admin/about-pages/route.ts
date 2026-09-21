@@ -6,11 +6,25 @@ import { aboutPageDefaults, type AboutPageSlug } from "@/data/aboutPages";
 const VALID_SLUGS = Object.keys(aboutPageDefaults) as AboutPageSlug[];
 
 async function seedAboutPages() {
+  const oldDefaultImages = [
+    "/uploads/about/president-message.jpg",
+    "/uploads/about/ceo-message.png",
+    "/principle.avif",
+  ];
+
   for (const slug of VALID_SLUGS) {
     const existing = await AboutPageModel.findOne({ slug }).lean();
     if (!existing) {
       await AboutPageModel.create(aboutPageDefaults[slug]);
       continue;
+    }
+
+    if (
+      ["management-message", "ceo-message", "secretary-message", "principals-message"].includes(slug) &&
+      existing.portraitImage &&
+      oldDefaultImages.includes(existing.portraitImage)
+    ) {
+      await AboutPageModel.updateOne({ slug }, { $set: { portraitImage: "" } });
     }
 
     if (slug === "management" && (!existing.members || existing.members.length === 0)) {

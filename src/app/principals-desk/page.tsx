@@ -21,7 +21,7 @@ export default function PrincipalsDeskPage() {
             pageTitle: data.pageTitle || defaults.pageTitle,
             pageSubtitle: data.pageSubtitle || defaults.pageSubtitle,
             bannerImage: data.bannerImage || defaults.bannerImage,
-            portraitImage: data.portraitImage || defaults.portraitImage,
+            portraitImage: data.portraitImage ?? defaults.portraitImage,
             personName: data.personName || defaults.personName,
             personDesignation: data.personDesignation || defaults.personDesignation,
             content: data.content || defaults.content,

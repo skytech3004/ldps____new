@@ -177,7 +177,7 @@ export const adminNavGroups: NavGroup[] = [
         href: "/admin/managing-committee",
         label: "Staff",
         icon: Users,
-        description: "School managing committee members and office bearers roster.",
+        description: "Manage staff roster, order (1, 2, 3...), and profile photos shown on /staff.",
         roles: ["super_admin", "admin"],
       },
       {

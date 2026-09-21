@@ -19,7 +19,12 @@ type OptimizedMemberImageProps = {
 const ALLOWED_REMOTE_HOSTS = [
   "images.unsplash.com",
   "www.lpsvidhyawadi.com",
+  "lpsvidhyawadi.com",
+  "www.lpsvidyawadi.com",
+  "lpsvidyawadi.com",
   "img.youtube.com",
+  "res.cloudinary.com",
+  "cdn.pixabay.com",
 ];
 
 export default function OptimizedMemberImage({
@@ -34,12 +39,13 @@ export default function OptimizedMemberImage({
   priority = false,
 }: OptimizedMemberImageProps) {
   const [imageError, setImageError] = useState(false);
+  const [finalFallback, setFinalFallback] = useState(false);
 
   // Clean and trim src string if provided
   const cleanedSrc = src?.trim();
 
-  // If no image provided or error occurred, render fallback avatar badge
-  if (!cleanedSrc || imageError) {
+  // If no image provided or both Next Image & native img failed, render fallback avatar badge
+  if (!cleanedSrc || finalFallback) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center text-primary/40 p-4 space-y-2 bg-gradient-to-br from-primary/5 via-primary/10 to-secondary/5">
         <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary/50 shadow-inner group-hover:scale-110 transition-transform">
@@ -49,6 +55,18 @@ export default function OptimizedMemberImage({
           {fallbackLabel}
         </span>
       </div>
+    );
+  }
+
+  // If Next.js <Image> failed, fallback to native <img> tag so uploaded image still displays
+  if (imageError) {
+    return (
+      <img
+        src={cleanedSrc}
+        alt={alt}
+        className={className}
+        onError={() => setFinalFallback(true)}
+      />
     );
   }
 

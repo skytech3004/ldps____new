@@ -46,7 +46,7 @@ export default function Navbar() {
 
         { label: "CEO's Message", href: "/about/ceo-message" },
         { label: "Principal's Desk", href: "/principals-desk" },
-        { label: "Academic Excellence Team", href: "/managing-committee" },
+        { label: "Staff & Faculty", href: "/staff" },
       ],
     },
     {
