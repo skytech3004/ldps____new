@@ -6,6 +6,7 @@ import {
   Search, Users, RefreshCw, AlertCircle, CheckCircle2,
   Upload, Image as ImageIcon, User, Loader2
 } from "lucide-react";
+import OptimizedMemberImage from "@/components/OptimizedMemberImage";
 
 type Teacher = {
   _id?: string;
@@ -349,17 +350,15 @@ export default function AdminManagingCommitteePage() {
                     <tr key={teacher._id || idx} className="hover:bg-[#111827]/25 transition-all">
                       <td className="px-4 py-3.5 text-center font-mono text-gray-500 font-bold">{idx + 1}</td>
                       <td className="px-4 py-3.5 text-center">
-                        {teacher.image ? (
-                          <img 
-                            src={teacher.image} 
-                            alt={teacher.name} 
-                            className="w-10 h-10 rounded-full object-cover object-top border border-[#374151] mx-auto shadow-sm"
+                        <div className="w-10 h-10 rounded-full overflow-hidden border border-[#374151] mx-auto shadow-sm relative">
+                          <OptimizedMemberImage
+                            src={teacher.image}
+                            alt={teacher.name}
+                            fill
+                            sizes="40px"
+                            fallbackLabel=""
                           />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-[#1F2937]/80 border border-[#374151]/50 flex items-center justify-center text-gray-500 mx-auto">
-                            <User size={18} />
-                          </div>
-                        )}
+                        </div>
                       </td>
                       <td className="px-5 py-3.5 font-bold font-montserrat uppercase tracking-tight text-white">{teacher.name}</td>
                       <td className="px-5 py-3.5">
@@ -469,14 +468,14 @@ export default function AdminManagingCommitteePage() {
                 </label>
                 
                 <div className="flex gap-4 items-center bg-[#111827]/40 border border-[#1F2937] p-3.5 rounded-xl">
-                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#0A0E17] border border-[#374151]/50 flex items-center justify-center shrink-0">
-                    {previewSrc ? (
-                      <img src={previewSrc} alt="Preview" className="w-full h-full object-cover object-top" />
-                    ) : form.image ? (
-                      <img src={form.image} alt="Current" className="w-full h-full object-cover object-top" />
-                    ) : (
-                      <ImageIcon className="text-gray-600" size={24} />
-                    )}
+                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#0A0E17] border border-[#374151]/50 flex items-center justify-center shrink-0 relative">
+                    <OptimizedMemberImage
+                      src={previewSrc || form.image}
+                      alt="Preview"
+                      fill
+                      sizes="64px"
+                      fallbackLabel=""
+                    />
                   </div>
 
                   <div className="space-y-2 flex-1 min-w-0">

@@ -8,6 +8,7 @@ import RichHtmlContent from "@/components/RichHtmlContent";
 import { aboutPageDefaults } from "@/data/aboutPages";
 import { trustInstitutions, trustStats } from "@/data/aboutTrust";
 import { Building2, Heart, Sparkles, Users, Award } from "lucide-react";
+import OptimizedMemberImage from "@/components/OptimizedMemberImage";
 
 type AboutTrustData = {
   pageTitle: string;
@@ -133,15 +134,15 @@ export default function AboutTrustPage() {
               >
                 {/* Profile Image */}
                 <div className="relative aspect-[4/5] bg-slate-100 overflow-hidden">
-                  <img
+                  <OptimizedMemberImage
                     src={member.image}
                     alt={member.name}
+                    fallbackLabel="Trust Member"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    onError={(e) => {
-                      e.currentTarget.src = "/lps-vidhyawadi/about-banner.jpg";
-                    }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                 </div>
 
                 {/* Card Text Content */}

@@ -1,9 +1,10 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { User, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { connectToDatabase } from "@/lib/mongodb";
 import { TeacherModel } from "@/models/Teacher";
+import OptimizedMemberImage from "@/components/OptimizedMemberImage";
 
 type RosterMember = {
   _id?: string;
@@ -11,6 +12,33 @@ type RosterMember = {
   designation: string;
   image?: string;
 };
+
+const DEFAULT_STAFF_ROSTER: RosterMember[] = [
+  {
+    _id: "default-1",
+    name: "Ms. Jyoti Nath",
+    designation: "Principal & Academic Head",
+    image: "/principle.avif",
+  },
+  {
+    _id: "default-2",
+    name: "Shri Kantilal N. Mehta",
+    designation: "President, Managing Committee",
+    image: "/uploads/about/president-message.jpg",
+  },
+  {
+    _id: "default-3",
+    name: "Executive Leadership",
+    designation: "Chief Executive Officer (CEO)",
+    image: "/uploads/about/ceo-message.png",
+  },
+  {
+    _id: "default-4",
+    name: "Vidyawadi Academic Council",
+    designation: "Managing Committee Board",
+    image: "/uploads/about/management-group.png",
+  },
+];
 
 async function loadRoster(): Promise<RosterMember[]> {
   try {
@@ -28,7 +56,7 @@ async function loadRoster(): Promise<RosterMember[]> {
     console.error("Failed to load teachers from MongoDB:", err);
   }
 
-  return [];
+  return DEFAULT_STAFF_ROSTER;
 }
 
 function countSupportStaff(roster: RosterMember[]) {
@@ -36,7 +64,8 @@ function countSupportStaff(roster: RosterMember[]) {
 }
 
 export default async function ManagingCommittee() {
-  const roster = await loadRoster();
+  const dbRoster = await loadRoster();
+  const roster = dbRoster.length > 0 ? dbRoster : DEFAULT_STAFF_ROSTER;
   const totalStaff = roster.length;
   const supportStaff = countSupportStaff(roster);
   const teachingStaff = totalStaff - supportStaff;
@@ -80,22 +109,16 @@ export default async function ManagingCommittee() {
                 key={member._id || `${member.name}-${idx}`} 
                 className="bg-white border border-primary/10 rounded-[2rem] p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center group"
               >
-                {/* 1. Image FIRST (at the top) */}
+                {/* 1. Image FIRST (at the top) with Next.js sharp optimization & onError fallback */}
                 <div className="w-full h-56 relative rounded-2xl overflow-hidden bg-gradient-to-br from-primary/5 via-primary/10 to-secondary/5 border border-primary/10 flex items-center justify-center mb-5">
-                  {member.image ? (
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-primary/30 p-4 space-y-2">
-                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary/40 group-hover:scale-110 transition-transform">
-                        <User size={36} strokeWidth={1.75} />
-                      </div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">LPS Staff Member</span>
-                    </div>
-                  )}
+                  <OptimizedMemberImage
+                    src={member.image}
+                    alt={member.name}
+                    fallbackLabel="LPS Staff Member"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                  />
                 </div>
 
                 {/* 2. Name & 3. Designation */}
