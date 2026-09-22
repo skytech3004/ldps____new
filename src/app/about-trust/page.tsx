@@ -175,9 +175,10 @@ export default function AboutTrustPage() {
             <div className="lg:col-span-5">
               <div className="relative aspect-[4/5] max-w-md mx-auto rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white bg-gray-100">
                 {pageData.portraitImage ? (
-                  <Image
+                  <OptimizedMemberImage
                     src={pageData.portraitImage}
                     alt={pageData.personName}
+                    fallbackLabel={pageData.personDesignation || "Our Inspiration"}
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 420px"

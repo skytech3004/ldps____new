@@ -4,6 +4,7 @@ import React, { useEffect, useState, use } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import NonBoardResultsSection from "@/components/NonBoardResultsSection";
 import { Trophy, Loader2 } from "lucide-react";
 
 interface ResultImage {
@@ -168,6 +169,9 @@ export default function ResultYearPage({ params }: { params: Promise<{ year: str
             </p>
           </div>
         )}
+
+        {/* Non-Board Results Section (Rendered after 10 & 12 Board Results) */}
+        <NonBoardResultsSection year={year} />
       </div>
 
       <Footer />

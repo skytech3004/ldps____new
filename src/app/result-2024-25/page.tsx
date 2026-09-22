@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import NonBoardResultsSection from "@/components/NonBoardResultsSection";
 import { Award, Trophy, Star, Search, ShieldCheck, CheckCircle2, ChevronRight, FileSpreadsheet } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -385,6 +386,9 @@ export default function Result2024_25Page() {
               </div>
             </div>
           </section>
+
+          {/* Non-Board Results Section */}
+          <NonBoardResultsSection year="2024-25" />
         </div>
       )}
 

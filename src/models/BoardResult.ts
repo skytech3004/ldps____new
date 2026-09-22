@@ -67,6 +67,17 @@ const BoardResultSchema = new Schema(
       type: [Schema.Types.Mixed],
       default: [],
     },
+    nonBoardResults: {
+      type: [
+        {
+          title: { type: String, default: "", trim: true },
+          imageUrl: { type: String, default: "", trim: true },
+          pdfUrl: { type: String, default: "", trim: true },
+          classLevel: { type: String, default: "", trim: true },
+        },
+      ],
+      default: [],
+    },
   },
   {
     timestamps: true,

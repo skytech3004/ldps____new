@@ -70,17 +70,25 @@ export default function OptimizedMemberImage({
     );
   }
 
-  // Check if image is external URL and whether domain is in allowed patterns
+  // Check if image is local upload or external URL and whether domain is in allowed patterns
   let isUnoptimized = false;
-  try {
-    if (cleanedSrc.startsWith("http://") || cleanedSrc.startsWith("https://")) {
-      const url = new URL(cleanedSrc);
-      if (!ALLOWED_REMOTE_HOSTS.includes(url.hostname)) {
-        isUnoptimized = true;
-      }
-    }
-  } catch {
+  if (
+    cleanedSrc.startsWith("/uploads/") ||
+    cleanedSrc.startsWith("uploads/") ||
+    cleanedSrc.includes("/uploads/")
+  ) {
     isUnoptimized = true;
+  } else {
+    try {
+      if (cleanedSrc.startsWith("http://") || cleanedSrc.startsWith("https://")) {
+        const url = new URL(cleanedSrc);
+        if (!ALLOWED_REMOTE_HOSTS.includes(url.hostname)) {
+          isUnoptimized = true;
+        }
+      }
+    } catch {
+      isUnoptimized = true;
+    }
   }
 
   if (fill) {

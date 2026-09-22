@@ -5,6 +5,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/ui/Reveal";
+import NonBoardResultsSection from "@/components/NonBoardResultsSection";
 import { Trophy, ChevronRight } from "lucide-react";
 
 interface BoardResult {
@@ -140,6 +141,9 @@ export default function ResultIndexPage() {
             })}
           </div>
         )}
+
+        {/* Non-Board Examination Results Section */}
+        <NonBoardResultsSection />
       </section>
 
       <Footer />

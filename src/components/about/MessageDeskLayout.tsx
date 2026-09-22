@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import OptimizedMemberImage from "@/components/OptimizedMemberImage";
 import Link from "next/link";
 import { Quote, Sparkles, Award, ArrowLeft } from "lucide-react";
 
@@ -27,6 +27,8 @@ export default function MessageDeskLayout({
   backHref = "/about/management",
   backLabel = "Back to Management",
 }: MessageDeskLayoutProps) {
+  const hasImage = Boolean(portraitImage && portraitImage.trim());
+
   return (
     <main className="min-h-screen bg-[#F8F9FC] text-gray-800">
       <section className="relative pt-36 pb-12 md:pt-44 md:pb-16 px-6 bg-gradient-to-br from-primary to-[#2c246b] text-white">
@@ -52,20 +54,19 @@ export default function MessageDeskLayout({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-32">
             <div className="relative bg-white border border-primary/10 rounded-[2.5rem] p-6 shadow-2xl overflow-hidden group">
-              <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden shadow-md border-4 border-white bg-gray-100 mb-6">
-                {portraitImage ? (
-                  <Image
+              {hasImage && (
+                <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden shadow-md border-4 border-white bg-gray-100 mb-6">
+                  <OptimizedMemberImage
                     src={portraitImage}
                     alt={personName || pageTitle}
+                    fallbackLabel={personDesignation || pageTitle}
                     fill
                     sizes="(max-width: 1024px) 100vw, 420px"
                     className="object-cover group-hover:scale-[1.02] transition-transform duration-700"
                     priority
                   />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary via-secondary to-accent" />
-                )}
-              </div>
+                </div>
+              )}
 
               <div className="text-center space-y-2">
                 <div className="inline-flex items-center gap-1.5 bg-accent/10 border border-accent/20 px-4.5 py-1 rounded-full text-accent-hover font-bold text-xs uppercase tracking-wider">
