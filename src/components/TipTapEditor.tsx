@@ -7,12 +7,12 @@ import Image from "@tiptap/extension-image";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
-import TextStyle from "@tiptap/extension-text-style";
+import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
-import Table from "@tiptap/extension-table";
+import { Table } from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
@@ -94,8 +94,8 @@ function ToolbarButton({
       onClick={onClick}
       disabled={disabled}
       className={`min - w - [34px] h - [34px] px - 2 rounded - lg flex items - center justify - center transition - all ${active
-          ? "bg-[#F7B801] text-[#08152e] shadow-md"
-          : "text-white/80 hover:bg-white/10 hover:text-white"
+        ? "bg-[#F7B801] text-[#08152e] shadow-md"
+        : "text-white/80 hover:bg-white/10 hover:text-white"
         } ${disabled ? "opacity-30 cursor-not-allowed" : "cursor-pointer"} `}
     >
       {children}
@@ -835,4 +835,4 @@ export default function TipTapEditor({
     </div>
   );
 }
-```
+
