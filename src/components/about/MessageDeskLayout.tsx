@@ -111,11 +111,12 @@ export default function MessageDeskLayout({
             {(personName || personDesignation) && (
               <div className="pt-8 border-t border-gray-100 flex justify-between items-end">
                 <div className="space-y-1">
-                  {personDesignation ? (
-                    <p className="text-gray-400 font-bold uppercase tracking-wider text-xs">{personDesignation}</p>
-                  ) : null}
+
                   {personName ? (
                     <p className="text-xl font-black text-primary font-montserrat uppercase tracking-tight">{personName}</p>
+                  ) : null}
+                  {personDesignation ? (
+                    <p className="text-gray-400 font-bold uppercase tracking-wider text-xs">{personDesignation}</p>
                   ) : null}
                 </div>
                 <div className="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center text-primary/30 rotate-12 hidden xs:flex">
