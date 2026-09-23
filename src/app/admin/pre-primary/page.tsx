@@ -7,6 +7,7 @@ import {
   Upload, ArrowUpRight, ImageIcon, Eye 
 } from "lucide-react";
 import TipTapEditor from "@/components/TipTapEditor";
+import RichHtmlContent from "@/components/RichHtmlContent";
 
 type PrePrimaryItem = {
   _id: string;
@@ -230,7 +231,7 @@ export default function AdminPrePrimaryPage() {
                   <h3 className="font-black text-white text-base uppercase tracking-tight">{item.title}</h3>
                   <span className="text-[9px] text-[#F7B801] font-bold">Order: {item.sortOrder}</span>
                 </div>
-                <p className="text-xs text-white/70 leading-relaxed line-clamp-3">{item.description}</p>
+                <RichHtmlContent html={item.description} className="text-xs text-white/70 leading-relaxed line-clamp-3 [&_p]:text-white/70" />
               </div>
               <div className="p-4 border-t border-white/10 flex justify-end gap-2 bg-black/10">
                 <button onClick={() => openEditModal(item)} className="p-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors">

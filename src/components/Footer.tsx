@@ -9,7 +9,7 @@ import { schoolDatabase } from "@/data/lpsVidhyawadiDatabase";
 const schoolMapUrl =
   "https://www.google.com/maps/place/Marudhar+Mahila+Shikshan+Sangh,+Vidyawadi/@25.3203814,73.2889669,982m/data=!3m2!1e3!4b1!4m6!3m5!1s0x394285c38de7bf27:0x6413b20ba55fe11d!8m2!3d25.3203814!4d73.2915418!16s%2Fg%2F11cl_4pk1_?entry=ttu&g_ep=EgoyMDI2MDcyOS4wIKXMDSoASAFQAw%3D%3D";
 const schoolDirectionsUrl = "https://maps.app.goo.gl/CVPUXGyTHZCyCry58";
-const schoolYoutubeUrl = "https://www.youtube.com/@MMSSVIDYAWADIOFFICIAL";
+const schoolYoutubeUrl = "https://www.youtube.com/@Vidyawadimmss";
 
 function YouTubeMark({ className = "", size = 18 }: { className?: string; size?: number }) {
   return (
@@ -29,7 +29,7 @@ function YouTubeMark({ className = "", size = 18 }: { className?: string; size?:
 const socialLinks = [
   {
     name: "Facebook",
-    href: "https://www.facebook.com/profile.php?id=61583590541462",
+    href: "https://www.facebook.com/people/Vidyawadi/61583590541462/",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>

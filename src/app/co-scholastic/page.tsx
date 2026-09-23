@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -8,6 +8,29 @@ import { Palette, Music, Sparkles, Trophy, CheckCircle, ArrowRight, Heart, Users
 import { motion } from "framer-motion";
 
 export default function CoScholasticPage() {
+  const [clubs, setClubs] = useState<{ _id?: string; name: string; sortOrder: number }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchClubs() {
+      try {
+        const res = await fetch("/api/admin/clubs");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const activeOnly = data.filter((c: any) => c.status !== "inactive");
+            setClubs(activeOnly);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch clubs:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchClubs();
+  }, []);
+
   const artsList = [
     { name: "Creative Art & Craft", desc: "Best out of Waste, card & bookmark making, face painting, card folding, fabric painting, acrylic/glass designs, and soft toy making." },
     { name: "Acoustics Music Wing", desc: "Indian Classical and Folk music training conducted in an acoustically refined sound room equipped with keyboards, guitars, tablas, and violins." },
@@ -19,12 +42,6 @@ export default function CoScholasticPage() {
     { name: "Padmavati House", color: "border-amber-500 bg-amber-500/5 text-amber-500 text-amber-400", motto: "Wisdom & Honor" },
     { name: "Sarojini Naidu House", color: "border-indigo-500 bg-indigo-500/5 text-indigo-500 text-indigo-400", motto: "Grace & Expression" },
     { name: "Vijaya Lakshmi House", color: "border-emerald-500 bg-emerald-500/5 text-emerald-500 text-emerald-400", motto: "Peace & Harmony" }
-  ];
-
-  const clubs = [
-    "Eco Club", "Literary Club", "Eco-System Trails", "Music & Oratory", 
-    "Drama & Pantomime", "Hindi Sahitya", "SUPW Skills", "Heritage Club",
-    "Eco-Awareness Projects", "IT & Robotics", "Reader's Integrity", "Eco walks"
   ];
 
   return (
@@ -134,16 +151,31 @@ export default function CoScholasticPage() {
           <div className="h-1.5 w-24 bg-accent mx-auto rounded-full" />
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto pt-4">
-          {clubs.map((club, idx) => (
-            <div 
-              key={idx} 
-              className="bg-white border border-primary/5 rounded-xl p-4 shadow-sm hover:border-accent transition-all flex items-center gap-3 group"
-            >
-              <CheckCircle size={16} className="text-accent shrink-0" />
-              <span className="text-xs md:text-sm font-bold text-primary/80 group-hover:text-primary transition-colors">{club}</span>
+        <div className="pt-4">
+          {loading ? (
+            <div className="py-12 text-center text-primary font-bold">
+              <div className="w-8 h-8 border-4 border-[#3D348B] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-xs uppercase tracking-wider">Loading Clubs & Societies...</p>
             </div>
-          ))}
+          ) : clubs.length === 0 ? (
+            <div className="text-center py-12 text-gray-400 font-medium">No clubs configured.</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-6xl mx-auto">
+              {clubs.map((club, idx) => (
+                <div 
+                  key={club._id || idx} 
+                  className="bg-white border border-primary/10 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-accent transition-all flex items-center gap-3 group"
+                >
+                  <span className="w-7 h-7 rounded-lg bg-primary/5 text-primary font-mono text-xs font-bold flex items-center justify-center shrink-0">
+                    {idx + 1}
+                  </span>
+                  <span className="text-xs md:text-sm font-black text-primary uppercase font-montserrat tracking-tight group-hover:text-accent transition-colors line-clamp-1">
+                    {club.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

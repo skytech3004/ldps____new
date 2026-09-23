@@ -53,13 +53,15 @@ async function loadRoster(): Promise<RosterMember[]> {
     await connectToDatabase();
     const items = await TeacherModel.find().sort({ sortOrder: 1, createdAt: 1 }).lean();
     if (items && items.length > 0) {
-      return items.map((item, index) => ({
+      const mapped = items.map((item, index) => ({
         _id: String(item._id),
         name: item.name,
         designation: item.designation,
         image: item.image || "",
-        sortOrder: typeof item.sortOrder === "number" ? item.sortOrder : index,
+        sortOrder: typeof item.sortOrder === "number" ? item.sortOrder : index + 1,
       }));
+
+      return mapped.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
     }
   } catch (err) {
     console.error("Failed to load staff roster from MongoDB:", err);

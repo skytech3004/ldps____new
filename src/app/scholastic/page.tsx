@@ -32,7 +32,9 @@ import { curriculumPage, getSection } from "@/data/lpsVidhyawadiDatabase";
 
 export default function ScholasticPage() {
   const [facilities, setFacilities] = useState<any[]>([]);
+  const [skills, setSkills] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [skillsLoading, setSkillsLoading] = useState(true);
   const [prospectusUrl, setProspectusUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -50,6 +52,23 @@ export default function ScholasticPage() {
       }
     }
 
+    async function fetchSkills() {
+      try {
+        const res = await fetch("/api/admin/skills");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const activeOnly = data.filter((s: any) => s.status !== "inactive");
+            setSkills(activeOnly);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch skills:", err);
+      } finally {
+        setSkillsLoading(false);
+      }
+    }
+
     async function checkProspectus() {
       try {
         const res = await fetch("/api/admin/prospectus");
@@ -64,7 +83,7 @@ export default function ScholasticPage() {
       }
     }
 
-    Promise.all([fetchFacilities(), checkProspectus()]);
+    Promise.all([fetchFacilities(), fetchSkills(), checkProspectus()]);
   }, []);
 
   const primaryCurriculum = getSection(curriculumPage, "The Curriculum");
@@ -363,43 +382,45 @@ export default function ScholasticPage() {
               <div className="h-1 w-12 bg-accent mx-auto mt-2 rounded-full" />
             </div>
 
-            {/* Grid of 13 Skill Badges */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
-              {[
-                { name: "Information Technology", icon: Cpu, color: "from-cyan-500/10 to-cyan-500/5", text: "text-cyan-600" },
-                { name: "Food Nutrition & Dietetics", icon: Brain, color: "from-pink-500/10 to-pink-500/5", text: "text-pink-600" },
-                { name: "AI (Artificial Intelligence)", icon: Sparkles, color: "from-indigo-500/10 to-indigo-500/5", text: "text-indigo-600" },
-                { name: "Block Printing", icon: Gem, color: "from-teal-500/10 to-teal-500/5", text: "text-teal-600" },
-                { name: "Rockets", icon: Compass, color: "from-red-500/10 to-red-500/5", text: "text-red-600" },
-                { name: "Design Thinking", icon: Brain, color: "from-purple-500/10 to-purple-500/5", text: "text-purple-600" },
-                { name: "Satellites", icon: Satellite, color: "from-sky-500/10 to-sky-500/5", text: "text-sky-600" },
-                { name: "Financial Literacy", icon: Coins, color: "from-emerald-500/10 to-emerald-500/5", text: "text-emerald-600" },
-                { name: "Handicraft", icon: Wrench, color: "from-amber-500/10 to-amber-500/5", text: "text-amber-600" },
-                { name: "Marketing", icon: Users, color: "from-blue-500/10 to-blue-500/5", text: "text-blue-600" },
-                { name: "Tourism", icon: Palmtree, color: "from-green-500/10 to-green-500/5", text: "text-green-600" },
-                { name: "Digital Citizenship", icon: Cpu, color: "from-violet-500/10 to-violet-500/5", text: "text-violet-600" },
-                { name: "Beauty & Wellness", icon: Sparkles, color: "from-rose-500/10 to-rose-500/5", text: "text-rose-600" }
-              ].map((skill, idx) => {
-                const Icon = skill.icon;
-                return (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.3, delay: (idx % 6) * 0.05 }}
-                    whileHover={{ scale: 1.05, y: -4 }}
-                    className="bg-white border border-slate-100 hover:border-accent p-5 rounded-2xl shadow-premium-xs hover:shadow-premium-md transition-all duration-300 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group"
-                  >
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${skill.color} ${skill.text} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                      <Icon size={20} />
-                    </div>
-                    <span className="text-xs font-black text-primary uppercase tracking-tight leading-tight line-clamp-2">
-                      {skill.name}
-                    </span>
-                  </motion.div>
-                );
-              })}
+            {/* Grid of Dynamic Skill Badges */}
+            <div className="pt-2">
+              {skillsLoading ? (
+                <div className="py-12 text-center text-primary font-bold">
+                  <div className="w-8 h-8 border-4 border-[#3D348B] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                  <p className="text-xs uppercase tracking-wider">Loading Skill Courses...</p>
+                </div>
+              ) : skills.length === 0 ? (
+                <div className="text-center py-12 text-gray-400 font-medium">No skill courses configured.</div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+                  {skills.map((skill, idx) => (
+                    <motion.div
+                      key={skill._id || idx}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.3, delay: (idx % 6) * 0.05 }}
+                      whileHover={{ scale: 1.05, y: -4 }}
+                      className="bg-white border border-slate-100 hover:border-accent p-5 rounded-2xl shadow-premium-xs hover:shadow-premium-md transition-all duration-300 flex flex-col items-center justify-center text-center gap-3 cursor-pointer group"
+                    >
+                      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#3D348B]/10 to-[#7678ED]/5 text-primary flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform duration-300 relative border border-slate-100">
+                        {skill.image ? (
+                          <img
+                            src={skill.image}
+                            alt={skill.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Sparkles size={22} className="text-accent" />
+                        )}
+                      </div>
+                      <span className="text-xs font-black text-primary uppercase tracking-tight leading-tight line-clamp-2">
+                        {skill.name}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import RichHtmlContent from "@/components/RichHtmlContent";
 
 // Flat array of all showcase items for easy Lightbox cycling
 const prePrimaryShowcaseItems = [
@@ -297,9 +298,10 @@ export default function PrePrimaryClient() {
           <h3 className="text-[#3D348B] text-base md:text-lg font-black line-clamp-1 leading-snug tracking-tight">
             {item.title}
           </h3>
-          <p className="text-gray-500 text-xs font-bold leading-relaxed line-clamp-2">
-            {item.description}
-          </p>
+          <RichHtmlContent
+            html={item.description}
+            className="text-gray-500 text-xs font-bold leading-relaxed line-clamp-2"
+          />
         </div>
       </div>
     </motion.div >
@@ -451,9 +453,10 @@ export default function PrePrimaryClient() {
                 <p className="text-base md:text-xl font-black text-white tracking-wide max-w-2xl leading-snug mt-2">
                   {showcaseItems[activePhoto].title}
                 </p>
-                <p className="text-xs md:text-sm text-slate-300 max-w-xl leading-relaxed">
-                  {showcaseItems[activePhoto].description}
-                </p>
+                <RichHtmlContent
+                  html={showcaseItems[activePhoto].description}
+                  className="text-xs md:text-sm text-slate-300 max-w-xl leading-relaxed [&_p]:text-slate-300"
+                />
                 <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
                   Photo {activePhoto + 1} of {showcaseItems.length}
                 </p>

@@ -110,6 +110,13 @@ export const adminNavGroups: NavGroup[] = [
         description: "Sports team rosters, achievements, and player profiles.",
         roles: ["super_admin", "admin"],
       },
+      {
+        href: "/admin/clubs",
+        label: "Clubs & Societies",
+        icon: Sparkles,
+        description: "Manage co-scholastic student clubs, display order, and status.",
+        roles: ["super_admin", "admin"],
+      },
     ],
   },
   {
@@ -213,6 +220,13 @@ export const adminNavGroups: NavGroup[] = [
         label: "Pre-Primary Showcase",
         icon: Images,
         description: "Pre-primary activities, photo showcase, and curriculum highlights.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/skills",
+        label: "Skill & Vocational Courses",
+        icon: Sparkles,
+        description: "Manage skill courses, images, display order, and status.",
         roles: ["super_admin", "admin"],
       },
     ],

@@ -86,9 +86,9 @@ export default function RootLayout({
               "telephone": "+91-9414148005",
               "email": "lpsvidhyawadi@gmail.com",
               "sameAs": [
-                "https://www.facebook.com/profile.php?id=61583590541462",
+                "https://www.facebook.com/people/Vidyawadi/61583590541462/",
                 "https://www.instagram.com/vidyawadiofficial",
-                "https://www.youtube.com/@MMSSVIDYAWADIOFFICIAL"
+                "https://www.youtube.com/@Vidyawadimmss"
               ]
             })
           }}

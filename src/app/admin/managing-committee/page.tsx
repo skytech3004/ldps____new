@@ -29,10 +29,11 @@ export default function AdminManagingCommitteePage() {
   // Modal states
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
-  const [form, setForm] = useState<{ name: string; designation: string; image: string }>({
+  const [form, setForm] = useState<{ name: string; designation: string; image: string; sortOrder: number }>({
     name: "",
     designation: "",
     image: "",
+    sortOrder: 1,
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewSrc, setPreviewSrc] = useState("");
@@ -78,7 +79,8 @@ export default function AdminManagingCommitteePage() {
 
   function openAddModal() {
     setEditingTeacher(null);
-    setForm({ name: "", designation: "", image: "" });
+    const maxOrder = teachers.reduce((max, t) => Math.max(max, t.sortOrder || 0), 0);
+    setForm({ name: "", designation: "", image: "", sortOrder: maxOrder + 1 });
     setSelectedFile(null);
     setPreviewSrc("");
     setError("");
@@ -87,7 +89,12 @@ export default function AdminManagingCommitteePage() {
 
   function openEditModal(teacher: Teacher) {
     setEditingTeacher(teacher);
-    setForm({ name: teacher.name, designation: teacher.designation, image: teacher.image || "" });
+    setForm({
+      name: teacher.name,
+      designation: teacher.designation,
+      image: teacher.image || "",
+      sortOrder: teacher.sortOrder ?? 1,
+    });
     setSelectedFile(null);
     setPreviewSrc(teacher.image || "");
     setError("");
@@ -165,6 +172,10 @@ export default function AdminManagingCommitteePage() {
     newTeachers[index] = newTeachers[swapWithIndex];
     newTeachers[swapWithIndex] = temp;
 
+    newTeachers.forEach((t, idx) => {
+      t.sortOrder = idx + 1;
+    });
+
     setTeachers(newTeachers);
     setSuccess("Roster order modified. Click 'Save Roster Order' to persist!");
   }
@@ -189,6 +200,7 @@ export default function AdminManagingCommitteePage() {
         name: form.name.trim(),
         designation: form.designation.trim(),
         image: imageUrl,
+        sortOrder: form.sortOrder,
       };
 
       const response = await fetch("/api/admin/teachers", {
@@ -458,6 +470,16 @@ export default function AdminManagingCommitteePage() {
                   onChange={(e) => setForm(prev => ({ ...prev, designation: e.target.value }))}
                   placeholder="e.g. PGT (Biology) & V.P."
                   className="w-full bg-[#111827]/60 border border-[#1F2937] rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#F7B801] transition-all font-semibold"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">Display Order (1, 2, 3...)</label>
+                <input
+                  type="number"
+                  value={form.sortOrder}
+                  onChange={(e) => setForm(prev => ({ ...prev, sortOrder: Number(e.target.value) }))}
+                  className="w-full bg-[#111827]/60 border border-[#1F2937] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F7B801] transition-all font-mono font-bold"
                 />
               </div>
 
