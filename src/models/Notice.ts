@@ -7,6 +7,11 @@ const NoticeSchema = new Schema(
       required: true,
       trim: true,
     },
+    slug: {
+      type: String,
+      trim: true,
+      index: true,
+    },
     subject: {
       type: String,
       trim: true,
@@ -25,7 +30,7 @@ const NoticeSchema = new Schema(
     signatory: {
       type: String,
       trim: true,
-      default: "Principal,\nLPS English Medium School",
+      default: "Dr. Preeti Sharma\nPrincipal, LPS Vidyawadi",
     },
     category: {
       type: String,
@@ -46,8 +51,6 @@ const NoticeSchema = new Schema(
       default: "",
       trim: true,
     },
-    // Only News & Circulars receive this value. MongoDB's TTL index removes
-    // them automatically once the displayed date is one week old.
     expiresAt: {
       type: Date,
       default: undefined,

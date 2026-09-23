@@ -18,17 +18,14 @@ interface PageProps {
 }
 
 async function getNotice(slug: string) {
-  // Try static first
-  const staticNotice = getStaticNoticeBySlug(slug);
-  if (staticNotice) return staticNotice;
-
-  // Try database
+  // Try database first
   try {
     await connectToDatabase();
     const notices = await NoticeModel.find().lean();
-    const dbNotice = notices.find(n => {
-      const generatedSlug = n.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-      return generatedSlug === slug;
+    const dbNotice = notices.find((n) => {
+      const generatedCatSlug = `${n.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${n.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}`;
+      const generatedSimpleSlug = n.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      return n.slug === slug || generatedCatSlug === slug || generatedSimpleSlug === slug;
     });
 
     if (dbNotice) {
@@ -39,21 +36,36 @@ async function getNotice(slug: string) {
         refNo: dbNotice.refNo || "N/A",
         subject: dbNotice.subject || dbNotice.title,
         body: dbNotice.body || "No details provided.",
-        signatory: dbNotice.signatory || "Principal,\nLPS English Medium School"
+        signatory: dbNotice.signatory || "Dr. Preeti Sharma\nPrincipal, LPS Vidyawadi"
       };
     }
   } catch (error) {
     console.error("Failed to fetch notice from DB:", error);
   }
 
+  // Fallback to static data
+  const staticNotice = getStaticNoticeBySlug(slug);
+  if (staticNotice) return staticNotice;
+
   return null;
 }
 
 // Generate static routes at build-time
 export async function generateStaticParams() {
-  return allNotices.map((notice) => ({
+  const staticParams = allNotices.map((notice) => ({
     slug: notice.slug,
   }));
+
+  try {
+    await connectToDatabase();
+    const dbNotices = await NoticeModel.find().select("slug title category").lean();
+    const dbParams = dbNotices.map((n) => ({
+      slug: n.slug || `${n.category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${n.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}`,
+    }));
+    return [...staticParams, ...dbParams];
+  } catch {
+    return staticParams;
+  }
 }
 
 // Dynamic SEO Metadata generation

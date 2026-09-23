@@ -13,6 +13,7 @@ type Notice = {
   category: string;
   isNew: boolean;
   link?: string;
+  slug?: string;
 };
 
 export default function NoticeBoard() {
@@ -25,7 +26,9 @@ export default function NoticeBoard() {
         const res = await fetch("/api/admin/notices");
         if (res.ok) {
           const data = await res.json();
-          setDbNotices(data);
+          if (Array.isArray(data)) {
+            setDbNotices(data);
+          }
         }
       } catch (err) {
         console.error("Failed to fetch notices:", err);
@@ -68,8 +71,21 @@ export default function NoticeBoard() {
     return {
       title: cat,
       items: dbItems.length > 0 
-        ? dbItems.map(n => ({ title: n.title, isNew: n.isNew, link: n.link }))
-        : (staticCol?.items.map(title => ({ title, isNew: true, link: "" })) || [])
+        ? dbItems.map(n => {
+            const fallbackSlug = `${cat.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${n.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}`;
+            return {
+              title: n.title,
+              isNew: n.isNew,
+              link: n.link,
+              slug: n.slug || getNoticeSlug(n.title, cat) || fallbackSlug
+            };
+          })
+        : (staticCol?.items.map(title => ({
+            title,
+            isNew: true,
+            link: "",
+            slug: getNoticeSlug(title, cat)
+          })) || [])
     };
   });
 
@@ -123,10 +139,8 @@ export default function NoticeBoard() {
                     {/* Continuous looping scroll container */}
                     <div className="flex flex-col gap-3 animate-marquee-vertical hover:[animation-play-state:paused] py-2">
                       {duplicatedItems.map((item, idx) => {
-                        const originalIndex = idx % col.items.length;
                         const isNew = item.isNew;
-                        const slug = getNoticeSlug(item.title, col.title);
-                        const href = item.link || `/notice/${slug}`;
+                        const href = item.link || `/notice/${item.slug}`;
 
                         return (
                           <Link 
