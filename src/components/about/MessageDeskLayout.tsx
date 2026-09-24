@@ -104,7 +104,7 @@ export default function MessageDeskLayout({
             </div>
 
             <div
-              className="about-message-content text-gray-600 font-medium text-sm md:text-base space-y-6 [&_blockquote]:border-l-4 [&_blockquote]:border-secondary [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-primary [&_blockquote]:font-bold [&_p]:leading-relaxed [&_strong]:text-primary"
+              className="about-message-content rich-html-content text-gray-600 font-medium text-sm md:text-base space-y-6 [&_blockquote]:border-l-4 [&_blockquote]:border-secondary [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-primary [&_blockquote]:font-bold [&_p]:leading-relaxed [&_strong]:text-primary"
               dangerouslySetInnerHTML={{ __html: content }}
             />
 

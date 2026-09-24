@@ -76,7 +76,7 @@ export default function AboutManagementPage() {
 
       <section className="px-6 py-16 max-w-5xl mx-auto">
         <div
-          className="about-management-intro text-center space-y-6 [&_img]:mx-auto [&_img]:w-full [&_img]:max-w-4xl [&_img]:rounded-xl [&_img]:shadow-lg [&_h1]:text-2xl [&_h1]:md:text-3xl [&_h1]:font-black [&_h1]:text-[#2f2771] [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:font-black [&_h2]:text-[#2f2771] [&_p]:text-[#4a4a4a] [&_p]:text-sm [&_p]:md:text-base [&_p]:leading-relaxed [&_p]:max-w-3xl [&_p]:mx-auto"
+          className="about-management-intro rich-html-content text-center space-y-6 [&_img]:mx-auto [&_img]:w-full [&_img]:max-w-4xl [&_img]:rounded-xl [&_img]:shadow-lg [&_h1]:text-2xl [&_h1]:md:text-3xl [&_h1]:font-black [&_h1]:text-[#2f2771] [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:font-black [&_h2]:text-[#2f2771] [&_p]:text-[#4a4a4a] [&_p]:text-sm [&_p]:md:text-base [&_p]:leading-relaxed [&_p]:max-w-3xl [&_p]:mx-auto"
           dangerouslySetInnerHTML={{ __html: pageData.content }}
         />
       </section>

@@ -10,7 +10,8 @@ import GsapCounter from "@/components/ui/GsapCounter";
 import { 
   Shield, Tv, Sparkles, CheckCircle2, ChevronRight, HelpCircle, 
   Dumbbell, Users, Star, ChevronDown, Download, ArrowRight, 
-  History, Shirt, Ban, CalendarRange, X, ChevronLeft, ImageIcon
+  History, Shirt, Ban, CalendarRange, X, ChevronLeft, ImageIcon,
+  Activity, ShoppingBag, Heart, ShieldAlert
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -48,6 +49,47 @@ type HostelPhoto = {
   category: string;
 };
 
+type DBCareSection = { title: string; content: string[] };
+type DBCareContent = {
+  title: string;
+  status?: string;
+  sections: DBCareSection[];
+};
+
+const careStats = [
+  { label: "Full-Time Nurse", value: "1 Resident" },
+  { label: "Doctor Audits", value: "Weekly" },
+  { label: "Laundry Cycles", value: "Daily" },
+  { label: "Security Gates", value: "24/7 Guarded" }
+];
+
+const careServices = [
+  {
+    title: "Medical Infirmary",
+    desc: "Equipped health care center with a resident full-time nurse to monitor minor ailments. A part-time school doctor visits for weekly checkups and emergencies.",
+    icon: Activity,
+    color: "bg-red-50 text-red-500 border-red-100"
+  },
+  {
+    title: "Bal Dukan (Tuck Shop)",
+    desc: "An in-campus utility store that supplies boarders with toiletries, stationery, basic snacks, and everyday personal grooming items at regulated pricing.",
+    icon: ShoppingBag,
+    color: "bg-amber-50 text-amber-600 border-amber-100"
+  },
+  {
+    title: "Laundry & Linen Services",
+    desc: "Daily automated laundry facilities to handle school uniforms, casual boarder garments, and weekly linen/bedsheet washes for maximum cleanliness.",
+    icon: Shirt,
+    color: "bg-blue-50 text-blue-600 border-blue-100"
+  },
+  {
+    title: "Counseling & Wellbeing",
+    desc: "Personalized emotional guidance led by school wellness warden Ms. Neelam Parihar. Helps girls transition smoothly into residential schedules.",
+    icon: Heart,
+    color: "bg-pink-50 text-pink-600 border-pink-100"
+  }
+];
+
 const defaultHostelPhotos: HostelPhoto[] = [
   { src: "/uploads/hostel/hostel.jpg", title: "Premium Residence", category: "Campus" },
   { src: "/uploads/hostel/Cafeteria.png", title: "Student Cafeteria", category: "Mess" },
@@ -66,6 +108,7 @@ export default function HostelPage() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
   const [prospectusUrl, setProspectusUrl] = useState<string | null>(null);
+  const [dbCareContent, setDbCareContent] = useState<DBCareContent | null>(null);
 
   const [filters, setFilters] = useState<string[]>(["All", "Rooms", "Mess", "Campus"]);
 
@@ -79,6 +122,20 @@ export default function HostelPage() {
         }
       } catch (err) {
         console.error("Failed to fetch hostel data:", err);
+      }
+    }
+
+    async function fetchCareContent() {
+      try {
+        const res = await fetch("/api/admin/pages?slug=hostel-care");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.sections && data.sections.length > 0) {
+            setDbCareContent(data);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch dynamic hostel care content:", err);
       }
     }
 
@@ -131,7 +188,7 @@ export default function HostelPage() {
       }
     }
 
-    Promise.all([fetchHostelData(), fetchHostelPhotos(), fetchHostelFilters(), checkProspectus()]);
+    Promise.all([fetchHostelData(), fetchCareContent(), fetchHostelPhotos(), fetchHostelFilters(), checkProspectus()]);
   }, []);
 
   const filteredPhotos = activeFilter === "All"
@@ -580,6 +637,129 @@ export default function HostelPage() {
               </FadeIn>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Hostel Care & Pastoral Wellbeing Section */}
+      <section id="care" className="py-32 md:py-40 px-6 bg-[#F8F9FC] relative overflow-hidden">
+        <div className="max-w-7xl mx-auto space-y-16">
+          <div className="text-center space-y-4">
+            <Reveal>
+              <span className="text-accent font-black uppercase tracking-[0.4em] text-xs block">
+                Holistic Support Systems
+              </span>
+            </Reveal>
+            <Reveal width="100%">
+              <h2 className="text-3xl md:text-5xl font-black text-[#3D348B] uppercase font-montserrat tracking-tight">
+                Hostel Care & Health
+              </h2>
+            </Reveal>
+            <p className="text-gray-500 font-medium text-sm md:text-base max-w-2xl mx-auto">
+              Ensuring physical wellness, emotional counseling, daily utility services, and 24/7 security for all boarders.
+            </p>
+            <div className="h-1 w-16 bg-accent mx-auto mt-2 rounded-full" />
+          </div>
+
+          {/* Quick Care Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {careStats.map((stat, idx) => (
+              <FadeIn key={idx} delay={idx * 0.05}>
+                <div className="bg-white border border-slate-100 rounded-[2rem] p-6 text-center shadow-premium-sm space-y-1 hover:shadow-premium-md transition-shadow">
+                  <p className="text-3xl md:text-4xl font-black text-[#3D348B]">{stat.value}</p>
+                  <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-[#7678ED]">{stat.label}</p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+
+          {/* Dynamic DB Content (if configured in Admin) */}
+          {dbCareContent && dbCareContent.sections && dbCareContent.sections.length > 0 && (
+            <FadeIn>
+              <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 md:p-12 shadow-premium-sm space-y-8">
+                <div className="border-l-4 border-accent pl-6">
+                  <h3 className="text-2xl md:text-3xl font-black text-[#3D348B] uppercase tracking-tight font-montserrat">
+                    {dbCareContent.title}
+                  </h3>
+                  {dbCareContent.status && (
+                    <p className="text-gray-400 font-bold uppercase tracking-widest text-xs mt-1">{dbCareContent.status}</p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {dbCareContent.sections.map((section, sIdx) => (
+                    <article key={sIdx} className="bg-[#F8F9FC] border border-slate-100 rounded-[2rem] p-6 space-y-3">
+                      <h4 className="text-base font-black text-[#3D348B] uppercase tracking-tight flex items-center gap-2 font-montserrat">
+                        <span className="w-2 h-2 rounded-full bg-accent" />
+                        {section.title}
+                      </h4>
+                      <ul className="space-y-2.5">
+                        {section.content.map((line, lIdx) => (
+                          <li key={lIdx} className="text-gray-600 font-semibold text-xs leading-relaxed flex gap-3">
+                            <span className="text-accent mt-1 shrink-0">•</span>
+                            <span>{line}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </FadeIn>
+          )}
+
+          {/* Care Services Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {careServices.map((serv, idx) => {
+              const Icon = serv.icon;
+              return (
+                <FadeIn key={idx} delay={idx * 0.08}>
+                  <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-premium-sm hover:shadow-premium-lg transition-all duration-500 flex flex-col sm:flex-row gap-6 items-start h-full">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border ${serv.color}`}>
+                      <Icon size={26} />
+                    </div>
+                    <div className="space-y-2 flex-1">
+                      <h3 className="text-xl font-black text-[#3D348B] uppercase tracking-tight font-montserrat">
+                        {serv.title}
+                      </h3>
+                      <p className="text-xs md:text-sm text-gray-500 font-medium leading-relaxed">
+                        {serv.desc}
+                      </p>
+                    </div>
+                  </div>
+                </FadeIn>
+              );
+            })}
+          </div>
+
+          {/* Emergency Alert & Clearance Banner */}
+          <FadeIn delay={0.2}>
+            <div className="bg-[#3D348B] text-white rounded-[2.5rem] p-8 md:p-12 shadow-premium-lg relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 rounded-full blur-[80px] pointer-events-none" />
+              <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                <div className="md:col-span-8 space-y-4 text-left">
+                  <div className="flex items-center gap-2 text-accent">
+                    <ShieldAlert size={20} />
+                    <span className="font-black uppercase tracking-[0.3em] text-xs">Emergency Alert</span>
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-black uppercase font-montserrat tracking-tight text-white">
+                    Wellbeing Clearance & Medical Support
+                  </h3>
+                  <p className="text-white/80 font-medium text-xs md:text-sm leading-relaxed max-w-xl">
+                    In the event of critical sickness, parents are immediately notified by the wardens. A dedicated school ambulance stands by 24/7 to transport students to district hospitals in Rani or Falna if recommended by the resident doctor.
+                  </p>
+                </div>
+                <div className="md:col-span-4 flex justify-start md:justify-end">
+                  <Link
+                    href="/contact"
+                    className="bg-accent hover:bg-accent-hover text-[#3D348B] font-black px-7 py-4 rounded-2xl transition-all inline-flex items-center gap-2 text-xs uppercase tracking-widest shadow-premium-md hover:-translate-y-0.5"
+                  >
+                    Contact Wardens
+                    <ChevronRight size={16} />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </FadeIn>
         </div>
       </section>
 

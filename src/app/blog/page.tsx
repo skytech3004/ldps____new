@@ -8,6 +8,7 @@ import Reveal from "@/components/ui/Reveal";
 import FadeIn from "@/components/ui/FadeIn";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, Calendar, User, ArrowRight, BookMarked, X, ChevronDown, Tag } from "lucide-react";
+import RichHtmlContent from "@/components/RichHtmlContent";
 
 type BlogPost = {
   _id: string;
@@ -457,16 +458,8 @@ export default function BlogIndexPage() {
                 </div>
 
                 {/* Rich HTML Content */}
-                <div className="prose prose-sm md:prose-base max-w-none text-gray-600 font-medium leading-relaxed space-y-4 pt-2 border-b border-gray-100 pb-6">
-                  {/<[a-z][\s\S]*>/i.test(activePost.content) ? (
-                    <div dangerouslySetInnerHTML={{ __html: activePost.content }} />
-                  ) : (
-                    <div className="space-y-4 whitespace-pre-wrap text-left">
-                      {activePost.content.split(/\n\s*\n/).map((para, i) => (
-                        <p key={i}>{para.trim()}</p>
-                      ))}
-                    </div>
-                  )}
+                <div className="border-b border-gray-100 pb-6 pt-2">
+                  <RichHtmlContent html={activePost.content} className="text-gray-600 font-medium" />
                 </div>
 
                 {/* Actions bottom */}
