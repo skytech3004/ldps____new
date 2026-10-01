@@ -62,6 +62,7 @@ const NoticeSchema = new Schema(
 );
 
 NoticeSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0, sparse: true });
+NoticeSchema.index({ category: 1, date: -1 });
 
 export type NoticeDocument = InferSchemaType<typeof NoticeSchema> & { _id: string };
 

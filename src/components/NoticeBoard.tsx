@@ -23,7 +23,7 @@ export default function NoticeBoard() {
   useEffect(() => {
     async function fetchNotices() {
       try {
-        const res = await fetch("/api/admin/notices");
+        const res = await fetch("/api/admin/notices?summary=1");
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {

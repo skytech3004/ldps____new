@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { BrandModel } from "@/models/Brand";
+import { publicCacheHeaders } from "@/lib/publicCache";
 
 export async function GET(request: Request) {
   try {
@@ -10,11 +11,11 @@ export async function GET(request: Request) {
 
     if (key) {
       const item = await BrandModel.findOne({ key }).lean();
-      return NextResponse.json(item || { key, value: "" });
+      return NextResponse.json(item || { key, value: "" }, { headers: publicCacheHeaders });
     }
 
-    const items = await BrandModel.find({}).lean();
-    return NextResponse.json(items);
+    const items = await BrandModel.find({}).select("key value alt").lean();
+    return NextResponse.json(items, { headers: publicCacheHeaders });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch brand items.";
     return NextResponse.json({ error: message }, { status: 500 });

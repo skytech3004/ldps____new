@@ -13,5 +13,7 @@ const TestimonialSchema = new Schema(
   { timestamps: true }
 );
 
+TestimonialSchema.index({ status: 1, sortOrder: 1 });
+
 export type TestimonialDocument = InferSchemaType<typeof TestimonialSchema> & { _id: string };
 export const TestimonialModel = models.Testimonial || model("Testimonial", TestimonialSchema);

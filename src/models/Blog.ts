@@ -16,5 +16,7 @@ const BlogSchema = new Schema(
   { timestamps: true }
 );
 
+BlogSchema.index({ status: 1, updatedAt: -1 });
+
 export type BlogDocument = InferSchemaType<typeof BlogSchema> & { _id: string };
 export const BlogModel = models.Blog || model("Blog", BlogSchema);

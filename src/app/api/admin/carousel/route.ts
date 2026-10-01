@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { CarouselModel } from "@/models/Carousel";
+import { publicCacheHeaders } from "@/lib/publicCache";
 
 const defaultSlides = [
   { image: "/lps-vidhyawadi/about-banner.jpg", title: "Campus Banner", description: "LPS Vidyawadi campus banner" },
@@ -40,12 +41,12 @@ export async function GET(request: Request) {
             description: "Hostels, labs, library, sports grounds, dining, transport, and support systems for holistic student life.",
           },
         ];
-        return NextResponse.json({ key: "hero", slides: defaultHeroSlides });
+        return NextResponse.json({ key: "hero", slides: defaultHeroSlides }, { headers: publicCacheHeaders });
       }
       // Return default slides if not created in database yet
-      return NextResponse.json({ key: "homepage", slides: defaultSlides });
+      return NextResponse.json({ key: "homepage", slides: defaultSlides }, { headers: publicCacheHeaders });
     }
-    return NextResponse.json(carousel);
+    return NextResponse.json(carousel, { headers: publicCacheHeaders });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch carousel.";
     return NextResponse.json({ error: message }, { status: 500 });

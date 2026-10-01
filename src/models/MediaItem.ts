@@ -13,6 +13,9 @@ const MediaItemSchema = new Schema(
   }
 );
 
+MediaItemSchema.index({ type: 1, createdAt: -1 });
+MediaItemSchema.index({ category: 1, createdAt: -1 });
+
 export type MediaItemDocument = InferSchemaType<typeof MediaItemSchema> & { _id: string };
 
 export const MediaItemModel = models.MediaItem || model("MediaItem", MediaItemSchema);

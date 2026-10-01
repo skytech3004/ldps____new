@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface HeroSlide {
@@ -37,13 +37,17 @@ const socialSidebar = [
   }
 ];
  
-export default function Hero() {
+export default function Hero({
+  initialSlides = [],
+}: {
+  initialSlides?: HeroSlide[];
+}) {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [slides, setSlides] = useState<HeroSlide[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [transitionStyle, setTransitionStyle] = useState("fade");
+  const [slides, setSlides] = useState<HeroSlide[]>(initialSlides);
+  const [loading, setLoading] = useState(initialSlides.length === 0);
  
   useEffect(() => {
+    if (initialSlides.length > 0) return;
     async function loadHeroSlides() {
       try {
         const res = await fetch("/api/admin/carousel?key=hero");
@@ -51,9 +55,6 @@ export default function Hero() {
           const data = await res.json();
           if (Array.isArray(data.slides)) {
             setSlides(data.slides);
-          }
-          if (data.transition) {
-            setTransitionStyle(data.transition);
           }
         }
       } catch (err) {
@@ -67,10 +68,16 @@ export default function Hero() {
 
   useEffect(() => {
     if (slides.length === 0) return;
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000); // Auto-advance every 5 seconds
-    return () => clearInterval(timer);
+    let timer = 0;
+    const start = window.setTimeout(() => {
+      timer = window.setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
+      }, 5000);
+    }, 12000);
+    return () => {
+      window.clearTimeout(start);
+      window.clearInterval(timer);
+    };
   }, [slides]);
 
   const nextSlide = () => {
@@ -84,8 +91,11 @@ export default function Hero() {
 
   if (loading) {
     return (
-      <div className="h-[60vh] lg:h-[85vh] flex items-center justify-center bg-[#081736] text-white">
-        <span className="animate-pulse font-bold tracking-widest text-sm uppercase">Loading Campus Showcase...</span>
+      <div className="relative pt-32 lg:pt-0">
+        <div className="bg-yellow-accent py-3 px-6 border-b border-navy/10" />
+        <div className="h-[60vh] lg:h-[85vh] flex items-center justify-center bg-[#081736] text-white">
+          <span className="animate-pulse font-bold tracking-widest text-sm uppercase">Loading Campus Showcase...</span>
+        </div>
       </div>
     );
   }
@@ -110,41 +120,22 @@ export default function Hero() {
       {/* Hero Content */}
       <div className="relative h-[60vh] lg:h-[85vh] overflow-hidden group">
         {/* Background Image Carousel */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide}
-            initial={
-              transitionStyle === "slideLeft" ? { opacity: 0, x: "100%" } :
-              transitionStyle === "slideRight" ? { opacity: 0, x: "-100%" } :
-              transitionStyle === "zoom" ? { opacity: 0, scale: 1.15 } :
-              { opacity: 0 }
-            }
-            animate={
-              transitionStyle === "zoom" ? { opacity: 1, scale: 1 } :
-              { opacity: 1, x: 0 }
-            }
-            exit={
-              transitionStyle === "slideLeft" ? { opacity: 0, x: "-100%" } :
-              transitionStyle === "slideRight" ? { opacity: 0, x: "100%" } :
-              transitionStyle === "zoom" ? { opacity: 0, scale: 0.95 } :
-              { opacity: 0 }
-            }
-            transition={{
-              duration: transitionStyle === "zoom" ? 1.2 : 0.8,
-              ease: "easeInOut"
+        <div className="absolute inset-0">
+          <Image
+            src={slides[currentSlide].image || "/uploads/hostel/hostel.jpg"}
+            alt={`LPS Vidyawadi campus ${currentSlide + 1}`}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+            onError={(event) => {
+              const image = event.currentTarget;
+              if (!image.src.endsWith("/uploads/hostel/hostel.jpg")) {
+                image.src = "/uploads/hostel/hostel.jpg";
+              }
             }}
-            className="absolute inset-0"
-          >
-            <img 
-              src={slides[currentSlide].image}
-              alt={`LPS Vidyawadi campus ${currentSlide + 1}`}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.src = "/uploads/hostel/hostel.jpg";
-              }}
-            />
-          </motion.div>
-        </AnimatePresence>
+          />
+        </div>
 
         {/* Premium Glassmorphic Text Card Overlay */}
         <div className="absolute bottom-16 left-6 md:left-20 z-30 max-w-xl text-left text-white bg-black/40 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-[2rem] shadow-premium-lg pointer-events-none">

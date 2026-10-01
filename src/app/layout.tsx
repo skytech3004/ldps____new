@@ -5,9 +5,12 @@ import "./globals.css";
 const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
+  display: "swap",
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.lpsvidhyawadi.com"),
   title: {
     default: "LPS Vidyawadi | Leeladevi Parasmal Sancheti English Medium School",
     template: "%s | LPS Vidyawadi"

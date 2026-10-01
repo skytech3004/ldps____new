@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { TestimonialModel } from "@/models/Testimonial";
+import { publicCacheHeaders } from "@/lib/publicCache";
 
 const DEFAULT_TESTIMONIALS = [
   {
@@ -51,8 +52,11 @@ export async function GET() {
     if ((await TestimonialModel.estimatedDocumentCount()) === 0) {
       await TestimonialModel.insertMany(DEFAULT_TESTIMONIALS);
     }
-    const items = await TestimonialModel.find().sort({ sortOrder: 1, createdAt: 1 }).lean();
-    return NextResponse.json(items);
+    const items = await TestimonialModel.find()
+      .select("quote name role location rating sortOrder status")
+      .sort({ sortOrder: 1, createdAt: 1 })
+      .lean();
+    return NextResponse.json(items, { headers: publicCacheHeaders });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch testimonials.";
     return NextResponse.json({ error: message }, { status: 500 });

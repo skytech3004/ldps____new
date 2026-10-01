@@ -34,7 +34,7 @@ export default function LifeAtVidyawadi() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/admin/media-items"); // Fetch all types
+        const res = await fetch("/api/admin/media-items?fields=card");
         if (res.ok) {
           const data = await res.json();
           const processed = (data || []).map((item: any) => {

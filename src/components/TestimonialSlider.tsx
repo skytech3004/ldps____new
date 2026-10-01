@@ -47,7 +47,7 @@ export default function TestimonialSlider() {
     let cancelled = false;
     async function load() {
       try {
-        const res = await fetch("/api/admin/testimonials", { cache: "no-store" });
+        const res = await fetch("/api/admin/testimonials");
         if (!res.ok) return;
         const data: Testimonial[] = await res.json();
         const active = (Array.isArray(data) ? data : []).filter((item) => item.status !== "inactive" && item.quote && item.name);

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { NoticeModel } from "@/models/Notice";
 import { allNotices } from "@/data/noticeData";
+import { publicCacheHeaders } from "@/lib/publicCache";
 
 const NEWS_AND_CIRCULARS = "News & Circulars";
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -51,6 +52,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     const slug = searchParams.get("slug");
+    const summary = searchParams.get("summary") === "1";
 
     if (id) {
       const item = await NoticeModel.findById(id).lean();
@@ -71,8 +73,10 @@ export async function GET(request: Request) {
       return NextResponse.json(item);
     }
 
-    const items = await NoticeModel.find().sort({ date: -1, createdAt: -1 }).lean();
-    return NextResponse.json(items);
+    const finder = NoticeModel.find().sort({ date: -1, createdAt: -1 });
+    if (summary) finder.select("title slug category isNew link date");
+    const items = await finder.lean();
+    return NextResponse.json(items, { headers: publicCacheHeaders });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch notices.";
     return NextResponse.json({ error: message }, { status: 500 });

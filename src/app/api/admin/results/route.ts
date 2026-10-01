@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { BoardResultModel } from "@/models/BoardResult";
 import { defaultBoardResults } from "@/data/boardResults";
+import { publicCacheHeaders } from "@/lib/publicCache";
 
 async function seedResults() {
   const count = await BoardResultModel.estimatedDocumentCount();
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
     if (listType === "years") {
       const years = await BoardResultModel.find().select("year").sort({ year: -1 }).lean();
       const list = years.map((y) => y.year);
-      return NextResponse.json(list);
+      return NextResponse.json(list, { headers: publicCacheHeaders });
     }
 
     // If query is for a specific year

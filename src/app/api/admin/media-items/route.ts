@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { MediaItemModel } from "@/models/MediaItem";
+import { publicCacheHeaders } from "@/lib/publicCache";
 
 function normalizeMediaItem(body: Record<string, unknown>) {
   const category = String(body.category ?? "").trim();
@@ -20,14 +21,13 @@ export async function GET(request: Request) {
     await connectToDatabase();
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type");
+    const card = searchParams.get("fields") === "card";
 
-    let query = {};
-    if (type) {
-      query = { type };
-    }
-
-    const items = await MediaItemModel.find(query).sort({ createdAt: -1 }).lean();
-    return NextResponse.json(items);
+    const query = type ? { type } : {};
+    const finder = MediaItemModel.find(query).sort({ createdAt: -1 });
+    if (card) finder.select("title src alt type category");
+    const items = await finder.lean();
+    return NextResponse.json(items, { headers: publicCacheHeaders });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch media items.";
     return NextResponse.json({ error: message }, { status: 500 });
