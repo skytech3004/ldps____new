@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { X, ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
@@ -24,6 +25,24 @@ interface GalleryAlbum {
   cover?: string;
   featured?: boolean;
   createdAt?: string;
+}
+
+const OPTIMIZED_HOSTS = new Set([
+  "images.unsplash.com",
+  "www.lpsvidhyawadi.com",
+  "lpsvidhyawadi.com",
+  "img.youtube.com",
+]);
+
+function imageProps(src: string) {
+  if (src.startsWith("/") && !src.endsWith(".svg")) return { unoptimized: false };
+  try {
+    const host = new URL(src).hostname;
+    if (OPTIMIZED_HOSTS.has(host)) return { unoptimized: false };
+  } catch {
+    // Relative or invalid URLs stay unoptimized.
+  }
+  return { unoptimized: true };
 }
 
 type GalleryDisplayItem = {
@@ -240,12 +259,17 @@ export default function PhotoGalleryClient() {
 
             {/* Polaroid Padded Image Frame */}
             <div className="relative aspect-[4/3] rounded-xl overflow-hidden mt-auto bg-slate-50 border border-slate-100/50 shadow-inner flex items-center justify-center">
-              <img
-                src={item.src}
-                alt={item.alt || item.title}
-                className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-770 ease-out"
-                loading="lazy"
-              />
+              {item.src ? (
+                <Image
+                  src={item.src}
+                  alt={item.alt || item.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  quality={70}
+                  className="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+                  {...imageProps(item.src)}
+                />
+              ) : null}
               {/* Overlay visual badge */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-start p-3">
                 <span className="inline-flex items-center gap-1 text-[11px] font-black text-white uppercase bg-[#3D348B]/80 px-2.5 py-1 rounded-lg backdrop-blur-sm">
@@ -299,12 +323,16 @@ export default function PhotoGalleryClient() {
                 exit={{ scale: 0.95, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 28 }}
                 onClick={(e) => e.stopPropagation()}
-                className="relative max-h-full max-w-full md:max-w-4xl flex flex-col items-center justify-center"
+                className="relative h-[70vh] w-full max-w-4xl overflow-hidden rounded-xl border border-white/5 shadow-2xl"
               >
-                <img
+                <Image
                   src={filteredItems[activePhoto].src}
                   alt={filteredItems[activePhoto].alt || filteredItems[activePhoto].title}
-                  className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl border border-white/5 shadow-2xl"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 896px"
+                  quality={80}
+                  className="object-contain rounded-xl"
+                  {...imageProps(filteredItems[activePhoto].src)}
                 />
               </motion.div>
 
