@@ -97,6 +97,13 @@ export const adminNavGroups: NavGroup[] = [
         roles: ["super_admin", "admin", "admission"],
       },
       {
+        href: "/admin/testimonials",
+        label: "Parents & Alumni Say",
+        icon: MessageSquare,
+        description: "Homepage quotes from parents and alumni.",
+        roles: ["super_admin", "admin"],
+      },
+      {
         href: "/admin/results",
         label: "Board Results",
         icon: Trophy,
@@ -283,6 +290,13 @@ export const adminNavGroups: NavGroup[] = [
         label: "Media Gallery",
         icon: Images,
         description: "Photo albums, campus event galleries, and image categories.",
+        roles: ["super_admin", "admin"],
+      },
+      {
+        href: "/admin/media-library",
+        label: "Media Library",
+        icon: Images,
+        description: "Smoother desk for photos, event photos, videos, Guide & Bulbul, and NCC.",
         roles: ["super_admin", "admin"],
       },
       {

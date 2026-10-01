@@ -87,7 +87,7 @@ export default function Navbar() {
         { label: "Hostel", href: "/hostel" },
         //  { label: "Hostel Care", href: "/hostel-care" },
         { label: "Meals", href: "/meals" },
-        { label: "A Day at School", href: "/a-day-at-school" },
+        // { label: "A Day at School", href: "/a-day-at-school" },
         // { label: "Items Required By Boarders", href: "/items-required-by-boarders" },
         { label: "Investiture Ceremony", href: "/investiture-ceremony" },
 
@@ -108,6 +108,7 @@ export default function Navbar() {
       dropdown: [
         { label: "Magazine", href: "/magazine" },
         { label: "News", href: "/news" },
+        { label: "Blog", href: "/blog" },
         //{ label: "Transport", href: "/transport" },
         //  { label: "Public Disclosures", href: "/public-disclosures-cbse" },
         //{ label: "G.R. Mechanism", href: "/g-r-mechanism" },
@@ -116,7 +117,6 @@ export default function Navbar() {
         { label: "Alumni Registration", href: "/alumni" },
       ],
     },
-    { name: "Blog", href: "/blog" },
     { name: "Careers", href: "/career" },
     { name: "Contact", href: "/contact" },
 

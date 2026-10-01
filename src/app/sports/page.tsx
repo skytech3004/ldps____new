@@ -27,6 +27,7 @@ interface Stat {
 interface SportsData {
   complexImages: string[];
   players: Player[];
+  statePlayers?: Player[];
   games: Game[];
   stats: Stat[];
 }
@@ -146,6 +147,7 @@ export default function SportsPage() {
 
   const complexImages = data?.complexImages || [];
   const players = data?.players || [];
+  const statePlayers = data?.statePlayers || [];
   const games = data?.games || [];
   const stats = data?.stats || [];
 
@@ -327,6 +329,56 @@ export default function SportsPage() {
 
         </div>
       </section>
+
+      {statePlayers.length > 0 && (
+        <section className="py-20 px-6 bg-white text-primary">
+          <div className="max-w-7xl mx-auto space-y-12">
+            <div className="text-center space-y-3">
+              <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">State Milestones</span>
+              <h2 className="text-2xl md:text-4xl font-black font-montserrat uppercase">
+                Our State Players
+              </h2>
+              <div className="h-1.5 w-24 bg-accent mx-auto rounded-full" />
+              <p className="text-gray-500 text-xs md:text-sm max-w-xl mx-auto pt-2">
+                Students selected to represent the school at state-level championships.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6">
+              {statePlayers.map((star, idx) => (
+                <div
+                  key={`${star.name}-${idx}`}
+                  className="bg-[#F8F9FC] border border-gray-100 rounded-3xl overflow-hidden shadow-sm hover:scale-[1.03] transition-all duration-300 flex flex-col h-[380px] text-left group"
+                >
+                  <div className="relative h-56 w-full bg-slate-100 overflow-hidden shrink-0 border-b border-gray-100 flex items-center justify-center">
+                    {star.image ? (
+                      <img
+                        src={star.image}
+                        alt={star.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center text-primary/30 border border-primary/5">
+                        <Users size={40} />
+                      </div>
+                    )}
+                    <span className="absolute top-3 right-3 text-[9px] font-black text-white uppercase tracking-widest bg-primary px-2.5 py-1 rounded-full">State</span>
+                  </div>
+                  <div className="p-5 flex-1 flex flex-col justify-between">
+                    <div className="space-y-1">
+                      <h4 className="font-black text-base md:text-lg uppercase tracking-tight text-primary leading-tight">{star.name}</h4>
+                      <p className="text-xs text-gray-400 font-bold">{star.role}</p>
+                    </div>
+                    <div className="pt-2 border-t border-gray-100">
+                      <p className="text-[10px] uppercase font-black tracking-wider text-accent leading-relaxed">{star.achievement}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Players Carousel Section for Other Players & Sports Achievers */}
       {players.length > 0 && (

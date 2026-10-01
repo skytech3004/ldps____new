@@ -38,7 +38,7 @@ export default function Home() {
 
 
       {/* Journal & Upcoming Events Section */}
-      <UpcomingEventsAndBlogs />
+      {/* <UpcomingEventsAndBlogs /> */}
 
       {/* Parent & Alumni Testimonial Slider */}
       <TestimonialSlider />

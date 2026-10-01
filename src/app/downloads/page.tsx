@@ -8,13 +8,13 @@ import { Download, FileText, CalendarDays, ArrowRight, ShieldCheck, HelpCircle }
 import { motion } from "framer-motion";
 
 const fallbackForms = [
-  {
-    title: "Student Leave Application Form",
-    description: "Prescribed form for submitting student leave requests to the Principal, detailing the duration and reasons.",
-    filename: "LPS_Student_Leave_Form.pdf",
-    fileSize: "184 KB",
-    pdfUrl: "#"
-  },
+  // {
+  //   title: "Student Leave Application Form",
+  //   description: "Prescribed form for submitting student leave requests to the Principal, detailing the duration and reasons.",
+  //   filename: "LPS_Student_Leave_Form.pdf",
+  //   fileSize: "184 KB",
+  //   pdfUrl: "#"
+  // },
   {
     title: "School E-Prospectus & Brochure",
     description: "Official school prospectus detailing standard guidelines, infrastructure details, streams offered, and values.",
@@ -22,13 +22,13 @@ const fallbackForms = [
     fileSize: "2.4 MB",
     pdfUrl: "#"
   },
-  {
-    title: "T.C. Application Request Form",
-    description: "Standard written application form required to initiate student withdrawals and Transfer Certificate clearances.",
-    filename: "LPS_TC_Request_Form.pdf",
-    fileSize: "142 KB",
-    pdfUrl: "#"
-  },
+  // {
+  //   title: "T.C. Application Request Form",
+  //   description: "Standard written application form required to initiate student withdrawals and Transfer Certificate clearances.",
+  //   filename: "LPS_TC_Request_Form.pdf",
+  //   fileSize: "142 KB",
+  //   pdfUrl: "#"
+  // },
   {
     title: "Annual Activity Planner & Calendar",
     description: "Year planner detailing summer and winter breaks, holidays, PTM dates, and exam schedules.",

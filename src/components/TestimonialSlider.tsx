@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Reveal from "@/components/ui/Reveal";
 import FadeIn from "@/components/ui/FadeIn";
 
-const testimonials = [
+const fallbackTestimonials = [
   {
     quote: "LPS Vidyawadi has exceeded our expectations. The 65-acre secure campus, professional warden care, and outstanding CBSE curriculum gave our daughter the perfect foundation to grow into an independent leader.",
     name: "Sunita Choudhary",
@@ -30,15 +30,54 @@ const testimonials = [
   }
 ];
 
+type Testimonial = {
+  quote: string;
+  name: string;
+  role: string;
+  location?: string;
+  rating?: number;
+  status?: string;
+};
+
 export default function TestimonialSlider() {
+  const [testimonials, setTestimonials] = useState(fallbackTestimonials);
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch("/api/admin/testimonials", { cache: "no-store" });
+        if (!res.ok) return;
+        const data: Testimonial[] = await res.json();
+        const active = (Array.isArray(data) ? data : []).filter((item) => item.status !== "inactive" && item.quote && item.name);
+        if (!cancelled && active.length > 0) {
+          setTestimonials(active.map((item) => ({
+            quote: item.quote,
+            name: item.name,
+            role: item.role,
+            location: item.location || "",
+            rating: item.rating || 5,
+          })));
+          setCurrent(0);
+        }
+      } catch (error) {
+        console.error("Failed to load testimonials", error);
+      }
+    }
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (testimonials.length === 0) return;
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % testimonials.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [testimonials.length]);
 
   const handlePrev = () => {
     setCurrent((prev) => (prev - 1 + testimonials.length) % testimonials.length);
@@ -47,6 +86,9 @@ export default function TestimonialSlider() {
   const handleNext = () => {
     setCurrent((prev) => (prev + 1) % testimonials.length);
   };
+
+  const slide = testimonials[current] || testimonials[0];
+  if (!slide) return null;
 
   return (
     <section className="py-32 md:py-40 px-6 bg-[#F8F9FC] border-t border-[#1F2937]/5">
@@ -86,27 +128,27 @@ export default function TestimonialSlider() {
               >
                 {/* Stars Rating */}
                 <div className="flex gap-1 text-accent">
-                  {[...Array(testimonials[current].rating)].map((_, i) => (
+                  {[...Array(slide.rating)].map((_, i) => (
                     <Star key={i} size={16} className="fill-current" />
                   ))}
                 </div>
 
                 {/* Quote Text */}
                 <p className="text-gray-600 font-medium text-base md:text-lg leading-relaxed italic">
-                  "{testimonials[current].quote}"
+                  "{slide.quote}"
                 </p>
 
                 {/* Profile Details */}
                 <div className="pt-4 border-t border-slate-50 flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-[#3D348B]/10 text-[#3D348B] flex items-center justify-center font-black text-sm uppercase">
-                    {testimonials[current].name.charAt(0)}
+                    {slide.name.charAt(0)}
                   </div>
                   <div>
                     <h4 className="font-black text-[#3D348B] text-sm uppercase tracking-wider">
-                      {testimonials[current].name}
+                      {slide.name}
                     </h4>
                     <p className="text-xs text-gray-400 font-bold">
-                      {testimonials[current].role} • {testimonials[current].location}
+                      {slide.role}{slide.location ? ` • ${slide.location}` : ""}
                     </p>
                   </div>
                 </div>

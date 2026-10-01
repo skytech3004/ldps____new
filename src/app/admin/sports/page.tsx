@@ -2,17 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { 
-  Trophy, Plus, Trash2, Save, Loader2, Sparkles, Upload, X, Shield, ArrowUp, ArrowDown, Users, Image as ImageIcon, ClipboardList, Pencil
+  Trophy, Plus, Trash2, Save, Loader2, Sparkles, Upload, X, Shield, ArrowUp, ArrowDown, Image as ImageIcon, ClipboardList, Pencil
 } from "lucide-react";
 import TipTapEditor from "@/components/TipTapEditor";
+import PlayerShowcasePanel, { type ShowcasePlayer } from "@/components/admin/PlayerShowcasePanel";
 
-interface Player {
-  _id?: string;
-  name: string;
-  role: string;
-  achievement: string;
-  image: string;
-}
+type Player = ShowcasePlayer;
 
 interface Game {
   _id?: string;
@@ -28,6 +23,7 @@ interface Stat {
 export default function AdminSportsPage() {
   const [complexImages, setComplexImages] = useState<string[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
+  const [statePlayers, setStatePlayers] = useState<Player[]>([]);
   const [games, setGames] = useState<Game[]>([]);
   const [stats, setStats] = useState<Stat[]>([]);
   
@@ -39,12 +35,6 @@ export default function AdminSportsPage() {
   const [complexUploadPreview, setComplexUploadPreview] = useState<string | null>(null);
   const [uploadingComplex, setUploadingComplex] = useState(false);
 
-  const [newPlayer, setNewPlayer] = useState<Player>({ name: "", role: "", achievement: "", image: "" });
-  const [editingPlayerIndex, setEditingPlayerIndex] = useState<number | null>(null);
-  const [newPlayerFile, setNewPlayerFile] = useState<File | null>(null);
-  const [playerUploadPreview, setPlayerUploadPreview] = useState<string | null>(null);
-  const [uploadingPlayer, setUploadingPlayer] = useState(false);
-
   const [newGame, setNewGame] = useState<Game>({ title: "", desc: "" });
   const [editingGameIndex, setEditingGameIndex] = useState<number | null>(null);
 
@@ -55,6 +45,7 @@ export default function AdminSportsPage() {
       const data = await res.json();
       setComplexImages(data.complexImages || []);
       setPlayers(data.players || []);
+      setStatePlayers(data.statePlayers || []);
       setGames(data.games || []);
       setStats(data.stats || [
         { count: "0", label: "District Selections" },
@@ -74,7 +65,7 @@ export default function AdminSportsPage() {
     fetchSportsData();
   }, []);
 
-  const saveSportsData = async (nextComplex: string[], nextPlayers: Player[], nextGames: Game[], nextStats: Stat[]) => {
+  const saveSportsData = async (nextComplex: string[], nextPlayers: Player[], nextStatePlayers: Player[], nextGames: Game[], nextStats: Stat[]) => {
     setSaving(true);
     try {
       const res = await fetch("/api/admin/sports", {
@@ -83,6 +74,7 @@ export default function AdminSportsPage() {
         body: JSON.stringify({
           complexImages: nextComplex,
           players: nextPlayers,
+          statePlayers: nextStatePlayers,
           games: nextGames,
           stats: nextStats
         }),
@@ -128,7 +120,7 @@ export default function AdminSportsPage() {
       
       const nextComplex = [...complexImages, data.upload.src];
       setComplexImages(nextComplex);
-      saveSportsData(nextComplex, players, games, stats);
+      saveSportsData(nextComplex, players, statePlayers, games, stats);
       
       setNewComplexImageFile(null);
       setComplexUploadPreview(null);
@@ -143,93 +135,7 @@ export default function AdminSportsPage() {
   const deleteComplexImage = (index: number) => {
     const nextComplex = complexImages.filter((_, idx) => idx !== index);
     setComplexImages(nextComplex);
-    saveSportsData(nextComplex, players, games, stats);
-  };
-
-  // Players actions
-  const handlePlayerFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setNewPlayerFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPlayerUploadPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const addPlayer = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPlayer.name || !newPlayer.role || !newPlayer.achievement) {
-      alert("Please fill in player name, role, and achievement.");
-      return;
-    }
-
-    let pImage = "";
-    if (newPlayerFile) {
-      setUploadingPlayer(true);
-      try {
-        const formData = new FormData();
-        formData.append("file", newPlayerFile);
-        formData.append("page", "sports");
-        formData.append("section", "sports");
-        formData.append("title", `Player ${newPlayer.name}`);
-
-        const res = await fetch("/api/admin/upload", {
-          method: "POST",
-          body: formData,
-        });
-        if (!res.ok) throw new Error("Player image upload failed");
-        const uploadData = await res.json();
-        pImage = uploadData.upload.src;
-      } catch (err) {
-        console.error(err);
-        alert("Failed to upload player image.");
-        setUploadingPlayer(false);
-        return;
-      } finally {
-        setUploadingPlayer(false);
-      }
-    }
-
-    const player: Player = {
-      name: newPlayer.name,
-      role: newPlayer.role,
-      achievement: newPlayer.achievement,
-      image: pImage || newPlayer.image,
-    };
-
-    const nextPlayers = editingPlayerIndex === null
-      ? [...players, player]
-      : players.map((existing, index) => index === editingPlayerIndex ? { ...existing, ...player } : existing);
-    setPlayers(nextPlayers);
-    saveSportsData(complexImages, nextPlayers, games, stats);
-
-    setNewPlayer({ name: "", role: "", achievement: "", image: "" });
-    setEditingPlayerIndex(null);
-    setNewPlayerFile(null);
-    setPlayerUploadPreview(null);
-  };
-
-  const deletePlayer = (index: number) => {
-    const nextPlayers = players.filter((_, idx) => idx !== index);
-    setPlayers(nextPlayers);
-    saveSportsData(complexImages, nextPlayers, games, stats);
-  };
-
-  const editPlayer = (index: number) => {
-    setNewPlayer(players[index]);
-    setEditingPlayerIndex(index);
-    setNewPlayerFile(null);
-    setPlayerUploadPreview(players[index].image || null);
-  };
-
-  const cancelPlayerEdit = () => {
-    setNewPlayer({ name: "", role: "", achievement: "", image: "" });
-    setEditingPlayerIndex(null);
-    setNewPlayerFile(null);
-    setPlayerUploadPreview(null);
+    saveSportsData(nextComplex, players, statePlayers, games, stats);
   };
 
   // Game Summaries actions
@@ -243,7 +149,7 @@ export default function AdminSportsPage() {
       ? [...games, { title: newGame.title, desc: newGame.desc }]
       : games.map((existing, index) => index === editingGameIndex ? { ...existing, title: newGame.title, desc: newGame.desc } : existing);
     setGames(nextGames);
-    saveSportsData(complexImages, players, nextGames, stats);
+    saveSportsData(complexImages, players, statePlayers, nextGames, stats);
     setNewGame({ title: "", desc: "" });
     setEditingGameIndex(null);
   };
@@ -251,7 +157,7 @@ export default function AdminSportsPage() {
   const deleteGame = (index: number) => {
     const nextGames = games.filter((_, idx) => idx !== index);
     setGames(nextGames);
-    saveSportsData(complexImages, players, nextGames, stats);
+    saveSportsData(complexImages, players, statePlayers, nextGames, stats);
   };
 
   const editGame = (index: number) => {
@@ -269,7 +175,7 @@ export default function AdminSportsPage() {
     const nextStats = [...stats];
     nextStats[index].count = countVal;
     setStats(nextStats);
-    saveSportsData(complexImages, players, games, nextStats);
+    saveSportsData(complexImages, players, statePlayers, games, nextStats);
   };
 
   return (
@@ -282,7 +188,7 @@ export default function AdminSportsPage() {
             <Trophy size={36} className="text-accent" />
             <span>Sports & Selections</span>
           </h1>
-          <p className="text-white/70 mt-2">Manage players, sports complex images, selections counters, and summaries. Saved automatically.</p>
+          <p className="text-white/70 mt-2">Manage national and state players, sports complex images, selections counters, and summaries. Saved automatically.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${
@@ -335,140 +241,27 @@ export default function AdminSportsPage() {
               </div>
             </div>
 
-            {/* Players Table / Upload Form */}
-            <div className="rounded-2xl border border-white/15 bg-[#0f234f]/80 p-5 space-y-6">
-              <h2 className="text-lg font-black border-b border-white/5 pb-2.5 flex items-center gap-2">
-                <Users size={18} className="text-accent" />
-                <span>National Players Showcase</span>
-              </h2>
+            <PlayerShowcasePanel
+              title="National Players Showcase"
+              badge="National"
+              achievementPlaceholder="e.g. 8 Times National Player"
+              players={players}
+              onChange={(next) => {
+                setPlayers(next);
+                saveSportsData(complexImages, next, statePlayers, games, stats);
+              }}
+            />
 
-              <form onSubmit={addPlayer} className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end bg-[#081736]/25 border border-white/5 p-4 rounded-xl">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-white/50 uppercase">Player Name *</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={newPlayer.name}
-                    onChange={(e) => setNewPlayer({ ...newPlayer, name: e.target.value })}
-                    placeholder="e.g. Ms. Manisha Kanwar"
-                    className="w-full bg-[#081736] border border-white/10 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-accent text-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-white/50 uppercase">Role / Class *</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={newPlayer.role}
-                    onChange={(e) => setNewPlayer({ ...newPlayer, role: e.target.value })}
-                    placeholder="e.g. XII Humanities"
-                    className="w-full bg-[#081736] border border-white/10 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-accent text-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-white/50 uppercase">Achievement *</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={newPlayer.achievement}
-                    onChange={(e) => setNewPlayer({ ...newPlayer, achievement: e.target.value })}
-                    placeholder="e.g. 8 Times National Player"
-                    className="w-full bg-[#081736] border border-white/10 rounded-xl px-4 py-3 text-xs font-semibold focus:outline-none focus:border-accent text-white"
-                  />
-                </div>
-                
-                <div className="sm:col-span-2 space-y-2">
-                  <label className="text-xs font-bold text-white/50 uppercase">Player Photo (Optional)</label>
-                  <div className="flex items-center gap-3">
-                    <input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={handlePlayerFileChange}
-                      className="hidden"
-                      id="player-photo-upload"
-                    />
-                    <label 
-                      htmlFor="player-photo-upload"
-                      className="bg-white/10 hover:bg-white/15 px-4 py-2.5 rounded-lg border border-white/5 text-xs font-bold cursor-pointer flex items-center gap-2"
-                    >
-                      <Upload size={14} />
-                      Choose Photo
-                    </label>
-                    {playerUploadPreview && (
-                      <div className="flex items-center gap-2 bg-[#081736] px-3 py-1 rounded-lg border border-accent/20">
-                        <img src={playerUploadPreview} alt="Preview" className="w-6 h-6 object-cover rounded-full" />
-                        <span className="text-[10px] text-white/60">Selected</span>
-                        <button type="button" onClick={() => { setNewPlayerFile(null); setPlayerUploadPreview(null); }} className="text-red-400 hover:text-red-500">
-                          <X size={12} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  {editingPlayerIndex !== null && (
-                    <button
-                      type="button"
-                      onClick={cancelPlayerEdit}
-                      className="mr-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider text-white/70 hover:bg-white/10"
-                    >
-                      Cancel
-                    </button>
-                  )}
-                  <button 
-                    type="submit" 
-                    disabled={uploadingPlayer}
-                    className="bg-white hover:bg-white/90 text-primary px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 disabled:opacity-50"
-                  >
-                    {uploadingPlayer ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
-                    {editingPlayerIndex === null ? "Add Player" : "Update Player"}
-                  </button>
-                </div>
-              </form>
-
-              {/* Player list */}
-              <div className="space-y-3">
-                {players.length === 0 ? (
-                  <p className="text-center py-6 text-white/40 text-xs font-semibold uppercase">No players registered yet</p>
-                ) : (
-                  players.map((p, idx) => (
-                    <div key={idx} className="bg-[#081736]/40 border border-white/5 rounded-xl p-4 flex items-center gap-4 justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-white/5 rounded-xl border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
-                          {p.image ? (
-                            <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <Users className="text-white/30" size={20} />
-                          )}
-                        </div>
-                        <div className="text-left">
-                          <h4 className="text-sm font-black text-white uppercase">{p.name}</h4>
-                          <p className="text-xs text-white/50 font-bold">{p.role}</p>
-                          <p className="text-[10px] text-accent font-bold uppercase mt-1 tracking-wider">{p.achievement}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => editPlayer(idx)}
-                          className="p-2 bg-accent/10 hover:bg-accent hover:text-primary text-accent rounded-lg transition-colors"
-                          aria-label={`Edit ${p.name}`}
-                        >
-                          <Pencil size={14} />
-                        </button>
-                        <button 
-                          onClick={() => deletePlayer(idx)}
-                          className="p-2 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 rounded-lg transition-colors"
-                          aria-label={`Delete ${p.name}`}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
+            <PlayerShowcasePanel
+              title="State Players Showcase"
+              badge="State"
+              achievementPlaceholder="e.g. State Player (Athletics)"
+              players={statePlayers}
+              onChange={(next) => {
+                setStatePlayers(next);
+                saveSportsData(complexImages, players, next, games, stats);
+              }}
+            />
 
             {/* Game Summaries & Selections */}
             <div className="rounded-2xl border border-white/15 bg-[#0f234f]/80 p-5 space-y-6">

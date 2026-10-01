@@ -60,6 +60,7 @@ export async function PUT(request: Request) {
       {
         complexImages: body.complexImages,
         players: body.players,
+        statePlayers: body.statePlayers || [],
         games: body.games,
         stats: body.stats
       },

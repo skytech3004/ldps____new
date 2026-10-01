@@ -22,6 +22,7 @@ const SportsSchema = new Schema(
     key: { type: String, required: true, unique: true, default: "main" },
     complexImages: { type: [String], default: [] }, // carousel images
     players: { type: [PlayerSchema], default: [] },
+    statePlayers: { type: [PlayerSchema], default: [] },
     games: { type: [GameSummarySchema], default: [] },
     stats: { type: [SportsStatSchema], default: [] },
   },
