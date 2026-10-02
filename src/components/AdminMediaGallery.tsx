@@ -102,6 +102,8 @@ export default function AdminMediaGallery() {
     return url.includes("youtube.com") || url.includes("youtu.be");
   };
 
+  const isPhotoTab = activeTab !== "video";
+
   useEffect(() => {
     let cancelled = false;
 
@@ -730,7 +732,7 @@ export default function AdminMediaGallery() {
                   }}
                   className="relative aspect-video bg-slate-900 cursor-pointer overflow-hidden flex items-center justify-center"
                 >
-                  {activeTab === "photo" ? (
+                  {isPhotoTab ? (
                     <img
                       src={item.src}
                       alt={item.alt}
@@ -781,7 +783,7 @@ export default function AdminMediaGallery() {
                     className="w-full px-3 py-2 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white rounded transition-colors flex items-center justify-center gap-2 font-semibold text-sm"
                   >
                     <Trash2 size={16} />
-                    Delete {activeTab === "photo" ? "Photo" : "Video"}
+                    Delete {isPhotoTab ? "Photo" : "Video"}
                   </button>
                 </div>
               </motion.div>
@@ -834,7 +836,7 @@ export default function AdminMediaGallery() {
                     onClick={(e) => e.stopPropagation()}
                     className="relative w-full max-w-4xl aspect-video flex flex-col items-center justify-center"
                   >
-                    {activeTab === "photo" ? (
+                    {isPhotoTab ? (
                       <img
                         src={previewItem.src}
                         alt={previewItem.alt}
@@ -876,7 +878,7 @@ export default function AdminMediaGallery() {
                       {previewItem.title}
                     </p>
                     <p className="text-[11px] md:text-xs font-bold text-slate-400 uppercase">
-                      {activeTab === "photo" ? "Photo" : "Video"} {currentItems.findIndex((item) => item._id === activePreview) + 1} of {currentItems.length}
+                      {isPhotoTab ? "Photo" : "Video"} {currentItems.findIndex((item) => item._id === activePreview) + 1} of {currentItems.length}
                     </p>
                   </div>
 

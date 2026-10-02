@@ -85,8 +85,6 @@ export default function Navbar() {
         { label: "Pre-Primary", href: "/pre-primary" },
         { label: "Day Schooling", href: "/day-schooling" },
         { label: "Hostel", href: "/hostel" },
-        //  { label: "Hostel Care", href: "/hostel-care" },
-        { label: "Meals", href: "/meals" },
         // { label: "A Day at School", href: "/a-day-at-school" },
         // { label: "Items Required By Boarders", href: "/items-required-by-boarders" },
         { label: "Investiture Ceremony", href: "/investiture-ceremony" },

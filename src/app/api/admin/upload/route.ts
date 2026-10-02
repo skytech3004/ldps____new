@@ -1,5 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import sharp from "sharp";
+import heicConvert from "heic-convert";
 
 export const runtime = "nodejs";
 
@@ -75,25 +77,122 @@ export async function POST(request: Request) {
     const now = new Date();
     const timestamp = now.toISOString().replace(/[:.]/g, "-");
     const parsedName = path.parse(file.name);
-    const extension = parsedName.ext || ".bin";
+    const extension = (parsedName.ext || ".bin").toLowerCase();
     const cleanBase = safeName(parsedName.name || "upload");
-    const cleanFileName = `${timestamp}-${cleanBase}${extension}`;
-
+    
+    const isImage = [".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif", ".avif", ".tif", ".tiff", ".bmp"].includes(extension);
     const projectRoot = process.cwd();
     const uploadFolder = path.join(projectRoot, "public", "uploads", SECTION_FOLDERS[section]);
-    const outputPath = path.join(uploadFolder, cleanFileName);
-
     await fs.mkdir(uploadFolder, { recursive: true });
-    await fs.writeFile(outputPath, bytes);
 
-    const src = `/uploads/${SECTION_FOLDERS[section]}/${cleanFileName}`;
+    let finalFileName = `${timestamp}-${cleanBase}${extension}`;
+    let finalPath = path.join(uploadFolder, finalFileName);
+
+    if (isImage) {
+      let processBuffer = bytes;
+
+      // Safe pre-decoding for HEIC/HEIF files if needed
+      if (extension === ".heic" || extension === ".heif") {
+        try {
+          const convertedBuffer = await heicConvert({
+            buffer: bytes,
+            format: "JPEG",
+            quality: 1,
+          });
+          processBuffer = Buffer.from(convertedBuffer);
+        } catch (heicErr) {
+          console.warn("heic-convert pre-decoding notice, using original buffer:", heicErr);
+          processBuffer = bytes;
+        }
+      }
+
+      // Safe defensive Sharp pipeline with explicit sRGB normalization to eliminate space=32 GLib errors
+      const createPipeline = (buf: Buffer) =>
+        sharp(buf, {
+          failOn: "none",
+          limitInputPixels: false,
+        })
+          .rotate()
+          .toColorspace("srgb");
+
+      let conversionDone = false;
+
+      // Tier 1: AVIF
+      try {
+        const avifFileName = `${timestamp}-${cleanBase}.avif`;
+        const avifPath = path.join(uploadFolder, avifFileName);
+        const avifBuffer = await createPipeline(processBuffer)
+          .avif({ quality: 80, effort: 4 })
+          .toBuffer();
+
+        await fs.writeFile(avifPath, avifBuffer);
+        finalFileName = avifFileName;
+        finalPath = avifPath;
+        conversionDone = true;
+      } catch (avifErr) {
+        console.warn("AVIF conversion warning, falling back to WebP:", avifErr);
+      }
+
+      // Tier 2: WebP Fallback
+      if (!conversionDone) {
+        try {
+          const webpFileName = `${timestamp}-${cleanBase}.webp`;
+          const webpPath = path.join(uploadFolder, webpFileName);
+          const webpBuffer = await createPipeline(processBuffer)
+            .webp({ quality: 85 })
+            .toBuffer();
+
+          await fs.writeFile(webpPath, webpBuffer);
+          finalFileName = webpFileName;
+          finalPath = webpPath;
+          conversionDone = true;
+        } catch (webpErr) {
+          console.warn("WebP conversion warning, falling back to JPEG:", webpErr);
+        }
+      }
+
+      // Tier 3: JPEG Fallback
+      if (!conversionDone) {
+        try {
+          const jpegFileName = `${timestamp}-${cleanBase}.jpg`;
+          const jpegPath = path.join(uploadFolder, jpegFileName);
+          const jpegBuffer = await createPipeline(processBuffer)
+            .jpeg({ quality: 85, mozjpeg: true })
+            .toBuffer();
+
+          await fs.writeFile(jpegPath, jpegBuffer);
+          finalFileName = jpegFileName;
+          finalPath = jpegPath;
+          conversionDone = true;
+        } catch (jpegErr) {
+          console.warn("JPEG conversion warning, preserving original raw file:", jpegErr);
+        }
+      }
+
+      // Tier 4: Write original bytes if all conversions fail
+      if (!conversionDone) {
+        finalFileName = `${timestamp}-${cleanBase}${extension}`;
+        finalPath = path.join(uploadFolder, finalFileName);
+        await fs.writeFile(finalPath, bytes);
+      }
+    } else {
+      await fs.writeFile(finalPath, bytes);
+    }
+
+    // Verify generated file exists and is non-empty
+    const fileStat = await fs.stat(finalPath);
+    if (!fileStat || fileStat.size === 0) {
+      throw new Error(`Generated image file at ${finalPath} is missing or empty.`);
+    }
+
+    const src = `/uploads/${SECTION_FOLDERS[section]}/${finalFileName}`;
     const record: UploadRecord = {
       id: `${Date.now()}`,
       page,
       section,
       title,
       description,
-      fileName: cleanFileName,
+      fileName: finalFileName,
       src,
       uploadedAt: now.toISOString(),
     };

@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import sharp from "sharp";
 
 export const runtime = "nodejs";
 
@@ -31,11 +32,29 @@ export async function GET(
       
       // Determine correct mime-type based on extension
       const ext = path.extname(diskPath).toLowerCase();
+
+      if (ext === ".heic" || ext === ".heif") {
+        const jpegPath = diskPath.replace(/\.heic$/i, ".jpg").replace(/\.heif$/i, ".jpg");
+        let jpeg: Buffer;
+        try {
+          jpeg = await fs.readFile(jpegPath);
+        } catch {
+          jpeg = await sharp(fileBuffer).rotate().jpeg({ quality: 85, mozjpeg: true }).toBuffer();
+          await fs.writeFile(jpegPath, jpeg);
+        }
+        return new Response(new Uint8Array(jpeg), {
+          headers: {
+            "Content-Type": "image/jpeg",
+            "Cache-Control": "public, max-age=31536000, immutable",
+          },
+        });
+      }
       let contentType = "application/octet-stream";
       
       if (ext === ".jpg" || ext === ".jpeg") contentType = "image/jpeg";
       else if (ext === ".png") contentType = "image/png";
       else if (ext === ".webp") contentType = "image/webp";
+      else if (ext === ".avif") contentType = "image/avif";
       else if (ext === ".gif") contentType = "image/gif";
       else if (ext === ".svg") contentType = "image/svg+xml";
       else if (ext === ".pdf") contentType = "application/pdf";

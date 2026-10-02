@@ -213,7 +213,7 @@ export default async function NoticeDetailPage({ params }: PageProps) {
                 </p>
                 <div className="w-28 h-[1px] bg-slate-200 my-1.5 ml-auto" />
                 <p className="text-xs font-bold text-slate-500 whitespace-pre-line leading-snug uppercase tracking-wide">
-                  {notice.signatory}
+                  {notice.signatory.split('\n')[1]}
                 </p>
               </div>
             </footer>

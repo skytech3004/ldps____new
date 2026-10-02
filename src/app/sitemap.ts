@@ -30,8 +30,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/pre-primary",
     "/day-schooling",
     "/hostel",
-    "/hostel-care",
-    "/meals",
     "/a-day-at-school",
     "/items-required-by-boarders",
     "/photo-gallery",

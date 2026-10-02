@@ -11,7 +11,7 @@ import {
   Shield, Tv, Sparkles, CheckCircle2, ChevronRight, HelpCircle, 
   Dumbbell, Users, Star, ChevronDown, Download, ArrowRight, 
   History, Shirt, Ban, CalendarRange, X, ChevronLeft, ImageIcon,
-  Activity, ShoppingBag, Heart, ShieldAlert
+  Activity, ShoppingBag, Heart, ShieldAlert, Utensils
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -109,6 +109,8 @@ export default function HostelPage() {
   const [activePhoto, setActivePhoto] = useState<number | null>(null);
   const [prospectusUrl, setProspectusUrl] = useState<string | null>(null);
   const [dbCareContent, setDbCareContent] = useState<DBCareContent | null>(null);
+  const [dbMealsContent, setDbMealsContent] = useState<DBCareContent | null>(null);
+  const [activeMealDay, setActiveMealDay] = useState<"weekday" | "saturday" | "sunday">("weekday");
 
   const [filters, setFilters] = useState<string[]>(["All", "Rooms", "Mess", "Campus"]);
 
@@ -136,6 +138,20 @@ export default function HostelPage() {
         }
       } catch (err) {
         console.error("Failed to fetch dynamic hostel care content:", err);
+      }
+    }
+
+    async function fetchMealsContent() {
+      try {
+        const res = await fetch("/api/admin/pages?slug=meals");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.sections && data.sections.length > 0) {
+            setDbMealsContent(data);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch meals content:", err);
       }
     }
 
@@ -188,7 +204,7 @@ export default function HostelPage() {
       }
     }
 
-    Promise.all([fetchHostelData(), fetchCareContent(), fetchHostelPhotos(), fetchHostelFilters(), checkProspectus()]);
+    Promise.all([fetchHostelData(), fetchCareContent(), fetchMealsContent(), fetchHostelPhotos(), fetchHostelFilters(), checkProspectus()]);
   }, []);
 
   const filteredPhotos = activeFilter === "All"
@@ -641,7 +657,7 @@ export default function HostelPage() {
       </section>
 
       {/* Hostel Care & Pastoral Wellbeing Section */}
-      <section id="care" className="py-32 md:py-40 px-6 bg-[#F8F9FC] relative overflow-hidden">
+      <section id="hostel-care" className="py-32 md:py-40 px-6 bg-[#F8F9FC] relative overflow-hidden">
         <div className="max-w-7xl mx-auto space-y-16">
           <div className="text-center space-y-4">
             <Reveal>
@@ -651,7 +667,7 @@ export default function HostelPage() {
             </Reveal>
             <Reveal width="100%">
               <h2 className="text-3xl md:text-5xl font-black text-[#3D348B] uppercase font-montserrat tracking-tight">
-                Hostel Care & Health
+                Hostel Care
               </h2>
             </Reveal>
             <p className="text-gray-500 font-medium text-sm md:text-base max-w-2xl mx-auto">
@@ -760,6 +776,168 @@ export default function HostelPage() {
               </div>
             </div>
           </FadeIn>
+        </div>
+      </section>
+
+      <section id="meals" className="py-32 md:py-40 px-6 bg-white border-t border-slate-100">
+        <div className="max-w-7xl mx-auto space-y-16">
+          <div className="text-center space-y-4">
+            <Reveal>
+              <span className="text-accent font-black uppercase tracking-[0.4em] text-xs block">Dining Hall</span>
+            </Reveal>
+            <Reveal width="100%">
+              <h2 className="text-3xl md:text-5xl font-black text-[#3D348B] uppercase font-montserrat tracking-tight">Hostel Meals</h2>
+            </Reveal>
+            <p className="text-gray-500 font-medium text-sm md:text-base max-w-2xl mx-auto">
+              A clean dining hall serving nutritious, freshly prepared Jain vegetarian food to boarders.
+            </p>
+            <div className="h-1 w-16 bg-accent mx-auto mt-2 rounded-full" />
+          </div>
+
+          {dbMealsContent && dbMealsContent.sections.length > 0 ? (
+            <FadeIn>
+              <div className="bg-[#F8F9FC] border border-slate-100 rounded-[2.5rem] p-8 md:p-12 shadow-premium-sm space-y-8">
+                <div className="border-l-4 border-accent pl-6">
+                  <h3 className="text-2xl md:text-3xl font-black text-[#3D348B] uppercase tracking-tight font-montserrat">{dbMealsContent.title}</h3>
+                  {dbMealsContent.status && <p className="text-gray-400 font-bold uppercase tracking-widest text-xs mt-1">{dbMealsContent.status}</p>}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {dbMealsContent.sections.map((section, sIdx) => (
+                    <article key={sIdx} className="bg-white border border-slate-100 rounded-[2rem] p-6 space-y-3">
+                      <h4 className="text-base font-black text-[#3D348B] uppercase tracking-tight flex items-center gap-2 font-montserrat">
+                        <span className="w-2 h-2 rounded-full bg-accent" />
+                        {section.title}
+                      </h4>
+                      <ul className="space-y-2.5">
+                        {section.content.map((line, lIdx) => (
+                          <li key={lIdx} className="text-gray-600 font-semibold text-xs leading-relaxed flex gap-3">
+                            <span className="text-accent mt-1 shrink-0">•</span>
+                            <span>{line}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </FadeIn>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  { label: "Dining Capacity", value: "400" },
+                  { label: "Daily Cycles", value: "4 Meals" },
+                  { label: "Diet Standard", value: "Jain Veg" },
+                  { label: "Kitchen Audits", value: "Daily" },
+                ].map((stat, idx) => (
+                  <FadeIn key={stat.label} delay={idx * 0.05}>
+                    <div className="bg-[#F8F9FC] border border-slate-100 rounded-[2rem] p-6 text-center shadow-premium-sm space-y-1">
+                      <p className="text-3xl md:text-4xl font-black text-[#3D348B]">{stat.value}</p>
+                      <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-[#7678ED]">{stat.label}</p>
+                    </div>
+                  </FadeIn>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div className="lg:col-span-7 space-y-6">
+                  <div className="space-y-3">
+                    <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">Mess Standard</span>
+                    <h3 className="text-3xl font-black text-[#3D348B] uppercase font-montserrat tracking-tight">Jain Vegetarian Dietary Guidelines</h3>
+                    <div className="h-1.5 w-24 bg-accent rounded-full" />
+                  </div>
+                  <p className="text-gray-500 font-medium leading-relaxed">
+                    In strict compliance with school heritage norms, all meals cooked in our central steam kitchen are 100% vegetarian. Items prohibited under Jain dietary vows (such as root vegetables like onions, garlic, potatoes) are strictly excluded from campus recipes.
+                  </p>
+                  <div className="space-y-3">
+                    {[
+                      "No root vegetables or non-vegetarian ingredients allowed on campus",
+                      "Automated washing and slicing systems to maintain hygiene",
+                      "Daily quality checks by school administrative managers",
+                    ].map((item) => (
+                      <div key={item} className="flex items-center gap-2 text-sm font-bold text-[#3D348B]/80">
+                        <CheckCircle2 size={16} className="text-accent shrink-0" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="lg:col-span-5 bg-[#3D348B] rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-xl">
+                  <div className="space-y-6 relative z-10">
+                    <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-accent">
+                      <Utensils size={24} />
+                    </div>
+                    <h3 className="text-2xl font-black uppercase font-montserrat tracking-tight">Central Dining Hall</h3>
+                    <p className="text-white/80 font-medium text-xs leading-relaxed">
+                      Our central dining block accommodates up to 400 boarders at a single time. Meals are served warm and in cycles to foster community bonds, shared conversations, and healthy eating practices.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-8">
+                <div className="text-center space-y-2">
+                  <span className="text-accent font-black uppercase tracking-[0.35em] text-xs block">Weekly Menu</span>
+                  <h3 className="text-3xl font-black text-[#3D348B] uppercase font-montserrat tracking-tight">Boarders Meals Calendar</h3>
+                  <div className="h-1.5 w-24 bg-accent mx-auto rounded-full" />
+                </div>
+                <div className="flex justify-center">
+                  <div className="bg-[#F8F9FC] border border-slate-100 p-2 rounded-2xl flex gap-2 shadow-md max-w-3xl w-full">
+                    {([
+                      ["weekday", "Weekdays (Mon - Fri)"],
+                      ["saturday", "Saturday (Choice Meal)"],
+                      ["sunday", "Sunday Special"],
+                    ] as const).map(([day, label]) => (
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={() => setActiveMealDay(day)}
+                        className={`flex-1 py-3 px-4 rounded-xl font-black text-xs md:text-sm uppercase tracking-wider transition-all ${
+                          activeMealDay === day ? "bg-[#3D348B] text-white shadow-md" : "text-[#3D348B]/70 hover:bg-white"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="max-w-4xl mx-auto space-y-4">
+                  {(activeMealDay === "weekday"
+                    ? [
+                        ["Breakfast", "Poha, Veg Upma, or Steamed Idli-Sambar paired with Warm Milk / Ginger Tea"],
+                        ["Lunch", "Steamed Basmati Rice, Yellow Arhar Dal, Fresh Wheat Butter Chapattis, Seasonal Green Vegetable, and Roasted Cumin Raita"],
+                        ["Evening Snacks", "Veg Sandwiches or Baked Methi Mathri served with hot Tea / Milk"],
+                        ["Dinner", "Light Moong Dal Khichdi, Besan Kadhi, or Seasonal Gourd Curry with Chapattis (Strictly before sunset options available)"],
+                        ["Bedtime Snack", "Warm Organic Milk accompanied by high-fiber glucose biscuits"],
+                      ]
+                    : activeMealDay === "saturday"
+                      ? [
+                          ["Breakfast", "Vikas Puri Sprouts, boiled grams, Milk/Tea"],
+                          ["Lunch (Special Choice)", "Special Dal-Baati Churma or Paneer Butter Masala with Butter Tandoori Roti"],
+                          ["Evening Snacks", "Spiced Corn Chaat or Samosa-Kachori with Milk/Tea"],
+                          ["Dinner", "Aloo Gobhi Adraki, Dal Fry with Tawa Parathas"],
+                          ["Bedtime Snack", "Warm Milk with dry fruits"],
+                        ]
+                      : [
+                          ["Breakfast", "Stuffed Paneer Paratha with fresh butter and curd"],
+                          ["Lunch", "Jeera Rice, Chole Masala, Bhatura, and Sweet Lassi"],
+                          ["Evening Snacks", "Dhokla with Green Chutney and Tea/Milk"],
+                          ["Dinner", "Mix Veg Jhalfrezi, Dal Tadka, and Roti"],
+                          ["Bedtime Snack", "Warm Milk with biscuits"],
+                        ]
+                  ).map(([meal, items], idx) => (
+                    <div key={meal} className="bg-[#F8F9FC] border border-slate-100 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <span className="w-8 h-8 rounded-lg bg-[#3D348B]/10 text-[#3D348B] text-xs font-black flex items-center justify-center">{idx + 1}</span>
+                        <h4 className="font-black text-sm text-[#3D348B] uppercase">{meal}</h4>
+                      </div>
+                      <p className="text-xs md:text-sm text-gray-500 font-semibold max-w-xl text-left sm:text-right">{items}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
